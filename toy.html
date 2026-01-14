@@ -265,7 +265,7 @@
     <script>
         const SUPABASE_URL = 'https://ehuwltjozobbbzsdygbo.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVodXdsdGpvem9iYmJ6c2R5Z2JvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ5NjAzNDQsImV4cCI6MjA4MDUzNjM0NH0.xSRT_UkN4RLK40R51mHtksb1u90M8y2FjzS45aXLGSI';
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         let priceChart = null;
         let amazonRankChart = null;
@@ -280,7 +280,7 @@
         document.addEventListener('DOMContentLoaded', async () => {
             // Check auth
             try {
-                const { data } = await supabase.auth.getSession();
+                const { data } = await supabaseClient.auth.getSession();
                 if (data?.session) {
                     currentUser = data.session.user;
                     updateNavAuth();
@@ -292,19 +292,30 @@
 
             const asin = getUrlParam('asin');
             if (!asin) {
+                console.error('No ASIN provided');
                 showError();
                 return;
             }
 
+            console.log('Loading toy:', asin);
+
             try {
-                const [priceData, fullToyData] = await Promise.all([
-                    fetchPriceHistory(asin),
-                    fetchToyByAsin(asin)
-                ]);
+                // Fetch price history first (this has all the data we need)
+                const priceData = await fetchPriceHistory(asin);
+                console.log('Price data:', priceData);
 
                 if (!priceData || !priceData.toy) {
+                    console.error('No toy data in response');
                     showError();
                     return;
+                }
+
+                // Try to get additional data but don't fail if it doesn't work
+                let fullToyData = {};
+                try {
+                    fullToyData = await fetchToyByAsin(asin) || {};
+                } catch (e) {
+                    console.log('Could not fetch additional toy data:', e);
                 }
 
                 toyData = {
@@ -312,9 +323,9 @@
                     tt_grade: fullToyData.tt_grade || priceData.toy.tt_grade,
                     tt_grade_score: fullToyData.tt_grade_score || priceData.toy.tt_grade_score,
                     category_toytap: fullToyData.category_toytap || priceData.toy.category_toytap,
-                    discount_percent: fullToyData.discount_percent,
-                    compare_price: fullToyData.compare_price,
-                    is_lowest_price_ever: fullToyData.is_lowest_price_ever
+                    discount_percent: fullToyData.discount_percent || priceData.toy.discount_percent,
+                    compare_price: fullToyData.compare_price || priceData.toy.compare_price,
+                    is_lowest_price_ever: fullToyData.is_lowest_price_ever || priceData.toy.is_lowest_price_ever
                 };
                 priceStats = priceData.price_stats || {};
                 dealAnalysis = priceData.deal_analysis || {};
