@@ -229,16 +229,12 @@
             margin-top: 4px;
         }
 
-        /* Chart Section */
-        .chart-section {
-            background: var(--bg-card);
-            border-radius: 20px;
-            padding: 24px;
+        /* Charts Section */
+        .charts-section {
             margin-bottom: 24px;
-            border: 1px solid rgba(109,195,213,0.15);
         }
 
-        .chart-header {
+        .charts-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -247,34 +243,10 @@
             gap: 12px;
         }
 
-        .chart-tabs {
-            display: flex;
-            gap: 4px;
-            background: rgba(0,0,0,0.3);
-            padding: 4px;
-            border-radius: 10px;
-        }
-
-        .chart-tab {
-            padding: 10px 16px;
-            background: transparent;
-            border: none;
-            border-radius: 8px;
-            font-size: 13px;
-            font-weight: 600;
-            color: #94a3b8;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-family: 'Inter', sans-serif;
-        }
-
-        .chart-tab:hover {
+        .charts-title {
+            font-size: 20px;
+            font-weight: 700;
             color: #fff;
-        }
-
-        .chart-tab.active {
-            background: var(--cyan);
-            color: var(--navy);
         }
 
         .chart-period-btns {
@@ -304,30 +276,70 @@
             color: var(--navy);
         }
 
-        .chart-container {
-            position: relative;
-            height: 300px;
+        .chart-block {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+            border: 1px solid rgba(109,195,213,0.15);
         }
 
-        .chart-legend {
+        .chart-block-header {
             display: flex;
-            justify-content: center;
-            gap: 24px;
-            margin-top: 16px;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
         }
 
-        .legend-item {
+        .chart-block-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .chart-block-legend {
             display: flex;
             align-items: center;
             gap: 8px;
-            font-size: 13px;
+            font-size: 12px;
             color: #94a3b8;
         }
 
         .legend-dot {
-            width: 12px;
-            height: 12px;
-            border-radius: 4px;
+            width: 10px;
+            height: 10px;
+            border-radius: 3px;
+            display: inline-block;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 200px;
+        }
+
+        /* ToyTap Rank Display */
+        .toytap-rank-display {
+            text-align: center;
+            padding: 24px 16px;
+        }
+
+        .toytap-rank-value {
+            font-size: 48px;
+            font-weight: 900;
+            color: var(--cyan);
+            font-family: 'JetBrains Mono', monospace;
+            margin-bottom: 8px;
+        }
+
+        .toytap-rank-label {
+            font-size: 14px;
+            color: #94a3b8;
+            margin-bottom: 8px;
+        }
+
+        .toytap-rank-note {
+            font-size: 12px;
+            color: #64748b;
         }
 
         /* Deal Analysis */
@@ -541,27 +553,49 @@
                 </div>
             </div>
 
-            <!-- Chart Section -->
-            <div class="chart-section">
-                <div class="chart-header">
-                    <div class="chart-tabs">
-                        <button class="chart-tab active" data-chart="price" onclick="setChartType('price')">Price</button>
-                        <button class="chart-tab" data-chart="amazon-rank" onclick="setChartType('amazon-rank')">Amazon Rank</button>
-                        <button class="chart-tab" data-chart="toytap-rank" onclick="setChartType('toytap-rank')">ToyTap Rank</button>
-                    </div>
+            <!-- Charts Section - All 3 Stacked -->
+            <div class="charts-section">
+                <div class="charts-header">
+                    <h3 class="charts-title">Price & Rank History</h3>
                     <div class="chart-period-btns">
                         <button class="period-btn" data-days="30" onclick="setPeriod(30)">30D</button>
                         <button class="period-btn active" data-days="90" onclick="setPeriod(90)">90D</button>
                         <button class="period-btn" data-days="365" onclick="setPeriod(365)">1Y</button>
                     </div>
                 </div>
-                <div class="chart-container">
-                    <canvas id="price-chart"></canvas>
+
+                <!-- Price Chart -->
+                <div class="chart-block">
+                    <div class="chart-block-header">
+                        <span class="chart-block-title">Price History</span>
+                        <span class="chart-block-legend"><span class="legend-dot" style="background: #ff9900;"></span> Amazon Price</span>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="price-chart"></canvas>
+                    </div>
                 </div>
-                <div class="chart-legend" id="chart-legend">
-                    <div class="legend-item">
-                        <div class="legend-dot" style="background: #ff9900;"></div>
-                        Amazon
+
+                <!-- Amazon Rank Chart -->
+                <div class="chart-block">
+                    <div class="chart-block-header">
+                        <span class="chart-block-title">Amazon Best Seller Rank</span>
+                        <span class="chart-block-legend"><span class="legend-dot" style="background: #10b981;"></span> Lower is better</span>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="amazon-rank-chart"></canvas>
+                    </div>
+                </div>
+
+                <!-- ToyTap Rank -->
+                <div class="chart-block toytap-rank-block">
+                    <div class="chart-block-header">
+                        <span class="chart-block-title">ToyTap Global Rank</span>
+                        <span class="chart-block-legend"><span class="legend-dot" style="background: #6DC3D5;"></span> Current ranking</span>
+                    </div>
+                    <div class="toytap-rank-display">
+                        <div class="toytap-rank-value" id="toytap-rank-value">#--</div>
+                        <div class="toytap-rank-label">out of 14,000+ toys tracked</div>
+                        <div class="toytap-rank-note">Based on TT Grade score combining reviews, ratings, and popularity</div>
                     </div>
                 </div>
             </div>
@@ -615,11 +649,11 @@
 <script src="js/api.js"></script>
 <script>
 let priceChart = null;
+let amazonRankChart = null;
 let priceHistory = [];
 let priceStats = {};
 let dealAnalysis = {};
 let currentPeriod = 90;
-let currentChartType = 'price';
 let toyData = null;
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -657,7 +691,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         priceHistory = priceData.price_history || [];
 
         renderProduct();
-        renderChart();
+        renderCharts();
         renderDealAnalysis();
 
         document.getElementById('loading').style.display = 'none';
@@ -772,20 +806,7 @@ function formatRank(rank) {
     return '#' + rank;
 }
 
-function setChartType(type) {
-    currentChartType = type;
-
-    // Update tab UI
-    document.querySelectorAll('.chart-tab').forEach(tab => {
-        tab.classList.toggle('active', tab.dataset.chart === type);
-    });
-
-    renderChart();
-}
-
-function renderChart() {
-    const ctx = document.getElementById('price-chart').getContext('2d');
-
+function renderCharts() {
     // Filter by period
     const cutoffDate = new Date();
     cutoffDate.setDate(cutoffDate.getDate() - currentPeriod);
@@ -802,105 +823,48 @@ function renderChart() {
         return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
     });
 
-    // Destroy existing chart
-    if (priceChart) {
-        priceChart.destroy();
-    }
+    // Destroy existing charts
+    if (priceChart) priceChart.destroy();
+    if (amazonRankChart) amazonRankChart.destroy();
 
-    // Configure based on chart type
-    let datasets = [];
-    let yAxisConfig = {};
-    let tooltipCallback = null;
-    let legendHtml = '';
-
-    if (currentChartType === 'price') {
-        const amazonPrices = filteredHistory.map(h => h.price);
-        datasets = [{
-            label: 'Price',
-            data: amazonPrices,
-            borderColor: '#ff9900',
-            backgroundColor: 'rgba(255, 153, 0, 0.1)',
-            fill: true,
-            tension: 0.3,
-            pointRadius: 2,
-            pointHoverRadius: 6
-        }];
-        yAxisConfig = {
-            ticks: {
-                color: '#64748b',
-                callback: (value) => '$' + value.toFixed(0)
+    // Common chart options
+    const commonOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: { display: false }
+        },
+        scales: {
+            x: {
+                grid: { color: 'rgba(255,255,255,0.05)' },
+                ticks: { color: '#64748b', maxTicksLimit: 8 }
             }
-        };
-        tooltipCallback = (context) => {
-            if (context.raw === null) return '';
-            return 'Price: $' + context.raw.toFixed(2);
-        };
-        legendHtml = '<div class="legend-item"><div class="legend-dot" style="background: #ff9900;"></div>Amazon Price</div>';
-    } else if (currentChartType === 'amazon-rank') {
-        const ranks = filteredHistory.map(h => h.rank || null);
-        datasets = [{
-            label: 'Amazon Rank',
-            data: ranks,
-            borderColor: '#10b981',
-            backgroundColor: 'rgba(16, 185, 129, 0.1)',
-            fill: true,
-            tension: 0.3,
-            pointRadius: 2,
-            pointHoverRadius: 6
-        }];
-        yAxisConfig = {
-            reverse: true, // Lower rank = better
-            ticks: {
-                color: '#64748b',
-                callback: (value) => '#' + value.toLocaleString()
-            }
-        };
-        tooltipCallback = (context) => {
-            if (context.raw === null) return '';
-            return 'Rank: #' + context.raw.toLocaleString();
-        };
-        legendHtml = '<div class="legend-item"><div class="legend-dot" style="background: #10b981;"></div>Amazon Best Seller Rank (lower is better)</div>';
-    } else if (currentChartType === 'toytap-rank') {
-        // ToyTap rank from toy_tap_rank_global - but we only have current, not history
-        // For now, show a flat line with current rank
-        const currentRank = toyData.toy_tap_rank_global || toyData.tt_rank || 0;
-        const ranks = filteredHistory.map(() => currentRank || null);
-        datasets = [{
-            label: 'ToyTap Rank',
-            data: ranks,
-            borderColor: '#6DC3D5',
-            backgroundColor: 'rgba(109, 195, 213, 0.1)',
-            fill: true,
-            tension: 0.3,
-            pointRadius: 2,
-            pointHoverRadius: 6
-        }];
-        yAxisConfig = {
-            reverse: true,
-            ticks: {
-                color: '#64748b',
-                callback: (value) => '#' + value.toLocaleString()
-            }
-        };
-        tooltipCallback = (context) => {
-            if (context.raw === null) return '';
-            return 'ToyTap Rank: #' + context.raw.toLocaleString();
-        };
-        legendHtml = '<div class="legend-item"><div class="legend-dot" style="background: #6DC3D5;"></div>ToyTap Global Rank (lower is better)</div>';
-    }
+        },
+        interaction: { mode: 'nearest', axis: 'x', intersect: false }
+    };
 
-    // Update legend
-    document.getElementById('chart-legend').innerHTML = legendHtml;
-
-    // Create chart
-    priceChart = new Chart(ctx, {
+    // 1. Price Chart
+    const priceCtx = document.getElementById('price-chart').getContext('2d');
+    const amazonPrices = filteredHistory.map(h => h.price);
+    priceChart = new Chart(priceCtx, {
         type: 'line',
-        data: { labels, datasets },
+        data: {
+            labels,
+            datasets: [{
+                label: 'Price',
+                data: amazonPrices,
+                borderColor: '#ff9900',
+                backgroundColor: 'rgba(255, 153, 0, 0.1)',
+                fill: true,
+                tension: 0.3,
+                pointRadius: 2,
+                pointHoverRadius: 6
+            }]
+        },
         options: {
-            responsive: true,
-            maintainAspectRatio: false,
+            ...commonOptions,
             plugins: {
-                legend: { display: false },
+                ...commonOptions.plugins,
                 tooltip: {
                     mode: 'index',
                     intersect: false,
@@ -910,22 +874,82 @@ function renderChart() {
                     borderColor: 'rgba(109,195,213,0.3)',
                     borderWidth: 1,
                     padding: 12,
-                    callbacks: { label: tooltipCallback }
+                    callbacks: {
+                        label: (context) => context.raw ? 'Price: $' + context.raw.toFixed(2) : ''
+                    }
                 }
             },
             scales: {
-                x: {
-                    grid: { color: 'rgba(255,255,255,0.05)' },
-                    ticks: { color: '#64748b', maxTicksLimit: 8 }
-                },
+                ...commonOptions.scales,
                 y: {
                     grid: { color: 'rgba(255,255,255,0.05)' },
-                    ...yAxisConfig
+                    ticks: {
+                        color: '#64748b',
+                        callback: (value) => '$' + value.toFixed(0)
+                    }
                 }
-            },
-            interaction: { mode: 'nearest', axis: 'x', intersect: false }
+            }
         }
     });
+
+    // 2. Amazon Rank Chart
+    const rankCtx = document.getElementById('amazon-rank-chart').getContext('2d');
+    const ranks = filteredHistory.map(h => h.rank || null);
+    amazonRankChart = new Chart(rankCtx, {
+        type: 'line',
+        data: {
+            labels,
+            datasets: [{
+                label: 'Amazon Rank',
+                data: ranks,
+                borderColor: '#10b981',
+                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                fill: true,
+                tension: 0.3,
+                pointRadius: 2,
+                pointHoverRadius: 6
+            }]
+        },
+        options: {
+            ...commonOptions,
+            plugins: {
+                ...commonOptions.plugins,
+                tooltip: {
+                    mode: 'index',
+                    intersect: false,
+                    backgroundColor: '#1a2234',
+                    titleColor: '#fff',
+                    bodyColor: '#94a3b8',
+                    borderColor: 'rgba(109,195,213,0.3)',
+                    borderWidth: 1,
+                    padding: 12,
+                    callbacks: {
+                        label: (context) => context.raw ? 'Rank: #' + context.raw.toLocaleString() : ''
+                    }
+                }
+            },
+            scales: {
+                ...commonOptions.scales,
+                y: {
+                    reverse: true,
+                    grid: { color: 'rgba(255,255,255,0.05)' },
+                    ticks: {
+                        color: '#64748b',
+                        callback: (value) => '#' + value.toLocaleString()
+                    }
+                }
+            }
+        }
+    });
+
+    // 3. ToyTap Rank Display (not a chart - just current value)
+    const toytapRank = toyData.toy_tap_rank_global || toyData.tt_rank || null;
+    const rankEl = document.getElementById('toytap-rank-value');
+    if (toytapRank) {
+        rankEl.textContent = '#' + toytapRank.toLocaleString();
+    } else {
+        rankEl.textContent = 'N/A';
+    }
 }
 
 function setPeriod(days) {
@@ -936,7 +960,7 @@ function setPeriod(days) {
         btn.classList.toggle('active', parseInt(btn.dataset.days) === days);
     });
 
-    renderChart();
+    renderCharts();
 }
 
 function renderDealAnalysis() {
