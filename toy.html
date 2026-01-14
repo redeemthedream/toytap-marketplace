@@ -603,16 +603,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     try {
-        const data = await fetchPriceHistory(asin);
-        if (!data || !data.toy) {
+        // Fetch both price history AND full toy data (for tt_grade)
+        const [priceData, fullToyData] = await Promise.all([
+            fetchPriceHistory(asin),
+            fetchToyByAsin(asin)
+        ]);
+
+        if (!priceData || !priceData.toy) {
             showError();
             return;
         }
 
-        toyData = data.toy;
-        priceStats = data.price_stats || {};
-        dealAnalysis = data.deal_analysis || {};
-        priceHistory = data.price_history || [];
+        // Merge data - fullToyData has tt_grade, priceData.toy has basics
+        toyData = { ...priceData.toy, ...fullToyData };
+        priceStats = priceData.price_stats || {};
+        dealAnalysis = priceData.deal_analysis || {};
+        priceHistory = priceData.price_history || [];
 
         renderProduct();
         renderChart();
@@ -625,6 +631,26 @@ document.addEventListener('DOMContentLoaded', async () => {
         showError();
     }
 });
+
+// Fetch full toy data by ASIN (includes tt_grade)
+async function fetchToyByAsin(asin) {
+    try {
+        // Check cache first
+        if (window.toyCache && window.toyCache[asin]) {
+            return window.toyCache[asin];
+        }
+        // Fetch from search API
+        const res = await fetch(`${API_BASE}/toys/search?q=${asin}&limit=1`);
+        const data = await res.json();
+        if (data.toys && data.toys.length > 0) {
+            return data.toys[0];
+        }
+        return {};
+    } catch (err) {
+        console.error('Fetch toy error:', err);
+        return {};
+    }
+}
 
 function renderProduct() {
     const toy = toyData;
