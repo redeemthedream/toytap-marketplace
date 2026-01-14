@@ -20,16 +20,20 @@ async function fetchToys(endpoint) {
 }
 
 async function fetchLeaderboard(limit = 100) {
-    return fetchToys(`/toys/leaderboard?limit=${limit}`);
+    const data = await fetchToys(`/toys/leaderboard?limit=${limit}`);
+    return data.toys || data || [];
 }
 
 async function fetchByCategory(category, subcategory = null, sort = 'score', limit = 100) {
     const cat = encodeURIComponent(category);
+    let data;
     if (subcategory) {
         const sub = encodeURIComponent(subcategory);
-        return fetchToys(`/toys/category/${cat}/${sub}?sort=${sort}&limit=${limit}`);
+        data = await fetchToys(`/toys/category/${cat}/${sub}?sort=${sort}&limit=${limit}`);
+    } else {
+        data = await fetchToys(`/toys/category/${cat}?sort=${sort}&limit=${limit}`);
     }
-    return fetchToys(`/toys/category/${cat}?sort=${sort}&limit=${limit}`);
+    return data.toys || data || [];
 }
 
 async function fetchByAge(age, sort = 'score', limit = 100) {
@@ -37,7 +41,8 @@ async function fetchByAge(age, sort = 'score', limit = 100) {
 }
 
 async function fetchByBrand(brand, sort = 'score', limit = 50) {
-    return fetchToys(`/toys/brand/${encodeURIComponent(brand)}?sort=${sort}&limit=${limit}`);
+    const data = await fetchToys(`/toys/brand/${encodeURIComponent(brand)}?sort=${sort}&limit=${limit}`);
+    return data.toys || data || [];
 }
 
 async function fetchPriceHistory(asin) {
