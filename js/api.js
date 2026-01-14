@@ -139,12 +139,15 @@ function renderToyCard(toy, options = {}) {
         rank = null,
         showGrade = true,
         showScore = false,
-        onClick = null
+        onClick = null,
+        linkToDetail = true  // NEW: default to linking to detail page
     } = options;
 
     const imageUrl = toy.image_url_proxied || toy.image_url || PLACEHOLDER_IMG;
     const hasDiscount = hasDeal(toy);
     const discountPct = getDiscountPercent(toy);
+    const isLowestEver = toy.is_lowest_price_ever || false;
+    const freshness = getFreshnessInfo(toy.updated_at);
 
     // Cache for modal
     window.toyCache[toy.asin] = toy;
@@ -170,11 +173,24 @@ function renderToyCard(toy, options = {}) {
         metricBadge = renderGradeBadge(toy.tt_grade, 'lg');
     }
 
-    const clickHandler = onClick || `openToyModal('${toy.asin}')`;
+    // Click handler - default to detail page, or custom onClick
+    const clickHandler = onClick || (linkToDetail ? `goToToyDetail('${toy.asin}')` : `openToyModal('${toy.asin}')`);
+
+    // Deal badge (top left)
+    const dealBadge = hasDiscount ? `<div class="toy-card-deal-badge">-${discountPct}%</div>` : '';
+
+    // Lowest ever badge (top right, above freshness)
+    const lowestBadge = isLowestEver ? `<div class="toy-card-lowest-badge">LOWEST EVER</div>` : '';
+
+    // Freshness badge
+    const freshnessBadge = `<div class="toy-card-freshness"><span class="freshness-pill ${freshness.class}">${freshness.label}</span></div>`;
 
     return `
         <div class="toy-card ${rankClass}" onclick="${clickHandler}">
             ${rankDisplay}
+            ${dealBadge}
+            ${lowestBadge}
+            ${freshnessBadge}
 
             <div class="toy-card-image-wrap">
                 <img src="${imageUrl}" alt="${toy.toy_name}" class="toy-card-image" onerror="this.src='${PLACEHOLDER_IMG}';">
@@ -196,6 +212,11 @@ function renderToyCard(toy, options = {}) {
             </div>
         </div>
     `;
+}
+
+// Navigate to toy detail page
+function goToToyDetail(asin) {
+    window.location.href = `toy.html?asin=${asin}`;
 }
 
 // ==================== MODAL ====================
@@ -245,7 +266,7 @@ function openToyModal(asin) {
             </div>
 
             <a href="${toy.affiliate_url || '#'}" target="_blank" class="modal-btn amazon">View on Amazon</a>
-            <a href="price.html?asin=${toy.asin}" class="modal-btn" style="background: var(--navy); color: #fff; margin-top: 10px;">📈 Price History</a>
+            <a href="toy.html?asin=${toy.asin}" class="modal-btn" style="background: var(--navy); color: #fff; margin-top: 10px;">View Full Details</a>
         </div>
     `;
 

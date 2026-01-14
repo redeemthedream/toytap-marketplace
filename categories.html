@@ -567,7 +567,7 @@ function sortToys() {
 function renderCategoryToys() {
     const toShow = toys.slice(0, visibleCount);
     document.getElementById('showing-count').textContent = toShow.length;
-    document.getElementById('toy-grid').innerHTML = toShow.map(toy => renderToyCard(toy, { showGrade: true })).join('');
+    document.getElementById('toy-grid').innerHTML = toShow.map(toy => renderToyCard(toy, { showGrade: true, linkToDetail: true })).join('');
     document.getElementById('show-more-btn').style.display = visibleCount < toys.length ? 'inline-flex' : 'none';
 }
 
@@ -646,7 +646,7 @@ function sortAgeToys() {
 function renderAgeToys() {
     const toShow = ageToys.slice(0, ageVisibleCount);
     document.getElementById('age-showing-count').textContent = toShow.length;
-    document.getElementById('age-toy-grid').innerHTML = toShow.map(toy => renderToyCard(toy, { showGrade: true })).join('');
+    document.getElementById('age-toy-grid').innerHTML = toShow.map(toy => renderToyCard(toy, { showGrade: true, linkToDetail: true })).join('');
     document.getElementById('age-show-more-btn').style.display = ageVisibleCount < ageToys.length ? 'inline-flex' : 'none';
 }
 

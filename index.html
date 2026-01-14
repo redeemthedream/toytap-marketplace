@@ -21,7 +21,7 @@
         /* Deals Page Specific Styles */
         .deals-hero {
             background: linear-gradient(135deg, #0a0e27 0%, var(--navy-dark) 50%, #1a1a2e 100%);
-            padding: 50px 20px 40px;
+            padding: 60px 20px 50px;
             text-align: center;
             position: relative;
             overflow: hidden;
@@ -39,11 +39,37 @@
             pointer-events: none;
         }
 
-        .deals-title {
-            font-size: clamp(28px, 6vw, 48px);
+        /* Hero Brand */
+        .hero-brand {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-logo {
+            height: 56px;
+            width: auto;
+        }
+
+        .hero-brand-text {
+            font-size: 42px;
             font-weight: 900;
+            background: linear-gradient(135deg, var(--cyan), #fff, var(--yellow));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.02em;
+        }
+
+        .deals-title {
+            font-size: clamp(24px, 5vw, 36px);
+            font-weight: 700;
             color: #fff;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
             position: relative;
             z-index: 1;
         }
@@ -51,9 +77,79 @@
         .deals-subtitle {
             font-size: 16px;
             color: rgba(255,255,255,0.7);
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Pulse Badge */
+        .pulse-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-size: 14px;
+            color: #10b981;
+            font-weight: 600;
             margin-bottom: 28px;
             position: relative;
             z-index: 1;
+        }
+
+        .pulse-badge strong {
+            color: #fff;
+        }
+
+        .pulse-dot {
+            width: 10px;
+            height: 10px;
+            background: #10b981;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+        }
+
+        /* Search Hints */
+        .search-hints {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 28px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hint-label {
+            font-size: 13px;
+            color: rgba(255,255,255,0.5);
+        }
+
+        .hint-chip {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: rgba(255,255,255,0.8);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .hint-chip:hover {
+            background: var(--cyan);
+            border-color: var(--cyan);
+            color: var(--navy);
         }
 
         /* Stats Bar */
@@ -402,10 +498,22 @@
 </header>
 
 <main class="page-wrapper">
-    <!-- Deals Hero -->
+    <!-- Hero Section -->
     <section class="deals-hero">
-        <h1 class="deals-title">Today's Best Toy Deals</h1>
-        <p class="deals-subtitle">Track prices across Amazon, Walmart & Target - Updated Daily</p>
+        <!-- Logo + Brand -->
+        <div class="hero-brand">
+            <img src="https://i.imgur.com/HXSawxU.png" alt="ToyTap" class="hero-logo" />
+            <span class="hero-brand-text">TOYTAP</span>
+        </div>
+
+        <h1 class="deals-title">The Smart Way to Buy Toys</h1>
+        <p class="deals-subtitle">Track prices, compare deals, and never overpay again</p>
+
+        <!-- Pulse Badge -->
+        <div class="pulse-badge">
+            <span class="pulse-dot"></span>
+            <span>Tracking <strong>14,000+</strong> Toys Live</span>
+        </div>
 
         <!-- Search Bar -->
         <div class="search-container">
@@ -416,17 +524,26 @@
                 type="text"
                 id="heroSearch"
                 class="search-input"
-                placeholder="Search 14,000+ toys..."
+                placeholder="Search toys, brands, or categories..."
                 onkeyup="handleSearch(event)"
             />
             <div id="searchResults" class="search-dropdown"></div>
+        </div>
+
+        <!-- Search Hints -->
+        <div class="search-hints">
+            <span class="hint-label">Popular:</span>
+            <button class="hint-chip" onclick="quickSearch('LEGO')">LEGO</button>
+            <button class="hint-chip" onclick="quickSearch('Fisher-Price')">Fisher-Price</button>
+            <button class="hint-chip" onclick="quickSearch('Hot Wheels')">Hot Wheels</button>
+            <button class="hint-chip" onclick="quickSearch('Melissa & Doug')">Melissa & Doug</button>
         </div>
 
         <!-- Stats Bar -->
         <div class="stats-bar">
             <div class="stat-item">
                 <div class="stat-value" id="stat-toys">--</div>
-                <div class="stat-label">Toys</div>
+                <div class="stat-label">Toys Tracked</div>
             </div>
             <div class="stat-item">
                 <div class="stat-value green" id="stat-deals">--</div>
@@ -732,66 +849,28 @@
             return;
         }
 
-        grid.innerHTML = toShow.map((toy, i) => renderDealCard(toy, i + 1)).join('');
+        // Use shared renderToyCard from api.js - links to toy detail page
+        grid.innerHTML = toShow.map((toy, i) => renderToyCard(toy, {
+            rank: i + 1 <= 3 ? i + 1 : null,
+            showGrade: true,
+            linkToDetail: true
+        })).join('');
 
         // Show/hide load more button
         const btn = document.getElementById('show-more-btn');
         btn.style.display = visibleCount < filteredToys.length ? 'inline-flex' : 'none';
     }
 
-    // Render deal card with freshness and discount badges
-    function renderDealCard(toy, rank) {
-        const imageUrl = toy.image_url_proxied || toy.image_url || PLACEHOLDER_IMG;
-        const hasDiscount = parseFloat(toy.discount_percent) > 0;
-        const discountPct = hasDiscount ? parseFloat(toy.discount_percent).toFixed(0) : 0;
-        const freshness = getFreshnessLabel(toy.updated_at);
-        const isWalmart = (toy.retailer || '').toLowerCase().includes('walmart');
-
-        // Cache for modal
-        window.toyCache[toy.asin] = toy;
-
-        // Rank display for top 3
-        let rankBadge = '';
-        if (rank <= 3) {
-            const medals = { 1: '&#129351;', 2: '&#129352;', 3: '&#129353;' };
-            rankBadge = `<div class="toy-card-rank top-3">${medals[rank]}</div>`;
-        }
-
-        return `
-            <div class="toy-card ${rank <= 3 ? 'rank-' + rank : ''}" onclick="openToyModal('${toy.asin}')">
-                ${rankBadge}
-
-                ${hasDiscount ? `<div class="toy-card-deal-badge">-${discountPct}%</div>` : ''}
-
-                <div class="toy-card-freshness">
-                    <span class="freshness-pill ${freshness.class}">${freshness.label}</span>
-                </div>
-
-                <div class="toy-card-image-wrap">
-                    <img src="${imageUrl}" alt="${toy.toy_name}" class="toy-card-image" onerror="this.src='${PLACEHOLDER_IMG}';">
-                    <div class="toy-card-metric">${renderGradeBadge(toy.tt_grade, 'lg')}</div>
-                </div>
-
-                <div class="toy-card-content">
-                    <div class="toy-card-brand">${toy.brand || 'Brand'}</div>
-                    <div class="toy-card-name">${toy.toy_name}</div>
-                    <div class="toy-card-info">
-                        <span>&#11088; ${toy.rating || 'N/A'}</span>
-                        <span>&#128172; ${(toy.reviews_count || 0).toLocaleString()}</span>
-                    </div>
-                    <div class="toy-card-price">
-                        $${formatPrice(toy.price)}
-                        ${hasDiscount ? `<span class="toy-card-original-price">$${formatPrice(toy.compare_price)}</span>` : ''}
-                    </div>
-                    ${isWalmart ? '<div class="walmart-badge">&#128154; Walmart</div>' : ''}
-                </div>
-            </div>
-        `;
-    }
-
     function showMore() {
         visibleCount += 24;
         renderToys();
+    }
+
+    // Quick search from hint chips
+    function quickSearch(brand) {
+        document.getElementById('heroSearch').value = brand;
+        // Navigate to brands page with brand selected
+        window.location.href = `brands.html?brand=${encodeURIComponent(brand)}`;
     }
 
     // Search functionality
@@ -820,7 +899,7 @@
                     results.innerHTML = toys.map(toy => {
                         window.toyCache[toy.asin] = toy;
                         return `
-                            <div class="search-result" onclick="openToyModal('${toy.asin}'); document.getElementById('searchResults').style.display='none';">
+                            <div class="search-result" onclick="goToToyDetail('${toy.asin}')">
                                 <img src="${toy.image_url_proxied || toy.image_url || PLACEHOLDER_IMG}" alt="" />
                                 <div class="search-result-info">
                                     <div class="search-result-name">${toy.toy_name}</div>

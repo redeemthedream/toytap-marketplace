@@ -499,11 +499,14 @@ function sortToys() {
     }
 }
 
-// Render toys
+// Render toys - use shared renderToyCard from api.js
 function renderToys() {
     const toShow = toys.slice(0, visibleCount);
     document.getElementById('showing-count').textContent = toShow.length;
-    document.getElementById('toy-grid').innerHTML = toShow.map(toy => renderToyCard(toy, { showGrade: true })).join('');
+    document.getElementById('toy-grid').innerHTML = toShow.map(toy => renderToyCard(toy, {
+        showGrade: true,
+        linkToDetail: true
+    })).join('');
     document.getElementById('show-more-btn').style.display = visibleCount < toys.length ? 'inline-flex' : 'none';
 }
 
