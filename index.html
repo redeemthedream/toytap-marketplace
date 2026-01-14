@@ -5,7 +5,7 @@
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
     <title>ToyTap - Track Toy Prices, Find the Best Deals</title>
 
-    <meta name="description" content="Track 14,000+ toys across Amazon, Walmart, and Target. Compare prices, see deal quality scores, and never overpay for toys again." />
+    <meta name="description" content="Track 14,000+ toys across Amazon, Walmart, and Target. Compare prices, see TT Grade scores, and never overpay for toys again." />
     <meta name="keywords" content="toy price tracker, toy deals, toy price comparison, Amazon toy deals, best toy prices" />
 
     <meta property="og:type" content="website" />
@@ -16,612 +16,428 @@
     <link rel="icon" type="image/png" href="https://i.imgur.com/HXSawxU.png" />
     <link rel="canonical" href="https://dashboard.gettoytap.com/" />
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@400,0&display=swap" rel="stylesheet"/>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        "primary": "#3EC3D5",
-                        "primary-dark": "#2BA8B9",
-                        "navy": "#0F172A",
-                    },
-                    fontFamily: {
-                        "sans": ["Inter", "system-ui", "sans-serif"]
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
-        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 500; }
-        .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-        .deal-card:hover { transform: translateY(-2px); }
-        .skeleton { background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; }
-        @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
-    </style>
+    <link rel="stylesheet" href="css/styles.css" />
 </head>
-<body class="bg-gray-50 font-sans text-navy antialiased">
+<body>
 
-<!-- Navigation -->
-<header class="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-100">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-        <a href="/" class="flex items-center gap-2">
-            <img src="https://i.imgur.com/HXSawxU.png" alt="ToyTap" class="h-9" />
+<!-- Header -->
+<header class="site-header">
+    <nav class="nav-container">
+        <a href="index.html">
+            <img src="https://i.imgur.com/HXSawxU.png" alt="ToyTap" class="nav-logo" />
         </a>
-        <nav class="hidden md:flex items-center gap-6">
-            <a href="#deals" class="text-sm font-medium text-gray-600 hover:text-navy transition-colors">Deals</a>
-            <a href="#categories" class="text-sm font-medium text-gray-600 hover:text-navy transition-colors">Categories</a>
-            <a href="#brands" class="text-sm font-medium text-gray-600 hover:text-navy transition-colors">Brands</a>
-            <a href="https://gettoytap.com" class="text-sm font-semibold text-primary hover:text-primary-dark transition-colors">For Businesses</a>
-        </nav>
-        <div class="flex items-center gap-3">
-            <button onclick="openSearch()" class="p-2 text-gray-500 hover:text-navy hover:bg-gray-100 rounded-lg transition-colors">
-                <span class="material-symbols-outlined">search</span>
-            </button>
+        <button class="nav-toggle" onclick="document.querySelector('.nav-links').classList.toggle('open')">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 12h18M3 6h18M3 18h18"/>
+            </svg>
+        </button>
+        <div class="nav-links">
+            <a href="index.html" class="nav-link active">Home</a>
+            <a href="rankings.html" class="nav-link">Rankings</a>
+            <a href="categories.html" class="nav-link">Categories</a>
+            <a href="brands.html" class="nav-link">Brands</a>
+            <a href="blog.html" class="nav-link">Blog</a>
+            <a href="watchlist.html" class="nav-link">Watchlist</a>
         </div>
-    </div>
+    </nav>
 </header>
 
-<main>
+<main class="page-wrapper">
     <!-- Hero Section -->
-    <section class="pt-12 pb-16 px-4 sm:px-6">
-        <div class="max-w-6xl mx-auto text-center">
-            <div class="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-1.5 rounded-full text-sm font-medium mb-6">
-                <span class="material-symbols-outlined text-lg">trending_up</span>
-                Tracking 14,000+ toys in real-time
+    <section class="hero">
+        <div class="hero-badge">Tracking 14,000+ toys</div>
+        <h1 class="hero-title">Never Overpay for Toys Again</h1>
+        <p class="hero-subtitle">
+            Track prices across Amazon, Walmart, and Target. See TT Grades, price history, and find the best time to buy.
+        </p>
+
+        <!-- Search Bar -->
+        <div style="max-width: 600px; margin: 32px auto 0; position: relative;">
+            <input
+                type="text"
+                id="heroSearch"
+                placeholder="Search for any toy..."
+                style="width: 100%; padding: 18px 20px 18px 54px; background: rgba(255,255,255,0.1); border: 1px solid rgba(109,195,213,0.3); border-radius: 16px; color: #fff; font-size: 16px; outline: none;"
+                onkeyup="handleSearch(event)"
+                onfocus="this.style.borderColor='var(--cyan)'"
+                onblur="this.style.borderColor='rgba(109,195,213,0.3)'"
+            />
+            <svg style="position: absolute; left: 18px; top: 50%; transform: translateY(-50%); opacity: 0.5;" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+            </svg>
+            <div id="searchResults" class="search-dropdown"></div>
+        </div>
+
+        <!-- Stats -->
+        <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 32px; margin-top: 40px; font-size: 14px; color: #94a3b8;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="color: var(--cyan);">14,000+</span> toys tracked
             </div>
-            <h1 class="text-4xl md:text-5xl font-black text-navy mb-4">
-                Never Overpay for Toys Again
-            </h1>
-            <p class="text-xl text-gray-600 max-w-2xl mx-auto mb-8">
-                Compare prices across Amazon, Walmart, and Target. See price history, deal scores, and find the best time to buy.
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="color: var(--cyan);">3</span> major retailers
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+                Updated <span style="color: var(--cyan);">daily</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Filter Tabs -->
+    <section class="filter-section">
+        <div class="filter-tabs">
+            <button class="filter-tab active" data-filter="quality" onclick="setFilter('quality')">Best Toys</button>
+            <button class="filter-tab" data-filter="value" onclick="setFilter('value')">Best Value</button>
+        </div>
+        <div id="tab-explanation" style="margin-top: 20px; padding: 14px 28px; background: rgba(255,255,255,0.06); border-radius: 12px; display: inline-block; border: 1px solid rgba(255,255,255,0.1);">
+            <p style="font-size: 15px; color: rgba(255,255,255,0.8); margin: 0;">
+                <strong style="color: var(--cyan);">TT Grade</strong> - Our quality rating based on reviews, ratings, and popularity
             </p>
-
-            <!-- Search Bar -->
-            <div class="max-w-xl mx-auto relative">
-                <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">search</span>
-                <input
-                    type="text"
-                    id="heroSearch"
-                    placeholder="Search for any toy..."
-                    class="w-full pl-12 pr-4 py-4 bg-white border border-gray-200 rounded-xl text-base focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 shadow-sm"
-                    onkeyup="handleSearchKeyup(event)"
-                />
-                <div id="searchResults" class="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-xl max-h-96 overflow-y-auto hidden z-50"></div>
-            </div>
-
-            <!-- Stats -->
-            <div class="flex flex-wrap justify-center gap-8 mt-10 text-sm">
-                <div class="flex items-center gap-2 text-gray-500">
-                    <span class="material-symbols-outlined text-primary">inventory_2</span>
-                    <span><strong class="text-navy">14,000+</strong> toys tracked</span>
-                </div>
-                <div class="flex items-center gap-2 text-gray-500">
-                    <span class="material-symbols-outlined text-primary">store</span>
-                    <span><strong class="text-navy">3</strong> major retailers</span>
-                </div>
-                <div class="flex items-center gap-2 text-gray-500">
-                    <span class="material-symbols-outlined text-primary">update</span>
-                    <span>Updated <strong class="text-navy">daily</strong></span>
-                </div>
-            </div>
         </div>
     </section>
 
-    <!-- Deals Section -->
-    <section id="deals" class="py-16 px-4 sm:px-6 bg-white">
-        <div class="max-w-6xl mx-auto">
-            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
-                <div>
-                    <h2 class="text-2xl md:text-3xl font-black text-navy">Today's Best Deals</h2>
-                    <p class="text-gray-500 mt-1">Real-time price drops and record lows</p>
-                </div>
-                <div class="flex gap-2 overflow-x-auto pb-2 sm:pb-0">
-                    <button onclick="loadDeals('hot')" id="filter-hot" class="filter-btn px-4 py-2 rounded-lg text-sm font-medium bg-primary text-white whitespace-nowrap">Hot Now</button>
-                    <button onclick="loadDeals('lowest')" id="filter-lowest" class="filter-btn px-4 py-2 rounded-lg text-sm font-medium bg-gray-100 text-gray-600 hover:bg-gray-200 whitespace-nowrap">Lowest Ever</button>
-                    <button onclick="loadDeals('biggest')" id="filter-biggest" class="filter-btn px-4 py-2 rounded-lg text-sm font-medium bg-gray-100 text-gray-600 hover:bg-gray-200 whitespace-nowrap">Biggest Drops</button>
-                    <button onclick="loadDeals('percent')" id="filter-percent" class="filter-btn px-4 py-2 rounded-lg text-sm font-medium bg-gray-100 text-gray-600 hover:bg-gray-200 whitespace-nowrap">% Off</button>
-                </div>
-            </div>
+    <!-- Toy Grid -->
+    <section class="toy-grid-section">
+        <div id="toy-grid" class="toy-grid">
+            <!-- Filled by JS -->
+        </div>
 
-            <!-- Deal Cards Grid -->
-            <div id="dealsGrid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                <!-- Skeleton loaders -->
-                <div class="skeleton h-80 rounded-xl"></div>
-                <div class="skeleton h-80 rounded-xl"></div>
-                <div class="skeleton h-80 rounded-xl"></div>
-                <div class="skeleton h-80 rounded-xl"></div>
-            </div>
-
-            <div class="text-center mt-8">
-                <button onclick="loadMoreDeals()" id="loadMoreBtn" class="px-6 py-3 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors">
-                    Load More Deals
-                </button>
-            </div>
+        <div style="text-align: center; margin-top: 40px;">
+            <button id="show-more-btn" class="btn btn-primary" onclick="showMore()" style="display: none;">
+                Show More Toys
+            </button>
         </div>
     </section>
 
-    <!-- Categories Section -->
-    <section id="categories" class="py-16 px-4 sm:px-6">
-        <div class="max-w-6xl mx-auto">
-            <h2 class="text-2xl md:text-3xl font-black text-navy mb-8 text-center">Shop by Category</h2>
-            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                <a href="/category/action-figures" class="group bg-white rounded-xl p-6 border border-gray-200 hover:border-primary hover:shadow-lg transition-all text-center">
-                    <span class="material-symbols-outlined text-3xl text-primary mb-3 block">robot</span>
-                    <span class="text-sm font-medium text-navy group-hover:text-primary">Action Figures</span>
-                </a>
-                <a href="/category/building-toys" class="group bg-white rounded-xl p-6 border border-gray-200 hover:border-primary hover:shadow-lg transition-all text-center">
-                    <span class="material-symbols-outlined text-3xl text-primary mb-3 block">construction</span>
-                    <span class="text-sm font-medium text-navy group-hover:text-primary">Building Toys</span>
-                </a>
-                <a href="/category/dolls" class="group bg-white rounded-xl p-6 border border-gray-200 hover:border-primary hover:shadow-lg transition-all text-center">
-                    <span class="material-symbols-outlined text-3xl text-primary mb-3 block">face</span>
-                    <span class="text-sm font-medium text-navy group-hover:text-primary">Dolls</span>
-                </a>
-                <a href="/category/games" class="group bg-white rounded-xl p-6 border border-gray-200 hover:border-primary hover:shadow-lg transition-all text-center">
-                    <span class="material-symbols-outlined text-3xl text-primary mb-3 block">casino</span>
-                    <span class="text-sm font-medium text-navy group-hover:text-primary">Games</span>
-                </a>
-                <a href="/category/outdoor" class="group bg-white rounded-xl p-6 border border-gray-200 hover:border-primary hover:shadow-lg transition-all text-center">
-                    <span class="material-symbols-outlined text-3xl text-primary mb-3 block">park</span>
-                    <span class="text-sm font-medium text-navy group-hover:text-primary">Outdoor</span>
-                </a>
-                <a href="/category/vehicles" class="group bg-white rounded-xl p-6 border border-gray-200 hover:border-primary hover:shadow-lg transition-all text-center">
-                    <span class="material-symbols-outlined text-3xl text-primary mb-3 block">directions_car</span>
-                    <span class="text-sm font-medium text-navy group-hover:text-primary">Vehicles</span>
-                </a>
-            </div>
-        </div>
-    </section>
+    <!-- How TT Grades Work -->
+    <section style="max-width: 900px; margin: 60px auto; padding: 0 20px;">
+        <h2 style="text-align: center; font-size: clamp(24px, 5vw, 36px); font-weight: 800; margin-bottom: 40px;">
+            How <span style="color: var(--cyan);">TT Grades</span> Work
+        </h2>
 
-    <!-- How TT Score Works -->
-    <section class="py-16 px-4 sm:px-6 bg-white">
-        <div class="max-w-4xl mx-auto">
-            <h2 class="text-2xl md:text-3xl font-black text-navy mb-4 text-center">How Our Deal Scores Work</h2>
-            <p class="text-gray-600 text-center mb-10">We analyze price history and market data to rate every deal</p>
-
-            <div class="grid sm:grid-cols-2 gap-6">
-                <div class="bg-gray-50 rounded-xl p-6">
-                    <h3 class="font-bold text-navy mb-4 flex items-center gap-2">
-                        <span class="w-8 h-8 bg-primary text-white rounded-lg flex items-center justify-center text-sm font-bold">TT</span>
-                        TT Score (Deal Quality)
-                    </h3>
-                    <div class="space-y-2 text-sm">
-                        <div class="flex items-center gap-3">
-                            <span class="w-8 h-6 bg-green-500 text-white rounded text-xs font-bold flex items-center justify-center">S</span>
-                            <span class="text-gray-600">Exceptional deal - lowest price ever or near it</span>
-                        </div>
-                        <div class="flex items-center gap-3">
-                            <span class="w-8 h-6 bg-green-400 text-white rounded text-xs font-bold flex items-center justify-center">A</span>
-                            <span class="text-gray-600">Great deal - well below average price</span>
-                        </div>
-                        <div class="flex items-center gap-3">
-                            <span class="w-8 h-6 bg-yellow-400 text-white rounded text-xs font-bold flex items-center justify-center">B</span>
-                            <span class="text-gray-600">Good deal - below average</span>
-                        </div>
-                        <div class="flex items-center gap-3">
-                            <span class="w-8 h-6 bg-orange-400 text-white rounded text-xs font-bold flex items-center justify-center">C</span>
-                            <span class="text-gray-600">Fair price - around average</span>
-                        </div>
-                        <div class="flex items-center gap-3">
-                            <span class="w-8 h-6 bg-red-400 text-white rounded text-xs font-bold flex items-center justify-center">D</span>
-                            <span class="text-gray-600">Wait for a better price</span>
-                        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px;">
+            <div style="background: var(--bg-card); border-radius: 16px; padding: 24px; border: 1px solid rgba(109,195,213,0.15);">
+                <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 16px; color: var(--cyan);">TT Grade (Quality)</h3>
+                <div style="display: flex; flex-direction: column; gap: 12px;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <span class="tt-grade-badge size-sm grade-s">S</span>
+                        <span style="color: #94a3b8; font-size: 14px;">Exceptional - top tier quality</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <span class="tt-grade-badge size-sm grade-a">A</span>
+                        <span style="color: #94a3b8; font-size: 14px;">Excellent - highly rated</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <span class="tt-grade-badge size-sm grade-b">B</span>
+                        <span style="color: #94a3b8; font-size: 14px;">Good - solid choice</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <span class="tt-grade-badge size-sm grade-c">C</span>
+                        <span style="color: #94a3b8; font-size: 14px;">Average - mixed reviews</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <span class="tt-grade-badge size-sm grade-d">D</span>
+                        <span style="color: #94a3b8; font-size: 14px;">Below average</span>
                     </div>
                 </div>
-                <div class="bg-gray-50 rounded-xl p-6">
-                    <h3 class="font-bold text-navy mb-4">What We Track</h3>
-                    <ul class="space-y-3 text-sm text-gray-600">
-                        <li class="flex items-start gap-2">
-                            <span class="material-symbols-outlined text-primary text-lg">check_circle</span>
-                            <span>Price history over 90+ days</span>
-                        </li>
-                        <li class="flex items-start gap-2">
-                            <span class="material-symbols-outlined text-primary text-lg">check_circle</span>
-                            <span>Lowest price ever recorded</span>
-                        </li>
-                        <li class="flex items-start gap-2">
-                            <span class="material-symbols-outlined text-primary text-lg">check_circle</span>
-                            <span>Average selling price</span>
-                        </li>
-                        <li class="flex items-start gap-2">
-                            <span class="material-symbols-outlined text-primary text-lg">check_circle</span>
-                            <span>Price across 3 retailers</span>
-                        </li>
-                        <li class="flex items-start gap-2">
-                            <span class="material-symbols-outlined text-primary text-lg">check_circle</span>
-                            <span>Review scores and ratings</span>
-                        </li>
-                    </ul>
-                </div>
+            </div>
+
+            <div style="background: var(--bg-card); border-radius: 16px; padding: 24px; border: 1px solid rgba(109,195,213,0.15);">
+                <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 16px; color: var(--yellow);">TT Score (Value)</h3>
+                <p style="color: #94a3b8; font-size: 14px; line-height: 1.7; margin-bottom: 16px;">
+                    Combines quality + current deal to show the best toys for your money <strong>right now</strong>.
+                </p>
+                <ul style="color: #94a3b8; font-size: 14px; line-height: 1.8;">
+                    <li style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                        <span style="color: var(--green);">&#10003;</span> Price vs. historical average
+                    </li>
+                    <li style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                        <span style="color: var(--green);">&#10003;</span> Current discount depth
+                    </li>
+                    <li style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                        <span style="color: var(--green);">&#10003;</span> Quality rating factored in
+                    </li>
+                    <li style="display: flex; align-items: center; gap: 8px;">
+                        <span style="color: var(--green);">&#10003;</span> Higher = better value
+                    </li>
+                </ul>
             </div>
         </div>
     </section>
 
-    <!-- Newsletter -->
-    <section class="py-16 px-4 sm:px-6">
-        <div class="max-w-xl mx-auto text-center">
-            <span class="material-symbols-outlined text-5xl text-primary mb-4">notifications_active</span>
-            <h2 class="text-2xl font-black text-navy mb-2">Get Deal Alerts</h2>
-            <p class="text-gray-600 mb-6">Be the first to know when prices drop on toys you're watching.</p>
-            <form class="flex gap-2" onsubmit="handleNewsletter(event)">
-                <input type="email" id="newsletterEmail" placeholder="your@email.com" required class="flex-1 px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-primary" />
-                <button type="submit" class="px-6 py-3 bg-primary text-white rounded-lg font-semibold hover:bg-primary-dark transition-colors">Subscribe</button>
-            </form>
+    <!-- Categories Preview -->
+    <section style="max-width: 1200px; margin: 60px auto; padding: 0 20px;">
+        <h2 style="text-align: center; font-size: clamp(24px, 5vw, 36px); font-weight: 800; margin-bottom: 40px;">
+            Browse by Category
+        </h2>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px;">
+            <a href="categories.html?cat=Building" class="category-card" style="background: var(--bg-card); border-radius: 16px; padding: 24px; text-align: center; border: 1px solid rgba(109,195,213,0.15); transition: all 0.3s; text-decoration: none;">
+                <div style="font-size: 36px; margin-bottom: 12px;">&#129521;</div>
+                <div style="font-size: 14px; font-weight: 600; color: #fff;">Building</div>
+            </a>
+            <a href="categories.html?cat=Vehicles" class="category-card" style="background: var(--bg-card); border-radius: 16px; padding: 24px; text-align: center; border: 1px solid rgba(109,195,213,0.15); transition: all 0.3s; text-decoration: none;">
+                <div style="font-size: 36px; margin-bottom: 12px;">&#128663;</div>
+                <div style="font-size: 14px; font-weight: 600; color: #fff;">Vehicles</div>
+            </a>
+            <a href="categories.html?cat=Outdoor" class="category-card" style="background: var(--bg-card); border-radius: 16px; padding: 24px; text-align: center; border: 1px solid rgba(109,195,213,0.15); transition: all 0.3s; text-decoration: none;">
+                <div style="font-size: 36px; margin-bottom: 12px;">&#127966;</div>
+                <div style="font-size: 14px; font-weight: 600; color: #fff;">Outdoor</div>
+            </a>
+            <a href="categories.html?cat=Baby & Toddler" class="category-card" style="background: var(--bg-card); border-radius: 16px; padding: 24px; text-align: center; border: 1px solid rgba(109,195,213,0.15); transition: all 0.3s; text-decoration: none;">
+                <div style="font-size: 36px; margin-bottom: 12px;">&#128118;</div>
+                <div style="font-size: 14px; font-weight: 600; color: #fff;">Baby & Toddler</div>
+            </a>
+            <a href="categories.html?cat=Educational" class="category-card" style="background: var(--bg-card); border-radius: 16px; padding: 24px; text-align: center; border: 1px solid rgba(109,195,213,0.15); transition: all 0.3s; text-decoration: none;">
+                <div style="font-size: 36px; margin-bottom: 12px;">&#127891;</div>
+                <div style="font-size: 14px; font-weight: 600; color: #fff;">Educational</div>
+            </a>
+            <a href="categories.html?cat=Pretend Play" class="category-card" style="background: var(--bg-card); border-radius: 16px; padding: 24px; text-align: center; border: 1px solid rgba(109,195,213,0.15); transition: all 0.3s; text-decoration: none;">
+                <div style="font-size: 36px; margin-bottom: 12px;">&#127917;</div>
+                <div style="font-size: 14px; font-weight: 600; color: #fff;">Pretend Play</div>
+            </a>
+        </div>
+        <div style="text-align: center; margin-top: 32px;">
+            <a href="categories.html" class="btn btn-secondary">View All Categories</a>
         </div>
     </section>
 </main>
 
 <!-- Footer -->
-<footer class="bg-navy py-12 px-4 sm:px-6">
-    <div class="max-w-6xl mx-auto">
-        <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
-            <div>
-                <img src="https://i.imgur.com/HXSawxU.png" alt="ToyTap" class="h-8 mb-4" />
-                <p class="text-gray-400 text-sm">Track toy prices. Find the best deals. Never overpay.</p>
-            </div>
-            <div>
-                <h4 class="text-white font-bold mb-4">Browse</h4>
-                <ul class="space-y-2 text-gray-400 text-sm">
-                    <li><a href="#deals" class="hover:text-white transition-colors">Today's Deals</a></li>
-                    <li><a href="#categories" class="hover:text-white transition-colors">Categories</a></li>
-                    <li><a href="#brands" class="hover:text-white transition-colors">Brands</a></li>
-                </ul>
-            </div>
-            <div>
-                <h4 class="text-white font-bold mb-4">For Businesses</h4>
-                <ul class="space-y-2 text-gray-400 text-sm">
-                    <li><a href="https://gettoytap.com" class="hover:text-white transition-colors">ToyTap for Venues</a></li>
-                    <li><a href="https://gettoytap.com/pricing" class="hover:text-white transition-colors">Pricing</a></li>
-                    <li><a href="https://partners.gettoytap.com" class="hover:text-white transition-colors">Partner Login</a></li>
-                </ul>
-            </div>
-            <div>
-                <h4 class="text-white font-bold mb-4">Company</h4>
-                <ul class="space-y-2 text-gray-400 text-sm">
-                    <li><a href="mailto:info@gettoytap.com" class="hover:text-white transition-colors">info@gettoytap.com</a></li>
-                    <li><a href="https://gettoytap.com/privacy" class="hover:text-white transition-colors">Privacy Policy</a></li>
-                    <li><a href="https://gettoytap.com/terms" class="hover:text-white transition-colors">Terms of Service</a></li>
-                </ul>
-            </div>
+<footer class="site-footer">
+    <div class="footer-container">
+        <img src="https://i.imgur.com/HXSawxU.png" alt="ToyTap" class="footer-logo" />
+        <div class="footer-links">
+            <a href="https://gettoytap.com" class="footer-link">For Businesses</a>
+            <a href="https://gettoytap.com/privacy" class="footer-link">Privacy</a>
+            <a href="https://gettoytap.com/terms" class="footer-link">Terms</a>
+            <a href="mailto:info@gettoytap.com" class="footer-link">Contact</a>
         </div>
-        <div class="pt-8 border-t border-white/10 text-center">
-            <p class="text-gray-500 text-sm">2025 ToyTap. All rights reserved.</p>
-        </div>
+        <p class="footer-copy">2025 ToyTap. All rights reserved.</p>
     </div>
 </footer>
 
-<!-- Product Modal -->
-<div id="productModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-[100] hidden" onclick="closeModal()">
-    <div class="bg-white rounded-2xl max-w-2xl w-[95%] max-h-[90vh] overflow-y-auto m-4" onclick="event.stopPropagation()">
-        <div id="modalContent" class="p-6">
+<!-- Modal -->
+<div id="toy-modal" class="toy-modal-overlay" onclick="if(event.target===this)closeToyModal()">
+    <div class="toy-modal">
+        <button class="modal-close" onclick="closeToyModal()">&times;</button>
+        <div id="modal-content-area">
             <!-- Filled by JS -->
         </div>
     </div>
 </div>
 
-<!-- Search Modal -->
-<div id="searchModal" class="fixed inset-0 bg-black/50 flex items-start justify-center z-[100] hidden pt-20" onclick="closeSearch()">
-    <div class="bg-white rounded-2xl max-w-xl w-[95%] m-4" onclick="event.stopPropagation()">
-        <div class="p-4">
-            <div class="relative">
-                <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">search</span>
-                <input
-                    type="text"
-                    id="modalSearchInput"
-                    placeholder="Search for any toy..."
-                    class="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-primary"
-                    onkeyup="handleModalSearchKeyup(event)"
-                    autofocus
-                />
-            </div>
-            <div id="modalSearchResults" class="mt-4 max-h-96 overflow-y-auto"></div>
-        </div>
-    </div>
-</div>
-
+<!-- Scripts -->
+<script src="js/api.js"></script>
 <script>
-const API_URL = 'https://hub.gettoytap.com';
-const AFFILIATE_TAG = 'toytap-20';
+    // Page-specific state
+    let allToys = [];
+    let currentFilter = 'quality';
+    let visibleCount = 12;
 
-let currentFilter = 'hot';
-let currentOffset = 0;
-const LIMIT = 12;
+    const TAB_CONFIG = {
+        quality: {
+            explanation: '<strong style="color: var(--cyan);">TT Grade</strong> - Our quality rating based on reviews, ratings, and popularity',
+            sortKey: 'tt_grade_score',
+            showGrade: true,
+            showScore: false
+        },
+        value: {
+            explanation: '<strong style="color: var(--yellow);">TT Score</strong> - Quality + deal combined. The best toy for your money right now',
+            sortKey: 'toy_tap_score',
+            showGrade: false,
+            showScore: true
+        }
+    };
 
-// Initialize
-document.addEventListener('DOMContentLoaded', () => {
-    loadDeals('hot');
-});
+    // Initialize
+    document.addEventListener('DOMContentLoaded', async () => {
+        showLoading(document.getElementById('toy-grid'));
 
-// Deal loading
-async function loadDeals(filter, append = false) {
-    if (!append) {
+        try {
+            allToys = await fetchLeaderboard(100);
+            filterAndRender();
+        } catch (err) {
+            showError(document.getElementById('toy-grid'));
+        }
+    });
+
+    function setFilter(filter) {
         currentFilter = filter;
-        currentOffset = 0;
-        updateFilterButtons(filter);
-    }
+        visibleCount = 12;
 
-    const grid = document.getElementById('dealsGrid');
-    if (!append) {
-        grid.innerHTML = '<div class="skeleton h-80 rounded-xl"></div>'.repeat(4);
-    }
-
-    try {
-        let endpoint;
-        switch(filter) {
-            case 'lowest': endpoint = '/toys/lowest-ever'; break;
-            case 'biggest': endpoint = '/toys/biggest-drops'; break;
-            case 'percent': endpoint = '/toys/percent-off'; break;
-            default: endpoint = '/toys/daily-deals';
-        }
-
-        const res = await fetch(`${API_URL}${endpoint}?limit=${LIMIT}&offset=${currentOffset}`);
-        const data = await res.json();
-        const toys = data.toys || data.deals || data || [];
-
-        if (!append) {
-            grid.innerHTML = '';
-        }
-
-        toys.forEach(toy => {
-            grid.innerHTML += createDealCard(toy);
+        // Update tab UI
+        document.querySelectorAll('.filter-tab').forEach(tab => {
+            tab.classList.toggle('active', tab.dataset.filter === filter);
         });
 
-        currentOffset += toys.length;
+        // Update explanation
+        document.getElementById('tab-explanation').innerHTML = `<p style="font-size: 15px; color: rgba(255,255,255,0.8); margin: 0;">${TAB_CONFIG[filter].explanation}</p>`;
 
-        // Hide load more if no more results
-        document.getElementById('loadMoreBtn').style.display = toys.length < LIMIT ? 'none' : 'inline-block';
-
-    } catch (err) {
-        console.error('Failed to load deals:', err);
-        grid.innerHTML = '<p class="col-span-full text-center text-gray-500 py-8">Failed to load deals. Please try again.</p>';
-    }
-}
-
-function loadMoreDeals() {
-    loadDeals(currentFilter, true);
-}
-
-function updateFilterButtons(active) {
-    document.querySelectorAll('.filter-btn').forEach(btn => {
-        btn.classList.remove('bg-primary', 'text-white');
-        btn.classList.add('bg-gray-100', 'text-gray-600');
-    });
-    document.getElementById(`filter-${active}`).classList.remove('bg-gray-100', 'text-gray-600');
-    document.getElementById(`filter-${active}`).classList.add('bg-primary', 'text-white');
-}
-
-function createDealCard(toy) {
-    const price = toy.current_price || toy.price || 0;
-    const originalPrice = toy.list_price || toy.original_price || price;
-    const discount = originalPrice > price ? Math.round((1 - price/originalPrice) * 100) : 0;
-    const grade = toy.tt_grade || toy.deal_score || 'B';
-    const gradeColor = getGradeColor(grade);
-
-    return `
-        <div class="deal-card bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition-all cursor-pointer" onclick="openProductModal('${toy.asin}')">
-            <div class="relative">
-                <img src="${toy.image_url || toy.image || ''}" alt="${toy.toy_name || toy.name || ''}" class="w-full h-40 object-contain bg-gray-50 p-4" loading="lazy" />
-                ${discount > 0 ? `<span class="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">${discount}% OFF</span>` : ''}
-                <span class="absolute top-2 right-2 ${gradeColor} text-white text-xs font-bold px-2 py-1 rounded">${grade}</span>
-            </div>
-            <div class="p-4">
-                <p class="text-xs text-gray-500 mb-1">${toy.brand || ''}</p>
-                <h3 class="font-medium text-sm text-navy line-clamp-2 mb-2">${toy.toy_name || toy.name || ''}</h3>
-                <div class="flex items-baseline gap-2">
-                    <span class="text-lg font-bold text-navy">$${price.toFixed(2)}</span>
-                    ${originalPrice > price ? `<span class="text-sm text-gray-400 line-through">$${originalPrice.toFixed(2)}</span>` : ''}
-                </div>
-                ${toy.rating ? `
-                <div class="flex items-center gap-1 mt-2">
-                    <span class="material-symbols-outlined text-yellow-400 text-sm">star</span>
-                    <span class="text-xs text-gray-600">${toy.rating} (${toy.review_count || 0})</span>
-                </div>
-                ` : ''}
-            </div>
-        </div>
-    `;
-}
-
-function getGradeColor(grade) {
-    const colors = {
-        'S': 'bg-green-500',
-        'A': 'bg-green-400',
-        'B': 'bg-yellow-400',
-        'C': 'bg-orange-400',
-        'D': 'bg-red-400'
-    };
-    return colors[grade] || 'bg-gray-400';
-}
-
-// Product Modal
-async function openProductModal(asin) {
-    const modal = document.getElementById('productModal');
-    const content = document.getElementById('modalContent');
-
-    content.innerHTML = '<div class="flex items-center justify-center py-12"><div class="w-8 h-8 border-2 border-gray-200 border-t-primary rounded-full animate-spin"></div></div>';
-    modal.classList.remove('hidden');
-
-    try {
-        // Fetch toy details and price history
-        const [toyRes, historyRes] = await Promise.all([
-            fetch(`${API_URL}/toys/search?q=${asin}&limit=1`),
-            fetch(`${API_URL}/toys/${asin}/price-history`)
-        ]);
-
-        const toyData = await toyRes.json();
-        const historyData = await historyRes.json();
-
-        const toy = toyData.toys?.[0] || toyData[0] || {};
-        const history = historyData.price_history || historyData || [];
-
-        content.innerHTML = createModalContent(toy, history);
-
-    } catch (err) {
-        console.error('Failed to load product:', err);
-        content.innerHTML = '<p class="text-center text-gray-500 py-8">Failed to load product details.</p>';
-    }
-}
-
-function createModalContent(toy, history) {
-    const price = toy.current_price || toy.price || 0;
-    const originalPrice = toy.list_price || toy.original_price || price;
-    const lowestPrice = toy.lowest_price || Math.min(...history.map(h => h.price || h.current_price || Infinity)) || price;
-    const amazonUrl = `https://www.amazon.com/dp/${toy.asin}?tag=${AFFILIATE_TAG}`;
-
-    return `
-        <div class="flex justify-between items-start mb-4">
-            <div class="flex-1">
-                <p class="text-sm text-gray-500">${toy.brand || ''}</p>
-                <h2 class="text-xl font-bold text-navy">${toy.toy_name || toy.name || ''}</h2>
-            </div>
-            <button onclick="closeModal()" class="p-2 hover:bg-gray-100 rounded-lg">
-                <span class="material-symbols-outlined">close</span>
-            </button>
-        </div>
-
-        <div class="flex flex-col sm:flex-row gap-6 mb-6">
-            <div class="sm:w-1/2">
-                <img src="${toy.image_url || toy.image || ''}" alt="" class="w-full h-64 object-contain bg-gray-50 rounded-xl" />
-            </div>
-            <div class="sm:w-1/2">
-                <div class="mb-4">
-                    <span class="text-3xl font-bold text-navy">$${price.toFixed(2)}</span>
-                    ${originalPrice > price ? `<span class="text-lg text-gray-400 line-through ml-2">$${originalPrice.toFixed(2)}</span>` : ''}
-                </div>
-
-                <div class="grid grid-cols-2 gap-3 mb-6 text-sm">
-                    <div class="bg-gray-50 rounded-lg p-3">
-                        <p class="text-gray-500">Lowest Ever</p>
-                        <p class="font-bold text-navy">$${lowestPrice.toFixed(2)}</p>
-                    </div>
-                    <div class="bg-gray-50 rounded-lg p-3">
-                        <p class="text-gray-500">TT Grade</p>
-                        <p class="font-bold text-navy">${toy.tt_grade || toy.deal_score || 'B'}</p>
-                    </div>
-                </div>
-
-                <a href="${amazonUrl}" target="_blank" rel="noopener noreferrer" class="block w-full py-3 bg-[#FF9900] text-white text-center font-semibold rounded-lg hover:bg-[#e8880a] transition-colors">
-                    View on Amazon
-                </a>
-            </div>
-        </div>
-
-        ${history.length > 0 ? `
-        <div>
-            <h3 class="font-bold text-navy mb-3">Price History</h3>
-            <div class="bg-gray-50 rounded-xl p-4 h-32 flex items-end gap-1">
-                ${createPriceChart(history)}
-            </div>
-        </div>
-        ` : ''}
-    `;
-}
-
-function createPriceChart(history) {
-    if (!history.length) return '';
-
-    const prices = history.slice(-30).map(h => h.price || h.current_price || 0);
-    const max = Math.max(...prices);
-    const min = Math.min(...prices);
-    const range = max - min || 1;
-
-    return prices.map((price, i) => {
-        const height = ((price - min) / range) * 80 + 20;
-        return `<div class="flex-1 bg-primary/60 rounded-t hover:bg-primary transition-colors" style="height: ${height}%" title="$${price.toFixed(2)}"></div>`;
-    }).join('');
-}
-
-function closeModal() {
-    document.getElementById('productModal').classList.add('hidden');
-}
-
-// Search
-let searchTimeout;
-
-function handleSearchKeyup(e) {
-    clearTimeout(searchTimeout);
-    const query = e.target.value.trim();
-
-    if (query.length < 2) {
-        document.getElementById('searchResults').classList.add('hidden');
-        return;
+        filterAndRender();
     }
 
-    searchTimeout = setTimeout(() => searchToys(query, 'searchResults'), 300);
-}
+    function filterAndRender() {
+        const config = TAB_CONFIG[currentFilter];
+        let filtered = [...allToys];
 
-function handleModalSearchKeyup(e) {
-    clearTimeout(searchTimeout);
-    const query = e.target.value.trim();
-
-    if (query.length < 2) {
-        document.getElementById('modalSearchResults').innerHTML = '';
-        return;
-    }
-
-    searchTimeout = setTimeout(() => searchToys(query, 'modalSearchResults'), 300);
-}
-
-async function searchToys(query, targetId) {
-    const container = document.getElementById(targetId);
-
-    try {
-        const res = await fetch(`${API_URL}/toys/search?q=${encodeURIComponent(query)}&limit=10`);
-        const data = await res.json();
-        const toys = data.toys || data || [];
-
-        if (toys.length === 0) {
-            container.innerHTML = '<p class="text-gray-500 text-center py-4">No toys found</p>';
+        // Sort based on filter
+        if (currentFilter === 'quality') {
+            filtered = filtered.filter(t => t.tt_grade_score && parseFloat(t.tt_grade_score) > 0);
+            filtered.sort((a, b) => (parseFloat(b.tt_grade_score) || 0) - (parseFloat(a.tt_grade_score) || 0));
         } else {
-            container.innerHTML = toys.map(toy => `
-                <div class="flex items-center gap-3 p-3 hover:bg-gray-50 rounded-lg cursor-pointer" onclick="openProductModal('${toy.asin}'); closeSearch();">
-                    <img src="${toy.image_url || toy.image || ''}" alt="" class="w-12 h-12 object-contain bg-gray-100 rounded" />
-                    <div class="flex-1 min-w-0">
-                        <p class="text-sm font-medium text-navy truncate">${toy.toy_name || toy.name || ''}</p>
-                        <p class="text-xs text-gray-500">${toy.brand || ''}</p>
-                    </div>
-                    <span class="text-sm font-bold text-navy">$${(toy.current_price || toy.price || 0).toFixed(2)}</span>
-                </div>
-            `).join('');
+            filtered = filtered.filter(t => t.toy_tap_score && parseFloat(t.toy_tap_score) > 0);
+            filtered.sort((a, b) => (parseFloat(b.toy_tap_score) || 0) - (parseFloat(a.toy_tap_score) || 0));
         }
 
-        container.classList.remove('hidden');
-    } catch (err) {
-        console.error('Search failed:', err);
+        // Render cards
+        const toShow = filtered.slice(0, visibleCount);
+        const grid = document.getElementById('toy-grid');
+
+        grid.innerHTML = toShow.map((toy, i) =>
+            renderToyCard(toy, {
+                rank: i + 1,
+                showGrade: config.showGrade,
+                showScore: config.showScore
+            })
+        ).join('');
+
+        // Show/hide load more button
+        const btn = document.getElementById('show-more-btn');
+        btn.style.display = visibleCount < filtered.length ? 'inline-flex' : 'none';
     }
-}
 
-function openSearch() {
-    document.getElementById('searchModal').classList.remove('hidden');
-    document.getElementById('modalSearchInput').focus();
-}
-
-function closeSearch() {
-    document.getElementById('searchModal').classList.add('hidden');
-    document.getElementById('heroSearch').value = '';
-    document.getElementById('searchResults').classList.add('hidden');
-}
-
-// Newsletter
-function handleNewsletter(e) {
-    e.preventDefault();
-    const email = document.getElementById('newsletterEmail').value;
-    alert('Thanks! You\'ll receive deal alerts at ' + email);
-    document.getElementById('newsletterEmail').value = '';
-}
-
-// Close modals on escape
-document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-        closeModal();
-        closeSearch();
+    function showMore() {
+        visibleCount += 12;
+        filterAndRender();
     }
-});
+
+    // Search functionality
+    let searchTimeout;
+
+    function handleSearch(e) {
+        clearTimeout(searchTimeout);
+        const query = e.target.value.trim();
+        const results = document.getElementById('searchResults');
+
+        if (query.length < 2) {
+            results.innerHTML = '';
+            results.style.display = 'none';
+            return;
+        }
+
+        searchTimeout = setTimeout(async () => {
+            try {
+                const res = await fetch(`${API_BASE}/toys/search?q=${encodeURIComponent(query)}&limit=8`);
+                const data = await res.json();
+                const toys = data.toys || data || [];
+
+                if (toys.length === 0) {
+                    results.innerHTML = '<div style="padding: 20px; text-align: center; color: #94a3b8;">No toys found</div>';
+                } else {
+                    results.innerHTML = toys.map(toy => {
+                        window.toyCache[toy.asin] = toy;
+                        return `
+                            <div class="search-result" onclick="openToyModal('${toy.asin}'); document.getElementById('searchResults').style.display='none';">
+                                <img src="${toy.image_url_proxied || toy.image_url || PLACEHOLDER_IMG}" alt="" />
+                                <div class="search-result-info">
+                                    <div class="search-result-name">${toy.toy_name}</div>
+                                    <div class="search-result-brand">${toy.brand || ''}</div>
+                                </div>
+                                <div class="search-result-price">$${formatPrice(toy.price)}</div>
+                            </div>
+                        `;
+                    }).join('');
+                }
+                results.style.display = 'block';
+            } catch (err) {
+                console.error('Search error:', err);
+            }
+        }, 300);
+    }
+
+    // Close search on click outside
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('#heroSearch') && !e.target.closest('#searchResults')) {
+            document.getElementById('searchResults').style.display = 'none';
+        }
+    });
 </script>
+
+<style>
+    /* Search dropdown styles */
+    .search-dropdown {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: var(--bg-card);
+        border: 1px solid rgba(109,195,213,0.2);
+        border-radius: 12px;
+        margin-top: 8px;
+        max-height: 400px;
+        overflow-y: auto;
+        z-index: 100;
+        display: none;
+    }
+
+    .search-result {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 16px;
+        cursor: pointer;
+        transition: background 0.2s;
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .search-result:hover {
+        background: rgba(109,195,213,0.1);
+    }
+
+    .search-result:last-child {
+        border-bottom: none;
+    }
+
+    .search-result img {
+        width: 48px;
+        height: 48px;
+        object-fit: contain;
+        background: #fff;
+        border-radius: 8px;
+    }
+
+    .search-result-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .search-result-name {
+        font-size: 14px;
+        font-weight: 600;
+        color: #fff;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .search-result-brand {
+        font-size: 12px;
+        color: var(--cyan);
+    }
+
+    .search-result-price {
+        font-size: 16px;
+        font-weight: 700;
+        color: #fff;
+        font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Category card hover */
+    .category-card:hover {
+        background: rgba(109,195,213,0.1) !important;
+        border-color: var(--cyan) !important;
+        transform: translateY(-4px);
+    }
+</style>
 
 </body>
 </html>

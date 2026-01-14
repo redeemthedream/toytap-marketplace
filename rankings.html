@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Toy Rankings - ToyTap</title>
+    <meta name="description" content="See the best toys ranked by quality and value. Find top-rated toys with TT Grades." />
+    <link rel="icon" type="image/png" href="https://i.imgur.com/HXSawxU.png" />
+    <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+
+<header class="site-header">
+    <nav class="nav-container">
+        <a href="index.html"><img src="https://i.imgur.com/HXSawxU.png" alt="ToyTap" class="nav-logo" /></a>
+        <button class="nav-toggle" onclick="document.querySelector('.nav-links').classList.toggle('open')">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+        </button>
+        <div class="nav-links">
+            <a href="index.html" class="nav-link">Home</a>
+            <a href="rankings.html" class="nav-link active">Rankings</a>
+            <a href="categories.html" class="nav-link">Categories</a>
+            <a href="brands.html" class="nav-link">Brands</a>
+            <a href="blog.html" class="nav-link">Blog</a>
+            <a href="watchlist.html" class="nav-link">Watchlist</a>
+        </div>
+    </nav>
+</header>
+
+<main class="page-wrapper">
+    <section class="hero">
+        <h1 class="hero-title">Toy Rankings</h1>
+        <p class="hero-subtitle" id="subtitle">The best toys, ranked by quality</p>
+    </section>
+
+    <section class="filter-section">
+        <div class="filter-tabs">
+            <button class="filter-tab active" data-filter="quality" onclick="setFilter('quality')">Best Toys</button>
+            <button class="filter-tab" data-filter="value" onclick="setFilter('value')">Best Value</button>
+        </div>
+    </section>
+
+    <section class="toy-grid-section">
+        <div id="toy-grid" class="toy-grid"></div>
+        <div style="text-align: center; margin-top: 40px;">
+            <button id="show-more-btn" class="btn btn-primary" onclick="showMore()" style="display: none;">Show More</button>
+        </div>
+    </section>
+</main>
+
+<footer class="site-footer">
+    <div class="footer-container">
+        <img src="https://i.imgur.com/HXSawxU.png" alt="ToyTap" class="footer-logo" />
+        <div class="footer-links">
+            <a href="https://gettoytap.com" class="footer-link">For Businesses</a>
+            <a href="https://gettoytap.com/privacy" class="footer-link">Privacy</a>
+            <a href="https://gettoytap.com/terms" class="footer-link">Terms</a>
+        </div>
+        <p class="footer-copy">2025 ToyTap. All rights reserved.</p>
+    </div>
+</footer>
+
+<div id="toy-modal" class="toy-modal-overlay">
+    <div class="toy-modal">
+        <button class="modal-close" onclick="closeToyModal()">&times;</button>
+        <div id="modal-content-area"></div>
+    </div>
+</div>
+
+<script src="js/api.js"></script>
+<script>
+let allToys = [];
+let currentFilter = 'quality';
+let visibleCount = 24;
+
+document.addEventListener('DOMContentLoaded', async () => {
+    showLoading(document.getElementById('toy-grid'));
+    allToys = await fetchLeaderboard(100);
+    filterAndRender();
+});
+
+function setFilter(filter) {
+    currentFilter = filter;
+    visibleCount = 24;
+    document.querySelectorAll('.filter-tab').forEach(t => t.classList.toggle('active', t.dataset.filter === filter));
+    document.getElementById('subtitle').textContent = filter === 'quality' ? 'The best toys, ranked by quality' : 'Best toys for your money right now';
+    filterAndRender();
+}
+
+function filterAndRender() {
+    let filtered = [...allToys];
+    if (currentFilter === 'quality') {
+        filtered = filtered.filter(t => t.tt_grade_score > 0).sort((a, b) => b.tt_grade_score - a.tt_grade_score);
+    } else {
+        filtered = filtered.filter(t => t.toy_tap_score > 0).sort((a, b) => b.toy_tap_score - a.toy_tap_score);
+    }
+    const toShow = filtered.slice(0, visibleCount);
+    document.getElementById('toy-grid').innerHTML = toShow.map((toy, i) =>
+        renderToyCard(toy, { rank: i + 1, showGrade: currentFilter === 'quality', showScore: currentFilter === 'value' })
+    ).join('');
+    document.getElementById('show-more-btn').style.display = visibleCount < filtered.length ? 'inline-flex' : 'none';
+}
+
+function showMore() { visibleCount += 24; filterAndRender(); }
+</script>
+</body>
+</html>

@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Brands - ToyTap</title>
+    <meta name="description" content="Browse toys by brand. LEGO, Fisher-Price, Hot Wheels, Barbie, and more." />
+    <link rel="icon" type="image/png" href="https://i.imgur.com/HXSawxU.png" />
+    <link rel="stylesheet" href="css/styles.css" />
+    <style>
+        .brand-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 16px; max-width: 1200px; margin: 0 auto; padding: 40px 20px; }
+        .brand-card { background: var(--bg-card); border-radius: 12px; padding: 24px 16px; text-align: center; border: 1px solid rgba(109,195,213,0.15); cursor: pointer; transition: all 0.3s; }
+        .brand-card:hover { background: rgba(109,195,213,0.1); border-color: var(--cyan); transform: translateY(-4px); }
+        .brand-name { font-size: 15px; font-weight: 700; color: #fff; }
+        .back-btn { display: inline-flex; align-items: center; gap: 8px; color: var(--cyan); font-weight: 600; cursor: pointer; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+
+<header class="site-header">
+    <nav class="nav-container">
+        <a href="index.html"><img src="https://i.imgur.com/HXSawxU.png" alt="ToyTap" class="nav-logo" /></a>
+        <button class="nav-toggle" onclick="document.querySelector('.nav-links').classList.toggle('open')">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+        </button>
+        <div class="nav-links">
+            <a href="index.html" class="nav-link">Home</a>
+            <a href="rankings.html" class="nav-link">Rankings</a>
+            <a href="categories.html" class="nav-link">Categories</a>
+            <a href="brands.html" class="nav-link active">Brands</a>
+            <a href="blog.html" class="nav-link">Blog</a>
+            <a href="watchlist.html" class="nav-link">Watchlist</a>
+        </div>
+    </nav>
+</header>
+
+<main class="page-wrapper">
+    <section class="hero">
+        <h1 class="hero-title" id="page-title">Shop by Brand</h1>
+        <p class="hero-subtitle" id="page-subtitle">Find toys from your favorite brands</p>
+    </section>
+
+    <div id="brands-view">
+        <div class="brand-grid" id="brand-grid"></div>
+    </div>
+
+    <div id="toys-view" style="display: none;">
+        <div style="max-width: 1200px; margin: 0 auto; padding: 20px;">
+            <div class="back-btn" onclick="showBrands()">&#8592; Back to Brands</div>
+        </div>
+        <section class="toy-grid-section">
+            <div id="toy-grid" class="toy-grid"></div>
+            <div style="text-align: center; margin-top: 40px;">
+                <button id="show-more-btn" class="btn btn-primary" onclick="showMore()" style="display: none;">Show More</button>
+            </div>
+        </section>
+    </div>
+</main>
+
+<footer class="site-footer">
+    <div class="footer-container">
+        <img src="https://i.imgur.com/HXSawxU.png" alt="ToyTap" class="footer-logo" />
+        <div class="footer-links">
+            <a href="https://gettoytap.com" class="footer-link">For Businesses</a>
+            <a href="https://gettoytap.com/privacy" class="footer-link">Privacy</a>
+        </div>
+        <p class="footer-copy">2025 ToyTap. All rights reserved.</p>
+    </div>
+</footer>
+
+<div id="toy-modal" class="toy-modal-overlay">
+    <div class="toy-modal">
+        <button class="modal-close" onclick="closeToyModal()">&times;</button>
+        <div id="modal-content-area"></div>
+    </div>
+</div>
+
+<script src="js/api.js"></script>
+<script>
+const BRANDS = [
+    'LEGO', 'Fisher-Price', 'Hot Wheels', 'Barbie', 'Melissa & Doug', 'Hasbro',
+    'Nerf', 'Play-Doh', 'Little Tikes', 'VTech', 'Paw Patrol', 'Disney',
+    'Marvel', 'Star Wars', 'Bluey', 'Nintendo', 'Pokémon', 'Transformers'
+];
+
+let currentBrand = null;
+let toys = [];
+let visibleCount = 24;
+
+document.addEventListener('DOMContentLoaded', () => {
+    const urlBrand = getUrlParam('brand');
+    if (urlBrand) {
+        selectBrand(urlBrand);
+    } else {
+        renderBrands();
+    }
+});
+
+function renderBrands() {
+    document.getElementById('brand-grid').innerHTML = BRANDS.map(brand => `
+        <div class="brand-card" onclick="selectBrand('${brand}')">
+            <div class="brand-name">${brand}</div>
+        </div>
+    `).join('');
+}
+
+async function selectBrand(brand) {
+    currentBrand = brand;
+    visibleCount = 24;
+
+    document.getElementById('page-title').textContent = brand;
+    document.getElementById('page-subtitle').textContent = `All ${brand} toys`;
+    document.getElementById('brands-view').style.display = 'none';
+    document.getElementById('toys-view').style.display = 'block';
+
+    showLoading(document.getElementById('toy-grid'));
+    toys = await fetchByBrand(brand);
+    renderToys();
+}
+
+function renderToys() {
+    const toShow = toys.slice(0, visibleCount);
+    document.getElementById('toy-grid').innerHTML = toShow.map(toy => renderToyCard(toy, { showGrade: true })).join('');
+    document.getElementById('show-more-btn').style.display = visibleCount < toys.length ? 'inline-flex' : 'none';
+}
+
+function showMore() { visibleCount += 24; renderToys(); }
+
+function showBrands() {
+    document.getElementById('brands-view').style.display = 'block';
+    document.getElementById('toys-view').style.display = 'none';
+    document.getElementById('page-title').textContent = 'Shop by Brand';
+    document.getElementById('page-subtitle').textContent = 'Find toys from your favorite brands';
+    currentBrand = null;
+}
+</script>
+</body>
+</html>

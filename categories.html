@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Categories - ToyTap</title>
+    <meta name="description" content="Browse toys by category. Building toys, vehicles, outdoor, dolls, and more." />
+    <link rel="icon" type="image/png" href="https://i.imgur.com/HXSawxU.png" />
+    <link rel="stylesheet" href="css/styles.css" />
+    <style>
+        .category-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; max-width: 1200px; margin: 0 auto; padding: 40px 20px; }
+        .category-card { background: var(--bg-card); border-radius: 16px; padding: 32px 20px; text-align: center; border: 1px solid rgba(109,195,213,0.15); cursor: pointer; transition: all 0.3s; }
+        .category-card:hover { background: rgba(109,195,213,0.1); border-color: var(--cyan); transform: translateY(-4px); }
+        .category-card.active { border-color: var(--cyan); background: rgba(109,195,213,0.15); }
+        .category-icon { font-size: 48px; margin-bottom: 16px; }
+        .category-name { font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+        .category-count { font-size: 12px; color: var(--cyan); }
+        .subcategory-pills { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; padding: 20px; max-width: 1000px; margin: 0 auto; }
+        .subcategory-pill { background: rgba(109,195,213,0.15); color: var(--cyan); padding: 10px 20px; border-radius: 50px; font-size: 14px; font-weight: 600; cursor: pointer; border: 1px solid transparent; transition: all 0.2s; }
+        .subcategory-pill:hover, .subcategory-pill.active { background: var(--cyan); color: var(--navy); }
+        .back-btn { display: inline-flex; align-items: center; gap: 8px; color: var(--cyan); font-weight: 600; cursor: pointer; margin-bottom: 20px; }
+        .back-btn:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+
+<header class="site-header">
+    <nav class="nav-container">
+        <a href="index.html"><img src="https://i.imgur.com/HXSawxU.png" alt="ToyTap" class="nav-logo" /></a>
+        <button class="nav-toggle" onclick="document.querySelector('.nav-links').classList.toggle('open')">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+        </button>
+        <div class="nav-links">
+            <a href="index.html" class="nav-link">Home</a>
+            <a href="rankings.html" class="nav-link">Rankings</a>
+            <a href="categories.html" class="nav-link active">Categories</a>
+            <a href="brands.html" class="nav-link">Brands</a>
+            <a href="blog.html" class="nav-link">Blog</a>
+            <a href="watchlist.html" class="nav-link">Watchlist</a>
+        </div>
+    </nav>
+</header>
+
+<main class="page-wrapper">
+    <section class="hero">
+        <h1 class="hero-title" id="page-title">Browse Categories</h1>
+        <p class="hero-subtitle" id="page-subtitle">Find toys in your favorite category</p>
+    </section>
+
+    <div id="categories-view">
+        <div class="category-grid" id="category-grid"></div>
+    </div>
+
+    <div id="toys-view" style="display: none;">
+        <div style="max-width: 1200px; margin: 0 auto; padding: 20px;">
+            <div class="back-btn" onclick="showCategories()">&#8592; Back to Categories</div>
+            <div id="subcategory-pills" class="subcategory-pills"></div>
+        </div>
+        <section class="toy-grid-section">
+            <div id="toy-grid" class="toy-grid"></div>
+            <div style="text-align: center; margin-top: 40px;">
+                <button id="show-more-btn" class="btn btn-primary" onclick="showMore()" style="display: none;">Show More</button>
+            </div>
+        </section>
+    </div>
+</main>
+
+<footer class="site-footer">
+    <div class="footer-container">
+        <img src="https://i.imgur.com/HXSawxU.png" alt="ToyTap" class="footer-logo" />
+        <div class="footer-links">
+            <a href="https://gettoytap.com" class="footer-link">For Businesses</a>
+            <a href="https://gettoytap.com/privacy" class="footer-link">Privacy</a>
+        </div>
+        <p class="footer-copy">2025 ToyTap. All rights reserved.</p>
+    </div>
+</footer>
+
+<div id="toy-modal" class="toy-modal-overlay">
+    <div class="toy-modal">
+        <button class="modal-close" onclick="closeToyModal()">&times;</button>
+        <div id="modal-content-area"></div>
+    </div>
+</div>
+
+<script src="js/api.js"></script>
+<script>
+const CATEGORIES = {
+    'Building': { icon: '🧱', subcategories: ['Building Blocks', 'Magnetic Tiles', 'LEGO', 'Marble Runs'] },
+    'Vehicles': { icon: '🚗', subcategories: ['Cars & Trucks', 'Trains', 'Ride On Cars', 'Remote Control'] },
+    'Outdoor': { icon: '🏞️', subcategories: ['Swing Sets', 'Playsets', 'Sand & Water', 'Sports', 'Bikes & Scooters'] },
+    'Baby & Toddler': { icon: '👶', subcategories: ['Baby Toys', 'Toddler Toys', 'Bath Toys', 'Sensory Toys'] },
+    'Educational': { icon: '🎓', subcategories: ['STEM Toys', 'Montessori', 'Learning Games'] },
+    'Pretend Play': { icon: '🎭', subcategories: ['Playsets', 'Kitchen & Food', 'Dress Up'] },
+    'Arts & Crafts': { icon: '🎨', subcategories: ['Drawing & Coloring', 'Craft Kits', 'Play-Doh & Clay'] },
+    'Games & Puzzles': { icon: '🧩', subcategories: ['Puzzles', 'Board Games', 'Card Games'] },
+    'Dolls & Plush': { icon: '🧸', subcategories: ['Dolls', 'Stuffed Animals', 'Doll Accessories'] },
+    'Electronics & Tech': { icon: '🤖', subcategories: ['Interactive Toys', 'Musical Toys', 'Tablets'] },
+    'Action & Figures': { icon: '🦸', subcategories: ['Action Figures', 'Playsets', 'Collectibles'] }
+};
+
+let currentCategory = null;
+let currentSubcategory = null;
+let toys = [];
+let visibleCount = 24;
+
+document.addEventListener('DOMContentLoaded', () => {
+    const urlCat = getUrlParam('cat');
+    if (urlCat && CATEGORIES[urlCat]) {
+        selectCategory(urlCat);
+    } else {
+        renderCategories();
+    }
+});
+
+function renderCategories() {
+    const grid = document.getElementById('category-grid');
+    grid.innerHTML = Object.entries(CATEGORIES).map(([name, data]) => `
+        <div class="category-card" onclick="selectCategory('${name}')">
+            <div class="category-icon">${data.icon}</div>
+            <div class="category-name">${name}</div>
+            <div class="category-count">${data.subcategories.length} subcategories</div>
+        </div>
+    `).join('');
+}
+
+async function selectCategory(name) {
+    currentCategory = name;
+    currentSubcategory = null;
+    visibleCount = 24;
+
+    document.getElementById('page-title').textContent = name;
+    document.getElementById('page-subtitle').textContent = `Explore ${name.toLowerCase()} toys`;
+    document.getElementById('categories-view').style.display = 'none';
+    document.getElementById('toys-view').style.display = 'block';
+
+    const cat = CATEGORIES[name];
+    document.getElementById('subcategory-pills').innerHTML = `
+        <div class="subcategory-pill active" onclick="selectSubcategory(null)">All ${name}</div>
+        ${cat.subcategories.map(sub => `<div class="subcategory-pill" onclick="selectSubcategory('${sub}')">${sub}</div>`).join('')}
+    `;
+
+    await loadToys();
+}
+
+async function selectSubcategory(sub) {
+    currentSubcategory = sub;
+    visibleCount = 24;
+    document.querySelectorAll('.subcategory-pill').forEach((p, i) => {
+        p.classList.toggle('active', sub ? p.textContent === sub : i === 0);
+    });
+    await loadToys();
+}
+
+async function loadToys() {
+    showLoading(document.getElementById('toy-grid'));
+    toys = await fetchByCategory(currentCategory, currentSubcategory);
+    renderToys();
+}
+
+function renderToys() {
+    const toShow = toys.slice(0, visibleCount);
+    document.getElementById('toy-grid').innerHTML = toShow.map(toy => renderToyCard(toy, { showGrade: true })).join('');
+    document.getElementById('show-more-btn').style.display = visibleCount < toys.length ? 'inline-flex' : 'none';
+}
+
+function showMore() { visibleCount += 24; renderToys(); }
+
+function showCategories() {
+    document.getElementById('categories-view').style.display = 'block';
+    document.getElementById('toys-view').style.display = 'none';
+    document.getElementById('page-title').textContent = 'Browse Categories';
+    document.getElementById('page-subtitle').textContent = 'Find toys in your favorite category';
+    currentCategory = null;
+}
+</script>
+</body>
+</html>

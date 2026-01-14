@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Blog - ToyTap</title>
+    <meta name="description" content="Toy guides, deals roundups, and shopping tips from ToyTap." />
+    <link rel="icon" type="image/png" href="https://i.imgur.com/HXSawxU.png" />
+    <link rel="stylesheet" href="css/styles.css" />
+    <style>
+        .blog-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px; max-width: 1200px; margin: 0 auto; padding: 40px 20px; }
+        .blog-card { background: var(--bg-card); border-radius: 16px; overflow: hidden; border: 1px solid rgba(109,195,213,0.15); transition: all 0.3s; cursor: pointer; }
+        .blog-card:hover { transform: translateY(-4px); border-color: var(--cyan); }
+        .blog-card-image { width: 100%; height: 180px; object-fit: cover; }
+        .blog-card-content { padding: 20px; }
+        .blog-card-category { font-size: 11px; color: var(--cyan); font-weight: 700; text-transform: uppercase; margin-bottom: 8px; }
+        .blog-card-title { font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 8px; line-height: 1.4; }
+        .blog-card-excerpt { font-size: 14px; color: #94a3b8; line-height: 1.6; margin-bottom: 12px; }
+        .blog-card-meta { font-size: 12px; color: #64748b; }
+        .filter-pills { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; padding: 20px; max-width: 800px; margin: 0 auto; }
+        .filter-pill { background: rgba(109,195,213,0.15); color: var(--cyan); padding: 10px 20px; border-radius: 50px; font-size: 14px; font-weight: 600; cursor: pointer; border: 1px solid transparent; transition: all 0.2s; }
+        .filter-pill:hover, .filter-pill.active { background: var(--cyan); color: var(--navy); }
+    </style>
+</head>
+<body>
+
+<header class="site-header">
+    <nav class="nav-container">
+        <a href="index.html"><img src="https://i.imgur.com/HXSawxU.png" alt="ToyTap" class="nav-logo" /></a>
+        <button class="nav-toggle" onclick="document.querySelector('.nav-links').classList.toggle('open')">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+        </button>
+        <div class="nav-links">
+            <a href="index.html" class="nav-link">Home</a>
+            <a href="rankings.html" class="nav-link">Rankings</a>
+            <a href="categories.html" class="nav-link">Categories</a>
+            <a href="brands.html" class="nav-link">Brands</a>
+            <a href="blog.html" class="nav-link active">Blog</a>
+            <a href="watchlist.html" class="nav-link">Watchlist</a>
+        </div>
+    </nav>
+</header>
+
+<main class="page-wrapper">
+    <section class="hero">
+        <h1 class="hero-title">ToyTap Blog</h1>
+        <p class="hero-subtitle">Guides, deal roundups, and shopping tips</p>
+    </section>
+
+    <div class="filter-pills">
+        <div class="filter-pill active" onclick="filterPosts('all')">All</div>
+        <div class="filter-pill" onclick="filterPosts('deals')">Deals</div>
+        <div class="filter-pill" onclick="filterPosts('guides')">Guides</div>
+        <div class="filter-pill" onclick="filterPosts('reviews')">Reviews</div>
+    </div>
+
+    <div id="blog-grid" class="blog-grid">
+        <!-- Sample posts - in production these would come from an API -->
+    </div>
+</main>
+
+<footer class="site-footer">
+    <div class="footer-container">
+        <img src="https://i.imgur.com/HXSawxU.png" alt="ToyTap" class="footer-logo" />
+        <div class="footer-links">
+            <a href="https://gettoytap.com" class="footer-link">For Businesses</a>
+            <a href="https://gettoytap.com/privacy" class="footer-link">Privacy</a>
+        </div>
+        <p class="footer-copy">2025 ToyTap. All rights reserved.</p>
+    </div>
+</footer>
+
+<script src="js/api.js"></script>
+<script>
+// Sample blog posts - replace with API call in production
+const POSTS = [
+    {
+        slug: 'best-lego-sets-2025',
+        title: 'Best LEGO Sets of 2025',
+        category: 'guides',
+        excerpt: 'Our top picks for LEGO sets this year, from Star Wars to City to Technic.',
+        image: 'https://images.unsplash.com/photo-1587654780291-39c9404d746b?w=400',
+        date: 'Jan 10, 2025'
+    },
+    {
+        slug: 'amazon-toy-deals-january',
+        title: 'Amazon Toy Deals This Week',
+        category: 'deals',
+        excerpt: 'The best toy discounts on Amazon right now, including some record lows.',
+        image: 'https://images.unsplash.com/photo-1558060370-d644479cb6f7?w=400',
+        date: 'Jan 8, 2025'
+    },
+    {
+        slug: 'educational-toys-toddlers',
+        title: 'Top Educational Toys for Toddlers',
+        category: 'guides',
+        excerpt: 'Montessori-approved and STEM toys that make learning fun.',
+        image: 'https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?w=400',
+        date: 'Jan 5, 2025'
+    },
+    {
+        slug: 'hot-wheels-collectors-guide',
+        title: 'Hot Wheels Collector\'s Guide',
+        category: 'reviews',
+        excerpt: 'Everything you need to know about collecting Hot Wheels in 2025.',
+        image: 'https://images.unsplash.com/photo-1594787318286-3d835c1d207f?w=400',
+        date: 'Jan 3, 2025'
+    }
+];
+
+let currentFilter = 'all';
+
+document.addEventListener('DOMContentLoaded', () => {
+    renderPosts();
+});
+
+function filterPosts(filter) {
+    currentFilter = filter;
+    document.querySelectorAll('.filter-pill').forEach(p => {
+        p.classList.toggle('active', p.textContent.toLowerCase() === filter || (filter === 'all' && p.textContent === 'All'));
+    });
+    renderPosts();
+}
+
+function renderPosts() {
+    const filtered = currentFilter === 'all' ? POSTS : POSTS.filter(p => p.category === currentFilter);
+    document.getElementById('blog-grid').innerHTML = filtered.map(post => `
+        <div class="blog-card" onclick="window.location='post.html?slug=${post.slug}'">
+            <img src="${post.image}" alt="${post.title}" class="blog-card-image" />
+            <div class="blog-card-content">
+                <div class="blog-card-category">${post.category}</div>
+                <h2 class="blog-card-title">${post.title}</h2>
+                <p class="blog-card-excerpt">${post.excerpt}</p>
+                <div class="blog-card-meta">${post.date}</div>
+            </div>
+        </div>
+    `).join('');
+}
+</script>
+</body>
+</html>

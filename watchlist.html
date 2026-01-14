@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Watchlist - ToyTap</title>
+    <meta name="description" content="Track your favorite toys and get notified when prices drop." />
+    <link rel="icon" type="image/png" href="https://i.imgur.com/HXSawxU.png" />
+    <link rel="stylesheet" href="css/styles.css" />
+    <style>
+        .watchlist-container { max-width: 800px; margin: 0 auto; padding: 40px 20px; }
+        .auth-card { background: var(--bg-card); border-radius: 20px; padding: 48px; text-align: center; border: 1px solid rgba(109,195,213,0.15); }
+        .auth-icon { font-size: 64px; margin-bottom: 20px; }
+        .auth-title { font-size: 24px; font-weight: 700; margin-bottom: 12px; }
+        .auth-text { color: #94a3b8; margin-bottom: 32px; }
+        .auth-input { width: 100%; max-width: 320px; padding: 16px; background: rgba(255,255,255,0.1); border: 1px solid rgba(109,195,213,0.3); border-radius: 12px; color: #fff; font-size: 16px; margin-bottom: 16px; }
+        .auth-input:focus { outline: none; border-color: var(--cyan); }
+        .auth-btn { width: 100%; max-width: 320px; padding: 16px; background: var(--cyan); color: var(--navy); font-size: 16px; font-weight: 700; border: none; border-radius: 12px; cursor: pointer; }
+        .auth-btn:hover { opacity: 0.9; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px; margin-bottom: 32px; }
+        .stat-card { background: var(--bg-card); padding: 24px; border-radius: 16px; text-align: center; border: 1px solid rgba(109,195,213,0.15); }
+        .stat-value { font-size: 32px; font-weight: 800; color: var(--cyan); font-family: 'JetBrains Mono', monospace; }
+        .stat-label { font-size: 12px; color: #94a3b8; margin-top: 8px; }
+        .empty-state { text-align: center; padding: 60px 20px; }
+        .empty-icon { font-size: 64px; margin-bottom: 20px; opacity: 0.5; }
+    </style>
+</head>
+<body>
+
+<header class="site-header">
+    <nav class="nav-container">
+        <a href="index.html"><img src="https://i.imgur.com/HXSawxU.png" alt="ToyTap" class="nav-logo" /></a>
+        <button class="nav-toggle" onclick="document.querySelector('.nav-links').classList.toggle('open')">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+        </button>
+        <div class="nav-links">
+            <a href="index.html" class="nav-link">Home</a>
+            <a href="rankings.html" class="nav-link">Rankings</a>
+            <a href="categories.html" class="nav-link">Categories</a>
+            <a href="brands.html" class="nav-link">Brands</a>
+            <a href="blog.html" class="nav-link">Blog</a>
+            <a href="watchlist.html" class="nav-link active">Watchlist</a>
+        </div>
+    </nav>
+</header>
+
+<main class="page-wrapper">
+    <section class="hero">
+        <h1 class="hero-title">Your Watchlist</h1>
+        <p class="hero-subtitle">Track toys and get notified when prices drop</p>
+    </section>
+
+    <div class="watchlist-container">
+        <!-- Not logged in state -->
+        <div id="auth-view" class="auth-card">
+            <div class="auth-icon">&#128270;</div>
+            <h2 class="auth-title">Track Your Favorite Toys</h2>
+            <p class="auth-text">Sign in to save toys to your watchlist and get price drop alerts.</p>
+            <input type="email" id="auth-email" class="auth-input" placeholder="Enter your email" />
+            <br />
+            <button class="auth-btn" onclick="handleAuth()">Continue with Email</button>
+            <p style="color: #64748b; font-size: 12px; margin-top: 16px;">We'll send you a magic link to sign in</p>
+        </div>
+
+        <!-- Logged in state -->
+        <div id="watchlist-view" style="display: none;">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-count">0</div>
+                    <div class="stat-label">Toys Watching</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-drops">0</div>
+                    <div class="stat-label">Price Drops</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-saved">$0</div>
+                    <div class="stat-label">Potential Savings</div>
+                </div>
+            </div>
+
+            <div id="watchlist-toys"></div>
+
+            <div id="empty-state" class="empty-state" style="display: none;">
+                <div class="empty-icon">&#128269;</div>
+                <h3 style="font-size: 20px; margin-bottom: 12px;">No toys yet</h3>
+                <p style="color: #94a3b8; margin-bottom: 24px;">Start browsing and add toys to your watchlist</p>
+                <a href="index.html" class="btn btn-primary">Browse Toys</a>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer class="site-footer">
+    <div class="footer-container">
+        <img src="https://i.imgur.com/HXSawxU.png" alt="ToyTap" class="footer-logo" />
+        <div class="footer-links">
+            <a href="https://gettoytap.com" class="footer-link">For Businesses</a>
+            <a href="https://gettoytap.com/privacy" class="footer-link">Privacy</a>
+        </div>
+        <p class="footer-copy">2025 ToyTap. All rights reserved.</p>
+    </div>
+</footer>
+
+<div id="toy-modal" class="toy-modal-overlay">
+    <div class="toy-modal">
+        <button class="modal-close" onclick="closeToyModal()">&times;</button>
+        <div id="modal-content-area"></div>
+    </div>
+</div>
+
+<script src="js/api.js"></script>
+<script>
+// Supabase config - replace with your actual keys
+const SUPABASE_URL = 'https://ehuwltjozobbbzsdygbo.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVodXdsdGpvem9iYmJ6c2R5Z2JvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzA2NjY0MzIsImV4cCI6MjA0NjI0MjQzMn0.example';
+
+let currentUser = null;
+let watchlist = [];
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Check for existing session
+    const savedUser = localStorage.getItem('toytap_user');
+    if (savedUser) {
+        try {
+            currentUser = JSON.parse(savedUser);
+            showWatchlist();
+        } catch (e) {
+            localStorage.removeItem('toytap_user');
+        }
+    }
+});
+
+async function handleAuth() {
+    const email = document.getElementById('auth-email').value.trim();
+    if (!email || !email.includes('@')) {
+        alert('Please enter a valid email');
+        return;
+    }
+
+    // For demo purposes, create a simple user object
+    // In production, this would use Supabase auth
+    currentUser = { email, id: btoa(email) };
+    localStorage.setItem('toytap_user', JSON.stringify(currentUser));
+    showWatchlist();
+}
+
+async function showWatchlist() {
+    document.getElementById('auth-view').style.display = 'none';
+    document.getElementById('watchlist-view').style.display = 'block';
+
+    // Load watchlist from localStorage (or Supabase in production)
+    const saved = localStorage.getItem('toytap_watchlist_' + currentUser.id);
+    watchlist = saved ? JSON.parse(saved) : [];
+
+    renderWatchlist();
+}
+
+function renderWatchlist() {
+    document.getElementById('stat-count').textContent = watchlist.length;
+
+    if (watchlist.length === 0) {
+        document.getElementById('watchlist-toys').innerHTML = '';
+        document.getElementById('empty-state').style.display = 'block';
+        return;
+    }
+
+    document.getElementById('empty-state').style.display = 'none';
+    document.getElementById('watchlist-toys').innerHTML = `
+        <div class="toy-grid">
+            ${watchlist.map(toy => renderToyCard(toy, { showGrade: true })).join('')}
+        </div>
+    `;
+}
+
+// Function to add toy to watchlist (called from other pages)
+window.addToWatchlist = function(toy) {
+    if (!currentUser) {
+        window.location = 'watchlist.html';
+        return;
+    }
+
+    if (!watchlist.find(t => t.asin === toy.asin)) {
+        watchlist.push(toy);
+        localStorage.setItem('toytap_watchlist_' + currentUser.id, JSON.stringify(watchlist));
+        alert('Added to watchlist!');
+    }
+};
+
+window.removeFromWatchlist = function(asin) {
+    watchlist = watchlist.filter(t => t.asin !== asin);
+    localStorage.setItem('toytap_watchlist_' + currentUser.id, JSON.stringify(watchlist));
+    renderWatchlist();
+};
+</script>
+</body>
+</html>
