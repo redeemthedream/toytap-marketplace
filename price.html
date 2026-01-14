@@ -6,30 +6,369 @@
     <title>Price History - ToyTap</title>
     <link rel="icon" type="image/png" href="https://i.imgur.com/HXSawxU.png" />
     <link rel="stylesheet" href="css/styles.css" />
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
     <style>
-        .price-container { max-width: 600px; margin: 0 auto; padding: 20px; }
-        .product-card { background: var(--bg-card); border-radius: 20px; padding: 24px; margin-bottom: 24px; border: 1px solid rgba(109,195,213,0.15); }
-        .product-image { width: 100%; max-width: 200px; height: 200px; object-fit: contain; margin: 0 auto 20px; display: block; background: #fff; border-radius: 12px; }
-        .product-brand { font-size: 12px; color: var(--cyan); font-weight: 700; text-transform: uppercase; }
-        .product-name { font-size: 20px; font-weight: 700; color: #fff; margin: 8px 0 20px; }
-        .price-current { font-size: 36px; font-weight: 800; color: #fff; font-family: 'JetBrains Mono', monospace; }
-        .price-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 20px 0; }
-        .stat-box { background: rgba(109,195,213,0.1); padding: 16px; border-radius: 12px; text-align: center; }
-        .stat-label { font-size: 11px; color: #94a3b8; text-transform: uppercase; margin-bottom: 6px; }
-        .stat-value { font-size: 18px; font-weight: 700; color: #fff; font-family: 'JetBrains Mono', monospace; }
-        .chart-container { background: var(--bg-card); border-radius: 16px; padding: 20px; border: 1px solid rgba(109,195,213,0.15); }
-        .chart-title { font-size: 16px; font-weight: 700; margin-bottom: 16px; }
-        .chart { height: 200px; display: flex; align-items: flex-end; gap: 2px; }
-        .chart-bar { flex: 1; background: var(--cyan); border-radius: 4px 4px 0 0; min-height: 4px; transition: all 0.2s; cursor: pointer; }
-        .chart-bar:hover { background: var(--yellow); }
-        .chart-bar.amazon { background: var(--amazon-orange); }
-        .chart-bar.walmart { background: var(--walmart-blue); }
-        .legend { display: flex; gap: 20px; margin-top: 16px; justify-content: center; }
-        .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #94a3b8; }
-        .legend-dot { width: 12px; height: 12px; border-radius: 3px; }
-        .buy-btn { display: block; width: 100%; padding: 18px; background: var(--amazon-orange); color: #111; font-size: 16px; font-weight: 700; border: none; border-radius: 12px; cursor: pointer; margin-top: 20px; text-align: center; text-decoration: none; }
-        .buy-btn:hover { opacity: 0.9; }
-        .back-link { display: inline-flex; align-items: center; gap: 8px; color: var(--cyan); font-weight: 600; margin-bottom: 20px; }
+        .price-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--cyan);
+            font-weight: 600;
+            margin-bottom: 24px;
+            cursor: pointer;
+        }
+
+        .back-link:hover {
+            opacity: 0.8;
+        }
+
+        /* Product Card */
+        .product-hero {
+            background: var(--bg-card);
+            border-radius: 24px;
+            padding: 32px;
+            margin-bottom: 24px;
+            border: 1px solid rgba(109,195,213,0.15);
+            display: flex;
+            gap: 32px;
+            flex-wrap: wrap;
+        }
+
+        .product-image-wrap {
+            flex-shrink: 0;
+        }
+
+        .product-image {
+            width: 200px;
+            height: 200px;
+            object-fit: contain;
+            background: #fff;
+            border-radius: 16px;
+        }
+
+        .product-details {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .product-brand {
+            font-size: 12px;
+            color: var(--cyan);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 8px;
+        }
+
+        .product-name {
+            font-size: 24px;
+            font-weight: 800;
+            color: #fff;
+            line-height: 1.3;
+            margin-bottom: 16px;
+        }
+
+        .product-metrics {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .product-metric {
+            background: rgba(109,195,213,0.1);
+            padding: 12px 16px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .metric-label {
+            font-size: 10px;
+            color: #94a3b8;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+
+        .metric-value {
+            font-size: 20px;
+            font-weight: 800;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Price Section */
+        .price-section {
+            background: linear-gradient(135deg, rgba(109,195,213,0.1), rgba(253,185,19,0.05));
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .current-price {
+            font-size: 48px;
+            font-weight: 900;
+            color: #fff;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .original-price {
+            font-size: 20px;
+            color: #94a3b8;
+            text-decoration: line-through;
+            margin-left: 12px;
+        }
+
+        .savings-badge {
+            display: inline-block;
+            background: var(--green);
+            color: #fff;
+            padding: 8px 16px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 700;
+            margin-top: 12px;
+        }
+
+        /* Price Stats */
+        .price-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            padding: 24px;
+            border-radius: 16px;
+            text-align: center;
+            border: 1px solid rgba(109,195,213,0.15);
+        }
+
+        .stat-card.lowest {
+            border-color: var(--green);
+        }
+
+        .stat-card.highest {
+            border-color: var(--red);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #94a3b8;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 800;
+            color: #fff;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .stat-card.lowest .stat-value { color: var(--green); }
+        .stat-card.highest .stat-value { color: var(--red); }
+
+        .stat-note {
+            font-size: 11px;
+            color: #64748b;
+            margin-top: 4px;
+        }
+
+        /* Chart Section */
+        .chart-section {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 24px;
+            border: 1px solid rgba(109,195,213,0.15);
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .chart-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .chart-period-btns {
+            display: flex;
+            gap: 8px;
+        }
+
+        .period-btn {
+            padding: 8px 16px;
+            background: rgba(109,195,213,0.1);
+            border: 1px solid transparent;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #94a3b8;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .period-btn:hover {
+            background: rgba(109,195,213,0.2);
+            color: #fff;
+        }
+
+        .period-btn.active {
+            background: var(--cyan);
+            color: var(--navy);
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+
+        .chart-legend {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            margin-top: 16px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: #94a3b8;
+        }
+
+        .legend-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 4px;
+        }
+
+        /* Deal Analysis */
+        .deal-analysis {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+            border: 1px solid rgba(109,195,213,0.15);
+        }
+
+        .deal-status {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .deal-indicator {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+        }
+
+        .deal-indicator.good { background: rgba(16, 185, 129, 0.2); }
+        .deal-indicator.fair { background: rgba(253, 185, 19, 0.2); }
+        .deal-indicator.poor { background: rgba(239, 68, 68, 0.2); }
+
+        .deal-text h3 {
+            font-size: 18px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 4px;
+        }
+
+        .deal-text p {
+            font-size: 14px;
+            color: #94a3b8;
+        }
+
+        /* Buy Buttons */
+        .buy-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .buy-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            padding: 18px;
+            border-radius: 14px;
+            font-size: 16px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .buy-btn.amazon {
+            background: var(--amazon-orange);
+            color: #111;
+        }
+
+        .buy-btn.walmart {
+            background: var(--walmart-blue);
+            color: #fff;
+        }
+
+        .buy-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+        }
+
+        /* Loading/Error States */
+        .page-loading {
+            text-align: center;
+            padding: 100px 20px;
+        }
+
+        .page-error {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        /* Mobile */
+        @media (max-width: 640px) {
+            .product-hero {
+                padding: 20px;
+            }
+
+            .product-image {
+                width: 150px;
+                height: 150px;
+            }
+
+            .price-stats {
+                grid-template-columns: 1fr;
+            }
+
+            .current-price {
+                font-size: 36px;
+            }
+
+            .chart-header {
+                flex-direction: column;
+                gap: 12px;
+                align-items: flex-start;
+            }
+        }
     </style>
 </head>
 <body>
@@ -50,48 +389,114 @@
     <div class="price-container">
         <a href="javascript:history.back()" class="back-link">&#8592; Back</a>
 
-        <div id="loading" class="loading">
+        <!-- Loading State -->
+        <div id="loading" class="page-loading">
             <div class="spinner"></div>
-            <p>Loading price history...</p>
+            <p style="color: #94a3b8; margin-top: 16px;">Loading price history...</p>
         </div>
 
+        <!-- Content (hidden until loaded) -->
         <div id="content" style="display: none;">
-            <div class="product-card">
-                <img id="product-image" class="product-image" src="" alt="" />
-                <div id="product-brand" class="product-brand"></div>
-                <h1 id="product-name" class="product-name"></h1>
-                <div id="product-price" class="price-current"></div>
-                <div id="product-grade" style="margin-top: 12px;"></div>
+            <!-- Product Hero -->
+            <div class="product-hero">
+                <div class="product-image-wrap">
+                    <img id="product-image" class="product-image" src="" alt="">
+                </div>
+                <div class="product-details">
+                    <div id="product-brand" class="product-brand"></div>
+                    <h1 id="product-name" class="product-name"></h1>
+                    <div class="product-metrics">
+                        <div class="product-metric">
+                            <div class="metric-label">TT Grade</div>
+                            <div class="metric-value" id="metric-grade"></div>
+                        </div>
+                        <div class="product-metric">
+                            <div class="metric-label">Rating</div>
+                            <div class="metric-value" id="metric-rating"></div>
+                        </div>
+                        <div class="product-metric">
+                            <div class="metric-label">Reviews</div>
+                            <div class="metric-value" id="metric-reviews"></div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
+            <!-- Price Section -->
+            <div class="price-section">
+                <div>
+                    <span class="current-price" id="current-price">$0.00</span>
+                    <span class="original-price" id="original-price" style="display: none;">$0.00</span>
+                </div>
+                <div id="savings-badge" class="savings-badge" style="display: none;">Save 0%</div>
+            </div>
+
+            <!-- Price Stats -->
             <div class="price-stats">
-                <div class="stat-box">
-                    <div class="stat-label">Lowest</div>
+                <div class="stat-card lowest">
+                    <div class="stat-label">Lowest Price</div>
                     <div class="stat-value" id="stat-lowest">--</div>
+                    <div class="stat-note" id="stat-lowest-note">All time low</div>
                 </div>
-                <div class="stat-box">
-                    <div class="stat-label">Highest</div>
-                    <div class="stat-value" id="stat-highest">--</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-label">Average</div>
+                <div class="stat-card">
+                    <div class="stat-label">Average Price</div>
                     <div class="stat-value" id="stat-average">--</div>
+                    <div class="stat-note">90-day average</div>
+                </div>
+                <div class="stat-card highest">
+                    <div class="stat-label">Highest Price</div>
+                    <div class="stat-value" id="stat-highest">--</div>
+                    <div class="stat-note">All time high</div>
                 </div>
             </div>
 
-            <div class="chart-container">
-                <div class="chart-title">Price History (90 Days)</div>
-                <div id="chart" class="chart"></div>
-                <div class="legend">
-                    <div class="legend-item"><div class="legend-dot" style="background: var(--amazon-orange);"></div> Amazon</div>
-                    <div class="legend-item"><div class="legend-dot" style="background: var(--walmart-blue);"></div> Walmart</div>
+            <!-- Chart Section -->
+            <div class="chart-section">
+                <div class="chart-header">
+                    <div class="chart-title">&#128200; Price History</div>
+                    <div class="chart-period-btns">
+                        <button class="period-btn" data-days="30" onclick="setPeriod(30)">30 Days</button>
+                        <button class="period-btn active" data-days="90" onclick="setPeriod(90)">90 Days</button>
+                        <button class="period-btn" data-days="365" onclick="setPeriod(365)">1 Year</button>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="price-chart"></canvas>
+                </div>
+                <div class="chart-legend">
+                    <div class="legend-item">
+                        <div class="legend-dot" style="background: #ff9900;"></div>
+                        Amazon
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-dot" style="background: #0071ce;"></div>
+                        Walmart
+                    </div>
                 </div>
             </div>
 
-            <a id="buy-link" href="#" target="_blank" class="buy-btn">View on Amazon</a>
+            <!-- Deal Analysis -->
+            <div class="deal-analysis">
+                <div class="deal-status">
+                    <div class="deal-indicator" id="deal-indicator">&#128176;</div>
+                    <div class="deal-text">
+                        <h3 id="deal-title">Checking deal...</h3>
+                        <p id="deal-description">Analyzing current price against historical data.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Buy Buttons -->
+            <div class="buy-buttons">
+                <a id="buy-amazon" href="#" target="_blank" class="buy-btn amazon">
+                    &#128722; View on Amazon
+                </a>
+            </div>
         </div>
 
-        <div id="error" style="display: none; text-align: center; padding: 60px 20px;">
+        <!-- Error State -->
+        <div id="error" class="page-error" style="display: none;">
+            <div style="font-size: 48px; margin-bottom: 16px;">&#128533;</div>
             <p style="color: var(--red); margin-bottom: 20px;">Could not load price history</p>
             <a href="index.html" class="btn btn-primary">Browse Toys</a>
         </div>
@@ -100,6 +505,11 @@
 
 <script src="js/api.js"></script>
 <script>
+let priceChart = null;
+let priceHistory = [];
+let currentPeriod = 90;
+let toyData = null;
+
 document.addEventListener('DOMContentLoaded', async () => {
     const asin = getUrlParam('asin');
     if (!asin) {
@@ -114,57 +524,235 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
 
-        renderProduct(data);
+        toyData = data.toy;
+        priceHistory = data.price_history || [];
+
+        renderProduct();
+        renderChart();
+        analyzeDeal();
+
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('content').style.display = 'block';
     } catch (err) {
-        console.error(err);
+        console.error('Load error:', err);
         showError();
     }
 });
 
-function renderProduct(data) {
-    const toy = data.toy;
-    const history = data.price_history || [];
+function renderProduct() {
+    const toy = toyData;
 
     document.getElementById('product-image').src = toy.image_url_proxied || toy.image_url || PLACEHOLDER_IMG;
-    document.getElementById('product-brand').textContent = toy.brand || '';
+    document.getElementById('product-brand').textContent = toy.brand || 'Unknown Brand';
     document.getElementById('product-name').textContent = toy.toy_name;
-    document.getElementById('product-price').textContent = '$' + formatPrice(toy.price);
-    document.getElementById('product-grade').innerHTML = renderGradeBadge(toy.tt_grade, 'lg');
-    document.getElementById('buy-link').href = toy.affiliate_url || `https://amazon.com/dp/${toy.asin}`;
 
-    // Calculate stats
-    const prices = history.map(h => h.price).filter(p => p > 0);
-    if (prices.length > 0) {
-        document.getElementById('stat-lowest').textContent = '$' + Math.min(...prices).toFixed(2);
-        document.getElementById('stat-highest').textContent = '$' + Math.max(...prices).toFixed(2);
-        document.getElementById('stat-average').textContent = '$' + (prices.reduce((a,b) => a+b, 0) / prices.length).toFixed(2);
+    // Metrics
+    document.getElementById('metric-grade').innerHTML = renderGradeBadge(toy.tt_grade, 'sm');
+    document.getElementById('metric-rating').innerHTML = `${toy.rating || 'N/A'} &#11088;`;
+    document.getElementById('metric-reviews').textContent = (toy.reviews_count || 0).toLocaleString();
+
+    // Current price
+    const price = parseFloat(toy.price) || 0;
+    document.getElementById('current-price').textContent = '$' + price.toFixed(2);
+
+    // Discount
+    const discount = parseFloat(toy.discount_percent) || 0;
+    if (discount > 0) {
+        const comparePrice = parseFloat(toy.compare_price) || 0;
+        document.getElementById('original-price').textContent = '$' + comparePrice.toFixed(2);
+        document.getElementById('original-price').style.display = 'inline';
+        document.getElementById('savings-badge').textContent = `Save ${discount.toFixed(0)}%`;
+        document.getElementById('savings-badge').style.display = 'inline-block';
     }
 
-    // Render chart
-    renderChart(history);
+    // Buy link
+    document.getElementById('buy-amazon').href = toy.affiliate_url || `https://amazon.com/dp/${toy.asin}`;
 
-    document.getElementById('loading').style.display = 'none';
-    document.getElementById('content').style.display = 'block';
+    // Price stats
+    if (priceHistory.length > 0) {
+        const prices = priceHistory.map(h => h.price).filter(p => p > 0);
+        const lowest = Math.min(...prices);
+        const highest = Math.max(...prices);
+        const average = prices.reduce((a, b) => a + b, 0) / prices.length;
+
+        document.getElementById('stat-lowest').textContent = '$' + lowest.toFixed(2);
+        document.getElementById('stat-highest').textContent = '$' + highest.toFixed(2);
+        document.getElementById('stat-average').textContent = '$' + average.toFixed(2);
+
+        // Check if current is at/near lowest
+        if (price <= lowest * 1.05) {
+            document.getElementById('stat-lowest-note').textContent = '&#10003; Current price!';
+            document.getElementById('stat-lowest-note').style.color = 'var(--green)';
+        }
+    }
 }
 
-function renderChart(history) {
-    const chart = document.getElementById('chart');
-    if (!history.length) {
-        chart.innerHTML = '<p style="color: #94a3b8; text-align: center; width: 100%;">No history available</p>';
-        return;
+function renderChart() {
+    const ctx = document.getElementById('price-chart').getContext('2d');
+
+    // Filter by period
+    const cutoffDate = new Date();
+    cutoffDate.setDate(cutoffDate.getDate() - currentPeriod);
+
+    const filteredHistory = priceHistory.filter(h => {
+        if (!h.date) return true;
+        return new Date(h.date) >= cutoffDate;
+    });
+
+    // Prepare data
+    const labels = filteredHistory.map(h => {
+        if (!h.date) return '';
+        const d = new Date(h.date);
+        return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    });
+
+    const amazonPrices = filteredHistory.map(h => {
+        const retailer = (h.retailer || '').toLowerCase();
+        return retailer.includes('walmart') ? null : h.price;
+    });
+
+    const walmartPrices = filteredHistory.map(h => {
+        const retailer = (h.retailer || '').toLowerCase();
+        return retailer.includes('walmart') ? h.price : null;
+    });
+
+    // Destroy existing chart
+    if (priceChart) {
+        priceChart.destroy();
     }
 
-    const last90 = history.slice(-90);
-    const max = Math.max(...last90.map(h => h.price));
-    const min = Math.min(...last90.map(h => h.price));
-    const range = max - min || 1;
+    // Create chart
+    priceChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Amazon',
+                    data: amazonPrices,
+                    borderColor: '#ff9900',
+                    backgroundColor: 'rgba(255, 153, 0, 0.1)',
+                    fill: true,
+                    tension: 0.3,
+                    pointRadius: 2,
+                    pointHoverRadius: 6
+                },
+                {
+                    label: 'Walmart',
+                    data: walmartPrices,
+                    borderColor: '#0071ce',
+                    backgroundColor: 'rgba(0, 113, 206, 0.1)',
+                    fill: true,
+                    tension: 0.3,
+                    pointRadius: 2,
+                    pointHoverRadius: 6
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    mode: 'index',
+                    intersect: false,
+                    backgroundColor: '#1a2234',
+                    titleColor: '#fff',
+                    bodyColor: '#94a3b8',
+                    borderColor: 'rgba(109,195,213,0.3)',
+                    borderWidth: 1,
+                    padding: 12,
+                    callbacks: {
+                        label: function(context) {
+                            if (context.raw === null) return '';
+                            return context.dataset.label + ': $' + context.raw.toFixed(2);
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    grid: {
+                        color: 'rgba(255,255,255,0.05)'
+                    },
+                    ticks: {
+                        color: '#64748b',
+                        maxTicksLimit: 8
+                    }
+                },
+                y: {
+                    grid: {
+                        color: 'rgba(255,255,255,0.05)'
+                    },
+                    ticks: {
+                        color: '#64748b',
+                        callback: function(value) {
+                            return '$' + value.toFixed(0);
+                        }
+                    }
+                }
+            },
+            interaction: {
+                mode: 'nearest',
+                axis: 'x',
+                intersect: false
+            }
+        }
+    });
+}
 
-    chart.innerHTML = last90.map(h => {
-        const height = ((h.price - min) / range) * 80 + 20;
-        const retailer = (h.retailer || '').toLowerCase();
-        const barClass = retailer.includes('walmart') ? 'walmart' : 'amazon';
-        return `<div class="chart-bar ${barClass}" style="height: ${height}%;" title="$${h.price.toFixed(2)} - ${h.date || ''}"></div>`;
-    }).join('');
+function setPeriod(days) {
+    currentPeriod = days;
+
+    // Update buttons
+    document.querySelectorAll('.period-btn').forEach(btn => {
+        btn.classList.toggle('active', parseInt(btn.dataset.days) === days);
+    });
+
+    renderChart();
+}
+
+function analyzeDeal() {
+    const currentPrice = parseFloat(toyData.price) || 0;
+    const discount = parseFloat(toyData.discount_percent) || 0;
+
+    // Calculate average from history
+    let avgPrice = currentPrice;
+    if (priceHistory.length > 0) {
+        const prices = priceHistory.map(h => h.price).filter(p => p > 0);
+        avgPrice = prices.reduce((a, b) => a + b, 0) / prices.length;
+    }
+
+    const percentFromAvg = ((avgPrice - currentPrice) / avgPrice) * 100;
+
+    const indicator = document.getElementById('deal-indicator');
+    const title = document.getElementById('deal-title');
+    const desc = document.getElementById('deal-description');
+
+    if (percentFromAvg >= 15 || discount >= 20) {
+        indicator.className = 'deal-indicator good';
+        indicator.innerHTML = '&#129321;';
+        title.textContent = 'Great Deal!';
+        desc.textContent = `Current price is ${percentFromAvg.toFixed(0)}% below average. This is a good time to buy.`;
+    } else if (percentFromAvg >= 5 || discount >= 10) {
+        indicator.className = 'deal-indicator fair';
+        indicator.innerHTML = '&#128077;';
+        title.textContent = 'Fair Price';
+        desc.textContent = `Price is slightly below average. Not bad, but you might find better deals.`;
+    } else if (percentFromAvg <= -10) {
+        indicator.className = 'deal-indicator poor';
+        indicator.innerHTML = '&#128528;';
+        title.textContent = 'Above Average';
+        desc.textContent = `Current price is ${Math.abs(percentFromAvg).toFixed(0)}% above average. Consider waiting for a better deal.`;
+    } else {
+        indicator.className = 'deal-indicator fair';
+        indicator.innerHTML = '&#128578;';
+        title.textContent = 'Average Price';
+        desc.textContent = 'Price is close to the historical average. Typical pricing for this toy.';
+    }
 }
 
 function showError() {

@@ -4,15 +4,242 @@
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
     <title>Brands - ToyTap</title>
-    <meta name="description" content="Browse toys by brand. LEGO, Fisher-Price, Hot Wheels, Barbie, and more." />
+    <meta name="description" content="Browse toys by brand. LEGO, Fisher-Price, Hot Wheels, Barbie, and more popular toy brands." />
     <link rel="icon" type="image/png" href="https://i.imgur.com/HXSawxU.png" />
     <link rel="stylesheet" href="css/styles.css" />
     <style>
-        .brand-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 16px; max-width: 1200px; margin: 0 auto; padding: 40px 20px; }
-        .brand-card { background: var(--bg-card); border-radius: 12px; padding: 24px 16px; text-align: center; border: 1px solid rgba(109,195,213,0.15); cursor: pointer; transition: all 0.3s; }
-        .brand-card:hover { background: rgba(109,195,213,0.1); border-color: var(--cyan); transform: translateY(-4px); }
-        .brand-name { font-size: 15px; font-weight: 700; color: #fff; }
-        .back-btn { display: inline-flex; align-items: center; gap: 8px; color: var(--cyan); font-weight: 600; cursor: pointer; margin-bottom: 20px; }
+        /* Brands Page Styles */
+        .brands-hero {
+            background: linear-gradient(135deg, #0a0e27 0%, var(--navy-dark) 50%, #1a1a2e 100%);
+            padding: 50px 20px;
+            text-align: center;
+        }
+
+        .brands-title {
+            font-size: clamp(28px, 6vw, 48px);
+            font-weight: 900;
+            color: #fff;
+            margin-bottom: 12px;
+        }
+
+        .brands-subtitle {
+            font-size: 16px;
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 24px;
+        }
+
+        /* Search Bar */
+        .brand-search-container {
+            max-width: 400px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .brand-search {
+            width: 100%;
+            padding: 14px 20px 14px 48px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(109,195,213,0.3);
+            border-radius: 12px;
+            color: #fff;
+            font-size: 15px;
+            outline: none;
+        }
+
+        .brand-search:focus {
+            border-color: var(--cyan);
+        }
+
+        .brand-search::placeholder {
+            color: rgba(255,255,255,0.5);
+        }
+
+        .brand-search-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255,255,255,0.5);
+        }
+
+        /* Section */
+        .brand-section {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .section-header {
+            font-size: 20px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Brand Grid */
+        .brand-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 12px;
+        }
+
+        .brand-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 20px 16px;
+            text-align: center;
+            border: 1px solid rgba(109,195,213,0.15);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .brand-card:hover {
+            background: rgba(109,195,213,0.1);
+            border-color: var(--cyan);
+            transform: translateY(-4px);
+        }
+
+        .brand-card.featured {
+            background: linear-gradient(135deg, rgba(109,195,213,0.1), rgba(253,185,19,0.1));
+            border-color: rgba(253,185,19,0.3);
+        }
+
+        .brand-name {
+            font-size: 14px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .brand-count {
+            font-size: 11px;
+            color: var(--cyan);
+            margin-top: 4px;
+        }
+
+        /* Back Button */
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--cyan);
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 20px;
+            padding: 10px 0;
+        }
+
+        .back-btn:hover {
+            opacity: 0.8;
+        }
+
+        /* Toys Header */
+        .toys-header {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 24px 20px;
+        }
+
+        .toys-title {
+            font-size: 28px;
+            font-weight: 800;
+            color: #fff;
+            margin-bottom: 8px;
+        }
+
+        /* Sort Bar */
+        .sort-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto 20px;
+            padding: 0 20px;
+        }
+
+        .toys-count {
+            font-size: 14px;
+            color: #94a3b8;
+        }
+
+        .toys-count strong {
+            color: var(--cyan);
+        }
+
+        .sort-select {
+            background: var(--bg-card);
+            border: 1px solid rgba(109,195,213,0.2);
+            border-radius: 8px;
+            padding: 10px 16px;
+            color: #fff;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        /* Alphabet Nav */
+        .alphabet-nav {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 6px;
+            padding: 16px 20px;
+            background: var(--bg-dark);
+            border-bottom: 1px solid rgba(109,195,213,0.1);
+            position: sticky;
+            top: 70px;
+            z-index: 100;
+        }
+
+        .alpha-btn {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-card);
+            border: 1px solid rgba(109,195,213,0.2);
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #94a3b8;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .alpha-btn:hover {
+            background: rgba(109,195,213,0.1);
+            color: #fff;
+        }
+
+        .alpha-btn.active {
+            background: var(--cyan);
+            color: var(--navy);
+            border-color: var(--cyan);
+        }
+
+        .alpha-btn.disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        /* Mobile */
+        @media (max-width: 640px) {
+            .brand-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .alphabet-nav {
+                gap: 4px;
+            }
+
+            .alpha-btn {
+                width: 32px;
+                height: 32px;
+                font-size: 12px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -35,23 +262,66 @@
 </header>
 
 <main class="page-wrapper">
-    <section class="hero">
-        <h1 class="hero-title" id="page-title">Shop by Brand</h1>
-        <p class="hero-subtitle" id="page-subtitle">Find toys from your favorite brands</p>
-    </section>
-
+    <!-- Brands View -->
     <div id="brands-view">
-        <div class="brand-grid" id="brand-grid"></div>
+        <section class="brands-hero">
+            <h1 class="brands-title">Shop by Brand</h1>
+            <p class="brands-subtitle">Find toys from your favorite brands</p>
+
+            <div class="brand-search-container">
+                <svg class="brand-search-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+                </svg>
+                <input type="text" class="brand-search" id="brand-search" placeholder="Search brands..." oninput="filterBrands()">
+            </div>
+        </section>
+
+        <!-- Alphabet Navigation -->
+        <div class="alphabet-nav" id="alphabet-nav"></div>
+
+        <!-- Popular Brands -->
+        <section class="brand-section">
+            <h2 class="section-header">&#11088; Popular Brands</h2>
+            <div class="brand-grid" id="popular-brands"></div>
+        </section>
+
+        <!-- All Brands -->
+        <section class="brand-section">
+            <h2 class="section-header">&#128193; All Brands</h2>
+            <div class="brand-grid" id="all-brands"></div>
+        </section>
     </div>
 
+    <!-- Toys View (shown when brand selected) -->
     <div id="toys-view" style="display: none;">
-        <div style="max-width: 1200px; margin: 0 auto; padding: 20px;">
+        <section class="brands-hero">
+            <h1 class="brands-title" id="toys-title">Brand</h1>
+            <p class="brands-subtitle" id="toys-subtitle">Browse toys</p>
+        </section>
+
+        <div class="toys-header">
             <div class="back-btn" onclick="showBrands()">&#8592; Back to Brands</div>
         </div>
+
+        <div class="sort-bar">
+            <div class="toys-count">
+                Showing <strong id="showing-count">0</strong> toys
+            </div>
+            <select class="sort-select" id="sort-select" onchange="handleSortChange()">
+                <option value="score">Best Match</option>
+                <option value="price-low">Price: Low to High</option>
+                <option value="price-high">Price: High to Low</option>
+                <option value="rating">Highest Rated</option>
+                <option value="popular">Most Popular</option>
+            </select>
+        </div>
+
         <section class="toy-grid-section">
             <div id="toy-grid" class="toy-grid"></div>
             <div style="text-align: center; margin-top: 40px;">
-                <button id="show-more-btn" class="btn btn-primary" onclick="showMore()" style="display: none;">Show More</button>
+                <button id="show-more-btn" class="btn btn-primary" onclick="showMore()" style="display: none;">
+                    Load More Toys
+                </button>
             </div>
         </section>
     </div>
@@ -68,7 +338,7 @@
     </div>
 </footer>
 
-<div id="toy-modal" class="toy-modal-overlay">
+<div id="toy-modal" class="toy-modal-overlay" onclick="if(event.target===this)closeToyModal()">
     <div class="toy-modal">
         <button class="modal-close" onclick="closeToyModal()">&times;</button>
         <div id="modal-content-area"></div>
@@ -77,60 +347,183 @@
 
 <script src="js/api.js"></script>
 <script>
-const BRANDS = [
+// Popular brands (featured at top)
+const POPULAR_BRANDS = [
     'LEGO', 'Fisher-Price', 'Hot Wheels', 'Barbie', 'Melissa & Doug', 'Hasbro',
-    'Nerf', 'Play-Doh', 'Little Tikes', 'VTech', 'Paw Patrol', 'Disney',
-    'Marvel', 'Star Wars', 'Bluey', 'Nintendo', 'Pokémon', 'Transformers'
+    'Nerf', 'Play-Doh', 'Little Tikes', 'VTech', 'Paw Patrol', 'Disney'
 ];
 
+// All brands A-Z
+const ALL_BRANDS = [
+    'American Girl', 'Barbie', 'Batman', 'Beyblade', 'Bluey', 'Bruder',
+    'Calico Critters', 'Crayola', 'Disney', 'Fat Brain Toys', 'Fisher-Price',
+    'Funko', 'Hasbro', 'Hot Wheels', 'Imaginext', 'K\'NEX', 'Kinetic Sand',
+    'LeapFrog', 'LEGO', 'Little People', 'Little Tikes', 'LOL Surprise',
+    'Magna-Tiles', 'Marvel', 'Matchbox', 'Mattel', 'Mega Bloks', 'Melissa & Doug',
+    'Moose Toys', 'My Little Pony', 'National Geographic', 'Nerf', 'Nintendo',
+    'Our Generation', 'Paw Patrol', 'PicassoTiles', 'Play-Doh', 'Playmobil',
+    'Pokemon', 'Power Rangers', 'Radio Flyer', 'Ravensburger', 'Razor',
+    'Roblox', 'Schleich', 'Squishmallows', 'Star Wars', 'Step2', 'Super Mario',
+    'Thames & Kosmos', 'Thomas & Friends', 'Transformers', 'VTech', 'Walmart Brand'
+];
+
+// State
 let currentBrand = null;
 let toys = [];
 let visibleCount = 24;
+let currentSort = 'score';
+let currentLetter = null;
 
+// Initialize
 document.addEventListener('DOMContentLoaded', () => {
     const urlBrand = getUrlParam('brand');
     if (urlBrand) {
         selectBrand(urlBrand);
     } else {
         renderBrands();
+        renderAlphabetNav();
     }
 });
 
+// Render alphabet navigation
+function renderAlphabetNav() {
+    const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+    const brandsFirstLetters = new Set(ALL_BRANDS.map(b => b[0].toUpperCase()));
+
+    document.getElementById('alphabet-nav').innerHTML = letters.map(letter => {
+        const hasbrands = brandsFirstLetters.has(letter);
+        return `<button class="alpha-btn ${!hasbrands ? 'disabled' : ''}" ${hasbrands ? `onclick="filterByLetter('${letter}')"` : ''}>${letter}</button>`;
+    }).join('');
+}
+
+// Render brands
 function renderBrands() {
-    document.getElementById('brand-grid').innerHTML = BRANDS.map(brand => `
+    // Popular brands
+    document.getElementById('popular-brands').innerHTML = POPULAR_BRANDS.map(brand => `
+        <div class="brand-card featured" onclick="selectBrand('${brand}')">
+            <div class="brand-name">${brand}</div>
+        </div>
+    `).join('');
+
+    // All brands
+    renderAllBrands(ALL_BRANDS);
+}
+
+// Render all brands (filtered or full)
+function renderAllBrands(brands) {
+    document.getElementById('all-brands').innerHTML = brands.map(brand => `
         <div class="brand-card" onclick="selectBrand('${brand}')">
             <div class="brand-name">${brand}</div>
         </div>
     `).join('');
 }
 
+// Filter by letter
+function filterByLetter(letter) {
+    currentLetter = currentLetter === letter ? null : letter;
+
+    // Update button states
+    document.querySelectorAll('.alpha-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.textContent === currentLetter);
+    });
+
+    // Filter brands
+    if (currentLetter) {
+        const filtered = ALL_BRANDS.filter(b => b[0].toUpperCase() === currentLetter);
+        renderAllBrands(filtered);
+    } else {
+        renderAllBrands(ALL_BRANDS);
+    }
+}
+
+// Search/filter brands
+function filterBrands() {
+    const query = document.getElementById('brand-search').value.toLowerCase().trim();
+
+    if (!query) {
+        renderAllBrands(ALL_BRANDS);
+        return;
+    }
+
+    const filtered = ALL_BRANDS.filter(b => b.toLowerCase().includes(query));
+    renderAllBrands(filtered);
+}
+
+// Select a brand
 async function selectBrand(brand) {
     currentBrand = brand;
     visibleCount = 24;
+    currentSort = 'score';
 
-    document.getElementById('page-title').textContent = brand;
-    document.getElementById('page-subtitle').textContent = `All ${brand} toys`;
+    document.getElementById('toys-title').textContent = brand;
+    document.getElementById('toys-subtitle').textContent = `All ${brand} toys`;
+
     document.getElementById('brands-view').style.display = 'none';
     document.getElementById('toys-view').style.display = 'block';
 
-    showLoading(document.getElementById('toy-grid'));
-    toys = await fetchByBrand(brand);
-    renderToys();
+    await loadBrandToys();
 }
 
+// Load toys for brand
+async function loadBrandToys() {
+    const grid = document.getElementById('toy-grid');
+    showLoading(grid);
+
+    try {
+        toys = await fetchByBrand(currentBrand, currentSort);
+        sortToys();
+        renderToys();
+    } catch (err) {
+        console.error('Load error:', err);
+        showError(grid);
+    }
+}
+
+// Sort toys
+function sortToys() {
+    switch (currentSort) {
+        case 'price-low':
+            toys.sort((a, b) => (parseFloat(a.price) || 0) - (parseFloat(b.price) || 0));
+            break;
+        case 'price-high':
+            toys.sort((a, b) => (parseFloat(b.price) || 0) - (parseFloat(a.price) || 0));
+            break;
+        case 'rating':
+            toys.sort((a, b) => (parseFloat(b.rating) || 0) - (parseFloat(a.rating) || 0));
+            break;
+        case 'popular':
+            toys.sort((a, b) => (parseInt(b.reviews_count) || 0) - (parseInt(a.reviews_count) || 0));
+            break;
+        default:
+            toys.sort((a, b) => (parseFloat(b.toy_tap_score) || 0) - (parseFloat(a.toy_tap_score) || 0));
+    }
+}
+
+// Render toys
 function renderToys() {
     const toShow = toys.slice(0, visibleCount);
+    document.getElementById('showing-count').textContent = toShow.length;
     document.getElementById('toy-grid').innerHTML = toShow.map(toy => renderToyCard(toy, { showGrade: true })).join('');
     document.getElementById('show-more-btn').style.display = visibleCount < toys.length ? 'inline-flex' : 'none';
 }
 
-function showMore() { visibleCount += 24; renderToys(); }
+// Handle sort change
+function handleSortChange() {
+    currentSort = document.getElementById('sort-select').value;
+    sortToys();
+    renderToys();
+}
 
+// Show more
+function showMore() {
+    visibleCount += 24;
+    renderToys();
+}
+
+// Back to brands
 function showBrands() {
     document.getElementById('brands-view').style.display = 'block';
     document.getElementById('toys-view').style.display = 'none';
-    document.getElementById('page-title').textContent = 'Shop by Brand';
-    document.getElementById('page-subtitle').textContent = 'Find toys from your favorite brands';
     currentBrand = null;
 }
 </script>

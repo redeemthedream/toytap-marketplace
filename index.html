@@ -17,6 +17,365 @@
     <link rel="canonical" href="https://dashboard.gettoytap.com/" />
 
     <link rel="stylesheet" href="css/styles.css" />
+    <style>
+        /* Deals Page Specific Styles */
+        .deals-hero {
+            background: linear-gradient(135deg, #0a0e27 0%, var(--navy-dark) 50%, #1a1a2e 100%);
+            padding: 50px 20px 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .deals-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(ellipse at 30% 20%, rgba(109, 195, 213, 0.15) 0%, transparent 50%),
+                        radial-gradient(ellipse at 70% 80%, rgba(253, 185, 19, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .deals-title {
+            font-size: clamp(28px, 6vw, 48px);
+            font-weight: 900;
+            color: #fff;
+            margin-bottom: 12px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .deals-subtitle {
+            font-size: 16px;
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 28px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Stats Bar */
+        .stats-bar {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            flex-wrap: wrap;
+            padding: 16px 20px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 16px;
+            max-width: 600px;
+            margin: 0 auto 0;
+            position: relative;
+            z-index: 1;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--cyan);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .stat-value.green { color: var(--green); }
+        .stat-value.yellow { color: var(--yellow); }
+
+        .stat-label {
+            font-size: 12px;
+            color: rgba(255,255,255,0.6);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* 6-Tab Filter */
+        .filter-tabs-container {
+            padding: 24px 20px;
+            text-align: center;
+            position: sticky;
+            top: 70px;
+            z-index: 100;
+            background: var(--bg-dark);
+            border-bottom: 1px solid rgba(109,195,213,0.1);
+        }
+
+        .filter-tabs-6 {
+            display: inline-flex;
+            gap: 8px;
+            padding: 8px;
+            background: var(--bg-card);
+            border-radius: 16px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .filter-tab-6 {
+            padding: 12px 20px;
+            background: transparent;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            color: #94a3b8;
+            transition: all 0.2s;
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+
+        .filter-tab-6:hover {
+            background: rgba(109,195,213,0.1);
+            color: #fff;
+        }
+
+        .filter-tab-6.active {
+            background: linear-gradient(135deg, var(--cyan), var(--navy));
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(109,195,213,0.3);
+        }
+
+        .filter-tab-6 .tab-icon {
+            font-size: 16px;
+        }
+
+        /* Toy Card Enhancements */
+        .toy-card-freshness {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            z-index: 3;
+        }
+
+        .freshness-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 6px 10px;
+            border-radius: 8px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .freshness-pill.fresh {
+            background: rgba(34, 197, 94, 0.15);
+            color: #22c55e;
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+
+        .freshness-pill.oneday {
+            background: rgba(253, 185, 19, 0.15);
+            color: #fbbf24;
+            border: 1px solid rgba(253, 185, 19, 0.3);
+        }
+
+        .freshness-pill.aging {
+            background: rgba(249, 115, 22, 0.15);
+            color: #f97316;
+            border: 1px solid rgba(249, 115, 22, 0.3);
+        }
+
+        .freshness-pill.old {
+            background: rgba(107, 114, 128, 0.15);
+            color: #9ca3af;
+            border: 1px solid rgba(107, 114, 128, 0.3);
+        }
+
+        /* Deal Badge on Card */
+        .toy-card-deal-badge {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            background: var(--green);
+            color: #fff;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+            z-index: 3;
+        }
+
+        /* Walmart badge */
+        .walmart-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: var(--walmart-blue);
+            color: #fff;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+
+        /* Search Bar */
+        .search-container {
+            max-width: 500px;
+            margin: 0 auto 24px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 16px 20px 16px 50px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(109,195,213,0.3);
+            border-radius: 14px;
+            color: #fff;
+            font-size: 15px;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .search-input:focus {
+            border-color: var(--cyan);
+            background: rgba(255,255,255,0.15);
+        }
+
+        .search-input::placeholder {
+            color: rgba(255,255,255,0.5);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255,255,255,0.5);
+        }
+
+        .search-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: var(--bg-card);
+            border: 1px solid rgba(109,195,213,0.2);
+            border-radius: 12px;
+            margin-top: 8px;
+            max-height: 400px;
+            overflow-y: auto;
+            display: none;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
+
+        .search-result {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: background 0.2s;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .search-result:hover {
+            background: rgba(109,195,213,0.1);
+        }
+
+        .search-result:last-child {
+            border-bottom: none;
+        }
+
+        .search-result img {
+            width: 48px;
+            height: 48px;
+            object-fit: contain;
+            background: #fff;
+            border-radius: 8px;
+        }
+
+        .search-result-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .search-result-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #fff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .search-result-brand {
+            font-size: 12px;
+            color: var(--cyan);
+        }
+
+        .search-result-price {
+            font-size: 16px;
+            font-weight: 700;
+            color: #fff;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Results Count */
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto 20px;
+            padding: 0 20px;
+        }
+
+        .results-count {
+            font-size: 14px;
+            color: #94a3b8;
+        }
+
+        .results-count strong {
+            color: var(--cyan);
+        }
+
+        /* Sort dropdown */
+        .sort-select {
+            background: var(--bg-card);
+            border: 1px solid rgba(109,195,213,0.2);
+            border-radius: 8px;
+            padding: 10px 16px;
+            color: #fff;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        @media (max-width: 768px) {
+            .filter-tabs-6 {
+                gap: 4px;
+                padding: 6px;
+            }
+
+            .filter-tab-6 {
+                padding: 10px 14px;
+                font-size: 12px;
+            }
+
+            .filter-tab-6 .tab-icon {
+                font-size: 14px;
+            }
+
+            .stats-bar {
+                gap: 20px;
+            }
+
+            .stat-value {
+                font-size: 22px;
+            }
+        }
+    </style>
 </head>
 <body>
 
@@ -43,57 +402,80 @@
 </header>
 
 <main class="page-wrapper">
-    <!-- Hero Section -->
-    <section class="hero">
-        <div class="hero-badge">Tracking 14,000+ toys</div>
-        <h1 class="hero-title">Never Overpay for Toys Again</h1>
-        <p class="hero-subtitle">
-            Track prices across Amazon, Walmart, and Target. See TT Grades, price history, and find the best time to buy.
-        </p>
+    <!-- Deals Hero -->
+    <section class="deals-hero">
+        <h1 class="deals-title">Today's Best Toy Deals</h1>
+        <p class="deals-subtitle">Track prices across Amazon, Walmart & Target - Updated Daily</p>
 
         <!-- Search Bar -->
-        <div style="max-width: 600px; margin: 32px auto 0; position: relative;">
+        <div class="search-container">
+            <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+            </svg>
             <input
                 type="text"
                 id="heroSearch"
-                placeholder="Search for any toy..."
-                style="width: 100%; padding: 18px 20px 18px 54px; background: rgba(255,255,255,0.1); border: 1px solid rgba(109,195,213,0.3); border-radius: 16px; color: #fff; font-size: 16px; outline: none;"
+                class="search-input"
+                placeholder="Search 14,000+ toys..."
                 onkeyup="handleSearch(event)"
-                onfocus="this.style.borderColor='var(--cyan)'"
-                onblur="this.style.borderColor='rgba(109,195,213,0.3)'"
             />
-            <svg style="position: absolute; left: 18px; top: 50%; transform: translateY(-50%); opacity: 0.5;" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-            </svg>
             <div id="searchResults" class="search-dropdown"></div>
         </div>
 
-        <!-- Stats -->
-        <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 32px; margin-top: 40px; font-size: 14px; color: #94a3b8;">
-            <div style="display: flex; align-items: center; gap: 8px;">
-                <span style="color: var(--cyan);">14,000+</span> toys tracked
+        <!-- Stats Bar -->
+        <div class="stats-bar">
+            <div class="stat-item">
+                <div class="stat-value" id="stat-toys">--</div>
+                <div class="stat-label">Toys</div>
             </div>
-            <div style="display: flex; align-items: center; gap: 8px;">
-                <span style="color: var(--cyan);">3</span> major retailers
+            <div class="stat-item">
+                <div class="stat-value green" id="stat-deals">--</div>
+                <div class="stat-label">On Sale</div>
             </div>
-            <div style="display: flex; align-items: center; gap: 8px;">
-                Updated <span style="color: var(--cyan);">daily</span>
+            <div class="stat-item">
+                <div class="stat-value yellow" id="stat-savings">--</div>
+                <div class="stat-label">Avg Savings</div>
             </div>
         </div>
     </section>
 
-    <!-- Filter Tabs -->
-    <section class="filter-section">
-        <div class="filter-tabs">
-            <button class="filter-tab active" data-filter="quality" onclick="setFilter('quality')">Best Toys</button>
-            <button class="filter-tab" data-filter="value" onclick="setFilter('value')">Best Value</button>
+    <!-- 6-Tab Filter -->
+    <div class="filter-tabs-container">
+        <div class="filter-tabs-6">
+            <button class="filter-tab-6 active" data-filter="hot" onclick="setFilter('hot')">
+                <span class="tab-icon">&#128293;</span> Hot Now
+            </button>
+            <button class="filter-tab-6" data-filter="picks" onclick="setFilter('picks')">
+                <span class="tab-icon">&#11088;</span> ToyTap Picks
+            </button>
+            <button class="filter-tab-6" data-filter="bestsellers" onclick="setFilter('bestsellers')">
+                <span class="tab-icon">&#127942;</span> Best Sellers
+            </button>
+            <button class="filter-tab-6" data-filter="drops" onclick="setFilter('drops')">
+                <span class="tab-icon">&#128200;</span> Price Drops
+            </button>
+            <button class="filter-tab-6" data-filter="rated" onclick="setFilter('rated')">
+                <span class="tab-icon">&#11088;</span> Top Rated
+            </button>
+            <button class="filter-tab-6" data-filter="walmart" onclick="setFilter('walmart')">
+                <span class="tab-icon">&#128154;</span> Walmart Deals
+            </button>
         </div>
-        <div id="tab-explanation" style="margin-top: 20px; padding: 14px 28px; background: rgba(255,255,255,0.06); border-radius: 12px; display: inline-block; border: 1px solid rgba(255,255,255,0.1);">
-            <p style="font-size: 15px; color: rgba(255,255,255,0.8); margin: 0;">
-                <strong style="color: var(--cyan);">TT Grade</strong> - Our quality rating based on reviews, ratings, and popularity
-            </p>
+    </div>
+
+    <!-- Results Header -->
+    <div class="results-header">
+        <div class="results-count">
+            Showing <strong id="showing-count">0</strong> toys
         </div>
-    </section>
+        <select class="sort-select" id="sort-select" onchange="handleSortChange()">
+            <option value="default">Default Sort</option>
+            <option value="price-low">Price: Low to High</option>
+            <option value="price-high">Price: High to Low</option>
+            <option value="discount">Biggest Discount</option>
+            <option value="rating">Highest Rated</option>
+        </select>
+    </div>
 
     <!-- Toy Grid -->
     <section class="toy-grid-section">
@@ -103,100 +485,8 @@
 
         <div style="text-align: center; margin-top: 40px;">
             <button id="show-more-btn" class="btn btn-primary" onclick="showMore()" style="display: none;">
-                Show More Toys
+                Load More Toys
             </button>
-        </div>
-    </section>
-
-    <!-- How TT Grades Work -->
-    <section style="max-width: 900px; margin: 60px auto; padding: 0 20px;">
-        <h2 style="text-align: center; font-size: clamp(24px, 5vw, 36px); font-weight: 800; margin-bottom: 40px;">
-            How <span style="color: var(--cyan);">TT Grades</span> Work
-        </h2>
-
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px;">
-            <div style="background: var(--bg-card); border-radius: 16px; padding: 24px; border: 1px solid rgba(109,195,213,0.15);">
-                <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 16px; color: var(--cyan);">TT Grade (Quality)</h3>
-                <div style="display: flex; flex-direction: column; gap: 12px;">
-                    <div style="display: flex; align-items: center; gap: 12px;">
-                        <span class="tt-grade-badge size-sm grade-s">S</span>
-                        <span style="color: #94a3b8; font-size: 14px;">Exceptional - top tier quality</span>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 12px;">
-                        <span class="tt-grade-badge size-sm grade-a">A</span>
-                        <span style="color: #94a3b8; font-size: 14px;">Excellent - highly rated</span>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 12px;">
-                        <span class="tt-grade-badge size-sm grade-b">B</span>
-                        <span style="color: #94a3b8; font-size: 14px;">Good - solid choice</span>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 12px;">
-                        <span class="tt-grade-badge size-sm grade-c">C</span>
-                        <span style="color: #94a3b8; font-size: 14px;">Average - mixed reviews</span>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 12px;">
-                        <span class="tt-grade-badge size-sm grade-d">D</span>
-                        <span style="color: #94a3b8; font-size: 14px;">Below average</span>
-                    </div>
-                </div>
-            </div>
-
-            <div style="background: var(--bg-card); border-radius: 16px; padding: 24px; border: 1px solid rgba(109,195,213,0.15);">
-                <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 16px; color: var(--yellow);">TT Score (Value)</h3>
-                <p style="color: #94a3b8; font-size: 14px; line-height: 1.7; margin-bottom: 16px;">
-                    Combines quality + current deal to show the best toys for your money <strong>right now</strong>.
-                </p>
-                <ul style="color: #94a3b8; font-size: 14px; line-height: 1.8;">
-                    <li style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-                        <span style="color: var(--green);">&#10003;</span> Price vs. historical average
-                    </li>
-                    <li style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-                        <span style="color: var(--green);">&#10003;</span> Current discount depth
-                    </li>
-                    <li style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-                        <span style="color: var(--green);">&#10003;</span> Quality rating factored in
-                    </li>
-                    <li style="display: flex; align-items: center; gap: 8px;">
-                        <span style="color: var(--green);">&#10003;</span> Higher = better value
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </section>
-
-    <!-- Categories Preview -->
-    <section style="max-width: 1200px; margin: 60px auto; padding: 0 20px;">
-        <h2 style="text-align: center; font-size: clamp(24px, 5vw, 36px); font-weight: 800; margin-bottom: 40px;">
-            Browse by Category
-        </h2>
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px;">
-            <a href="categories.html?cat=Building" class="category-card" style="background: var(--bg-card); border-radius: 16px; padding: 24px; text-align: center; border: 1px solid rgba(109,195,213,0.15); transition: all 0.3s; text-decoration: none;">
-                <div style="font-size: 36px; margin-bottom: 12px;">&#129521;</div>
-                <div style="font-size: 14px; font-weight: 600; color: #fff;">Building</div>
-            </a>
-            <a href="categories.html?cat=Vehicles" class="category-card" style="background: var(--bg-card); border-radius: 16px; padding: 24px; text-align: center; border: 1px solid rgba(109,195,213,0.15); transition: all 0.3s; text-decoration: none;">
-                <div style="font-size: 36px; margin-bottom: 12px;">&#128663;</div>
-                <div style="font-size: 14px; font-weight: 600; color: #fff;">Vehicles</div>
-            </a>
-            <a href="categories.html?cat=Outdoor" class="category-card" style="background: var(--bg-card); border-radius: 16px; padding: 24px; text-align: center; border: 1px solid rgba(109,195,213,0.15); transition: all 0.3s; text-decoration: none;">
-                <div style="font-size: 36px; margin-bottom: 12px;">&#127966;</div>
-                <div style="font-size: 14px; font-weight: 600; color: #fff;">Outdoor</div>
-            </a>
-            <a href="categories.html?cat=Baby & Toddler" class="category-card" style="background: var(--bg-card); border-radius: 16px; padding: 24px; text-align: center; border: 1px solid rgba(109,195,213,0.15); transition: all 0.3s; text-decoration: none;">
-                <div style="font-size: 36px; margin-bottom: 12px;">&#128118;</div>
-                <div style="font-size: 14px; font-weight: 600; color: #fff;">Baby & Toddler</div>
-            </a>
-            <a href="categories.html?cat=Educational" class="category-card" style="background: var(--bg-card); border-radius: 16px; padding: 24px; text-align: center; border: 1px solid rgba(109,195,213,0.15); transition: all 0.3s; text-decoration: none;">
-                <div style="font-size: 36px; margin-bottom: 12px;">&#127891;</div>
-                <div style="font-size: 14px; font-weight: 600; color: #fff;">Educational</div>
-            </a>
-            <a href="categories.html?cat=Pretend Play" class="category-card" style="background: var(--bg-card); border-radius: 16px; padding: 24px; text-align: center; border: 1px solid rgba(109,195,213,0.15); transition: all 0.3s; text-decoration: none;">
-                <div style="font-size: 36px; margin-bottom: 12px;">&#127917;</div>
-                <div style="font-size: 14px; font-weight: 600; color: #fff;">Pretend Play</div>
-            </a>
-        </div>
-        <div style="text-align: center; margin-top: 32px;">
-            <a href="categories.html" class="btn btn-secondary">View All Categories</a>
         </div>
     </section>
 </main>
@@ -228,86 +518,280 @@
 <!-- Scripts -->
 <script src="js/api.js"></script>
 <script>
-    // Page-specific state
+    // State
     let allToys = [];
-    let currentFilter = 'quality';
-    let visibleCount = 12;
+    let filteredToys = [];
+    let currentFilter = 'hot';
+    let currentSort = 'default';
+    let visibleCount = 24;
 
-    const TAB_CONFIG = {
-        quality: {
-            explanation: '<strong style="color: var(--cyan);">TT Grade</strong> - Our quality rating based on reviews, ratings, and popularity',
-            sortKey: 'tt_grade_score',
-            showGrade: true,
-            showScore: false
+    // Filter configurations
+    const FILTER_CONFIG = {
+        hot: {
+            name: 'Hot Now',
+            sortFn: (toys) => {
+                // Sort by recency + score combination
+                return toys.sort((a, b) => {
+                    const scoreA = parseFloat(a.toy_tap_score) || 0;
+                    const scoreB = parseFloat(b.toy_tap_score) || 0;
+                    const freshA = getFreshnessScore(a.updated_at);
+                    const freshB = getFreshnessScore(b.updated_at);
+                    return (scoreB + freshB * 20) - (scoreA + freshA * 20);
+                });
+            }
         },
-        value: {
-            explanation: '<strong style="color: var(--yellow);">TT Score</strong> - Quality + deal combined. The best toy for your money right now',
-            sortKey: 'toy_tap_score',
-            showGrade: false,
-            showScore: true
+        picks: {
+            name: 'ToyTap Picks',
+            sortFn: (toys) => {
+                // Highest TT Grade Score
+                return toys.sort((a, b) => {
+                    const gradeA = parseFloat(a.tt_grade_score) || 0;
+                    const gradeB = parseFloat(b.tt_grade_score) || 0;
+                    return gradeB - gradeA;
+                });
+            }
+        },
+        bestsellers: {
+            name: 'Best Sellers',
+            sortFn: (toys) => {
+                // Sort by reviews count (popularity)
+                return toys.sort((a, b) => {
+                    const revA = parseInt(a.reviews_count) || 0;
+                    const revB = parseInt(b.reviews_count) || 0;
+                    return revB - revA;
+                });
+            }
+        },
+        drops: {
+            name: 'Price Drops',
+            sortFn: (toys) => {
+                // Filter to only toys with discounts, sort by discount %
+                return toys
+                    .filter(t => parseFloat(t.discount_percent) > 0)
+                    .sort((a, b) => {
+                        const discA = parseFloat(a.discount_percent) || 0;
+                        const discB = parseFloat(b.discount_percent) || 0;
+                        return discB - discA;
+                    });
+            }
+        },
+        rated: {
+            name: 'Top Rated',
+            sortFn: (toys) => {
+                // Sort by rating, then reviews
+                return toys.sort((a, b) => {
+                    const ratingA = parseFloat(a.rating) || 0;
+                    const ratingB = parseFloat(b.rating) || 0;
+                    if (ratingB !== ratingA) return ratingB - ratingA;
+                    return (parseInt(b.reviews_count) || 0) - (parseInt(a.reviews_count) || 0);
+                });
+            }
+        },
+        walmart: {
+            name: 'Walmart Deals',
+            sortFn: (toys) => {
+                // Filter to Walmart toys with deals
+                return toys
+                    .filter(t => {
+                        const retailer = (t.retailer || '').toLowerCase();
+                        return retailer.includes('walmart');
+                    })
+                    .sort((a, b) => {
+                        const discA = parseFloat(a.discount_percent) || 0;
+                        const discB = parseFloat(b.discount_percent) || 0;
+                        return discB - discA;
+                    });
+            }
         }
     };
+
+    // Freshness score (higher = more recent)
+    function getFreshnessScore(updatedAt) {
+        if (!updatedAt) return 0;
+        const now = new Date();
+        const updated = new Date(updatedAt);
+        const hoursAgo = (now - updated) / (1000 * 60 * 60);
+        if (hoursAgo < 6) return 4;
+        if (hoursAgo < 24) return 3;
+        if (hoursAgo < 72) return 2;
+        if (hoursAgo < 168) return 1;
+        return 0;
+    }
+
+    // Get freshness label
+    function getFreshnessLabel(updatedAt) {
+        if (!updatedAt) return { class: 'old', label: 'Older' };
+        const now = new Date();
+        const updated = new Date(updatedAt);
+        const hoursAgo = (now - updated) / (1000 * 60 * 60);
+
+        if (hoursAgo < 6) return { class: 'fresh', label: 'Fresh' };
+        if (hoursAgo < 24) return { class: 'oneday', label: '1 Day' };
+        if (hoursAgo < 72) return { class: 'aging', label: '2-3 Days' };
+        return { class: 'old', label: 'Older' };
+    }
 
     // Initialize
     document.addEventListener('DOMContentLoaded', async () => {
         showLoading(document.getElementById('toy-grid'));
 
         try {
-            allToys = await fetchLeaderboard(100);
-            filterAndRender();
+            allToys = await fetchLeaderboard(200);
+            updateStats();
+            applyFilterAndRender();
         } catch (err) {
+            console.error('Load error:', err);
             showError(document.getElementById('toy-grid'));
         }
     });
 
+    // Update stats bar
+    function updateStats() {
+        const totalToys = allToys.length;
+        const dealsCount = allToys.filter(t => parseFloat(t.discount_percent) > 0).length;
+
+        // Calculate average savings
+        const toysWithDeals = allToys.filter(t => parseFloat(t.discount_percent) > 0);
+        let avgSavings = 0;
+        if (toysWithDeals.length > 0) {
+            const totalDiscount = toysWithDeals.reduce((sum, t) => sum + (parseFloat(t.discount_percent) || 0), 0);
+            avgSavings = Math.round(totalDiscount / toysWithDeals.length);
+        }
+
+        document.getElementById('stat-toys').textContent = totalToys.toLocaleString();
+        document.getElementById('stat-deals').textContent = dealsCount.toLocaleString();
+        document.getElementById('stat-savings').textContent = avgSavings + '%';
+    }
+
+    // Set filter tab
     function setFilter(filter) {
         currentFilter = filter;
-        visibleCount = 12;
+        visibleCount = 24;
 
         // Update tab UI
-        document.querySelectorAll('.filter-tab').forEach(tab => {
+        document.querySelectorAll('.filter-tab-6').forEach(tab => {
             tab.classList.toggle('active', tab.dataset.filter === filter);
         });
 
-        // Update explanation
-        document.getElementById('tab-explanation').innerHTML = `<p style="font-size: 15px; color: rgba(255,255,255,0.8); margin: 0;">${TAB_CONFIG[filter].explanation}</p>`;
-
-        filterAndRender();
+        applyFilterAndRender();
     }
 
-    function filterAndRender() {
-        const config = TAB_CONFIG[currentFilter];
-        let filtered = [...allToys];
+    // Apply filter and render
+    function applyFilterAndRender() {
+        const config = FILTER_CONFIG[currentFilter];
+        filteredToys = config.sortFn([...allToys]);
 
-        // Sort based on filter
-        if (currentFilter === 'quality') {
-            filtered = filtered.filter(t => t.tt_grade_score && parseFloat(t.tt_grade_score) > 0);
-            filtered.sort((a, b) => (parseFloat(b.tt_grade_score) || 0) - (parseFloat(a.tt_grade_score) || 0));
-        } else {
-            filtered = filtered.filter(t => t.toy_tap_score && parseFloat(t.toy_tap_score) > 0);
-            filtered.sort((a, b) => (parseFloat(b.toy_tap_score) || 0) - (parseFloat(a.toy_tap_score) || 0));
+        // Apply additional sort if selected
+        if (currentSort !== 'default') {
+            applySort();
         }
 
-        // Render cards
-        const toShow = filtered.slice(0, visibleCount);
+        renderToys();
+    }
+
+    // Apply sort
+    function applySort() {
+        switch (currentSort) {
+            case 'price-low':
+                filteredToys.sort((a, b) => (parseFloat(a.price) || 0) - (parseFloat(b.price) || 0));
+                break;
+            case 'price-high':
+                filteredToys.sort((a, b) => (parseFloat(b.price) || 0) - (parseFloat(a.price) || 0));
+                break;
+            case 'discount':
+                filteredToys.sort((a, b) => (parseFloat(b.discount_percent) || 0) - (parseFloat(a.discount_percent) || 0));
+                break;
+            case 'rating':
+                filteredToys.sort((a, b) => (parseFloat(b.rating) || 0) - (parseFloat(a.rating) || 0));
+                break;
+        }
+    }
+
+    // Handle sort change
+    function handleSortChange() {
+        currentSort = document.getElementById('sort-select').value;
+        applyFilterAndRender();
+    }
+
+    // Render toys
+    function renderToys() {
+        const toShow = filteredToys.slice(0, visibleCount);
         const grid = document.getElementById('toy-grid');
 
-        grid.innerHTML = toShow.map((toy, i) =>
-            renderToyCard(toy, {
-                rank: i + 1,
-                showGrade: config.showGrade,
-                showScore: config.showScore
-            })
-        ).join('');
+        document.getElementById('showing-count').textContent = toShow.length;
+
+        if (toShow.length === 0) {
+            grid.innerHTML = `
+                <div style="grid-column: 1/-1; text-align: center; padding: 60px 20px; color: #94a3b8;">
+                    <div style="font-size: 48px; margin-bottom: 16px;">&#128269;</div>
+                    <p style="font-size: 18px; margin-bottom: 8px;">No toys found</p>
+                    <p style="font-size: 14px;">Try a different filter</p>
+                </div>
+            `;
+            document.getElementById('show-more-btn').style.display = 'none';
+            return;
+        }
+
+        grid.innerHTML = toShow.map((toy, i) => renderDealCard(toy, i + 1)).join('');
 
         // Show/hide load more button
         const btn = document.getElementById('show-more-btn');
-        btn.style.display = visibleCount < filtered.length ? 'inline-flex' : 'none';
+        btn.style.display = visibleCount < filteredToys.length ? 'inline-flex' : 'none';
+    }
+
+    // Render deal card with freshness and discount badges
+    function renderDealCard(toy, rank) {
+        const imageUrl = toy.image_url_proxied || toy.image_url || PLACEHOLDER_IMG;
+        const hasDiscount = parseFloat(toy.discount_percent) > 0;
+        const discountPct = hasDiscount ? parseFloat(toy.discount_percent).toFixed(0) : 0;
+        const freshness = getFreshnessLabel(toy.updated_at);
+        const isWalmart = (toy.retailer || '').toLowerCase().includes('walmart');
+
+        // Cache for modal
+        window.toyCache[toy.asin] = toy;
+
+        // Rank display for top 3
+        let rankBadge = '';
+        if (rank <= 3) {
+            const medals = { 1: '&#129351;', 2: '&#129352;', 3: '&#129353;' };
+            rankBadge = `<div class="toy-card-rank top-3">${medals[rank]}</div>`;
+        }
+
+        return `
+            <div class="toy-card ${rank <= 3 ? 'rank-' + rank : ''}" onclick="openToyModal('${toy.asin}')">
+                ${rankBadge}
+
+                ${hasDiscount ? `<div class="toy-card-deal-badge">-${discountPct}%</div>` : ''}
+
+                <div class="toy-card-freshness">
+                    <span class="freshness-pill ${freshness.class}">${freshness.label}</span>
+                </div>
+
+                <div class="toy-card-image-wrap">
+                    <img src="${imageUrl}" alt="${toy.toy_name}" class="toy-card-image" onerror="this.src='${PLACEHOLDER_IMG}';">
+                    <div class="toy-card-metric">${renderGradeBadge(toy.tt_grade, 'lg')}</div>
+                </div>
+
+                <div class="toy-card-content">
+                    <div class="toy-card-brand">${toy.brand || 'Brand'}</div>
+                    <div class="toy-card-name">${toy.toy_name}</div>
+                    <div class="toy-card-info">
+                        <span>&#11088; ${toy.rating || 'N/A'}</span>
+                        <span>&#128172; ${(toy.reviews_count || 0).toLocaleString()}</span>
+                    </div>
+                    <div class="toy-card-price">
+                        $${formatPrice(toy.price)}
+                        ${hasDiscount ? `<span class="toy-card-original-price">$${formatPrice(toy.compare_price)}</span>` : ''}
+                    </div>
+                    ${isWalmart ? '<div class="walmart-badge">&#128154; Walmart</div>' : ''}
+                </div>
+            </div>
+        `;
     }
 
     function showMore() {
-        visibleCount += 12;
-        filterAndRender();
+        visibleCount += 24;
+        renderToys();
     }
 
     // Search functionality
@@ -361,83 +845,6 @@
         }
     });
 </script>
-
-<style>
-    /* Search dropdown styles */
-    .search-dropdown {
-        position: absolute;
-        top: 100%;
-        left: 0;
-        right: 0;
-        background: var(--bg-card);
-        border: 1px solid rgba(109,195,213,0.2);
-        border-radius: 12px;
-        margin-top: 8px;
-        max-height: 400px;
-        overflow-y: auto;
-        z-index: 100;
-        display: none;
-    }
-
-    .search-result {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        padding: 12px 16px;
-        cursor: pointer;
-        transition: background 0.2s;
-        border-bottom: 1px solid rgba(255,255,255,0.05);
-    }
-
-    .search-result:hover {
-        background: rgba(109,195,213,0.1);
-    }
-
-    .search-result:last-child {
-        border-bottom: none;
-    }
-
-    .search-result img {
-        width: 48px;
-        height: 48px;
-        object-fit: contain;
-        background: #fff;
-        border-radius: 8px;
-    }
-
-    .search-result-info {
-        flex: 1;
-        min-width: 0;
-    }
-
-    .search-result-name {
-        font-size: 14px;
-        font-weight: 600;
-        color: #fff;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-    .search-result-brand {
-        font-size: 12px;
-        color: var(--cyan);
-    }
-
-    .search-result-price {
-        font-size: 16px;
-        font-weight: 700;
-        color: #fff;
-        font-family: 'JetBrains Mono', monospace;
-    }
-
-    /* Category card hover */
-    .category-card:hover {
-        background: rgba(109,195,213,0.1) !important;
-        border-color: var(--cyan) !important;
-        transform: translateY(-4px);
-    }
-</style>
 
 </body>
 </html>
