@@ -1,723 +1,258 @@
 <!DOCTYPE html>
-<html lang="en">
+<html class="dark" lang="en">
 <head>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
     <title>Rankings - ToyTap</title>
     <meta name="description" content="See the top-ranked toys based on TT Grade (quality) and TT Score (value). Find the best toys and best deals." />
     <link rel="icon" type="image/png" href="https://i.imgur.com/HXSawxU.png" />
-    <link rel="stylesheet" href="css/styles.css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#3fc3d5",
+                        "background-dark": "#0a0e27",
+                        "navy-deep": "#0a0e27",
+                        "navy-card": "#12183d",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"],
+                        "mono": ["JetBrains Mono", "monospace"]
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        /* Rankings Page Styles */
-        .rankings-hero {
-            background: linear-gradient(135deg, #0a0e27 0%, var(--navy-dark) 50%, #1a1a2e 100%);
-            padding: 50px 20px;
-            text-align: center;
-            position: relative;
-        }
-
-        .rankings-hero::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: radial-gradient(ellipse at 50% 50%, rgba(255, 215, 0, 0.1) 0%, transparent 50%);
-            pointer-events: none;
-        }
-
-        .rankings-title {
-            font-size: clamp(32px, 7vw, 52px);
-            font-weight: 900;
-            background: linear-gradient(135deg, var(--gold), var(--yellow), #fff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 12px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .rankings-subtitle {
-            font-size: 16px;
-            color: rgba(255,255,255,0.7);
-            position: relative;
-            z-index: 1;
-        }
-
-        /* Tab Switcher */
-        .ranking-tabs {
-            display: flex;
-            justify-content: center;
-            gap: 0;
-            padding: 30px 20px;
-            background: var(--bg-dark);
-            position: sticky;
-            top: 70px;
-            z-index: 100;
-        }
-
-        .ranking-tab {
-            padding: 18px 48px;
-            background: var(--bg-card);
-            border: 2px solid transparent;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: 700;
-            color: #94a3b8;
-            transition: all 0.2s;
-            font-family: 'Inter', sans-serif;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .ranking-tab:first-child {
-            border-radius: 14px 0 0 14px;
-        }
-
-        .ranking-tab:last-child {
-            border-radius: 0 14px 14px 0;
-        }
-
-        .ranking-tab:hover {
-            background: rgba(109,195,213,0.1);
-            color: #fff;
-        }
-
-        .ranking-tab.active {
-            background: linear-gradient(135deg, var(--cyan), var(--navy));
-            color: #fff;
-            border-color: var(--cyan);
-        }
-
-        .ranking-tab.active.value {
-            background: linear-gradient(135deg, var(--yellow), var(--orange));
-            border-color: var(--yellow);
-        }
-
-        .tab-icon {
-            font-size: 20px;
-        }
-
-        /* Explanation Box */
-        .ranking-explanation {
-            max-width: 600px;
-            margin: 0 auto 30px;
-            padding: 20px 28px;
-            background: var(--bg-card);
-            border-radius: 14px;
-            border: 1px solid rgba(109,195,213,0.2);
-            text-align: center;
-        }
-
-        .ranking-explanation p {
-            font-size: 15px;
-            color: rgba(255,255,255,0.8);
-            margin: 0;
-            line-height: 1.6;
-        }
-
-        .ranking-explanation strong {
-            color: var(--cyan);
-        }
-
-        .ranking-explanation.value strong {
-            color: var(--yellow);
-        }
-
-        /* Ranking List */
-        .ranking-list {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 0 20px 60px;
-        }
-
-        .ranking-item {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            background: #fff;
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 16px;
-            cursor: pointer;
-            transition: all 0.3s;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
-
-        .ranking-item:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 30px rgba(0,0,0,0.2);
-        }
-
-        .ranking-item.rank-1 {
-            border: 3px solid var(--gold);
-            background: linear-gradient(135deg, #fffef5 0%, #fff 100%);
-        }
-
-        .ranking-item.rank-2 {
-            border: 3px solid var(--silver);
-        }
-
-        .ranking-item.rank-3 {
-            border: 3px solid var(--bronze);
-        }
-
-        .rank-badge {
-            width: 56px;
-            height: 56px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            font-size: 24px;
-            font-weight: 800;
-            font-family: 'JetBrains Mono', monospace;
-            flex-shrink: 0;
-        }
-
-        .rank-badge.gold {
-            background: linear-gradient(135deg, var(--gold), #ffeb3b);
-            color: #5d4e00;
-            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
-        }
-
-        .rank-badge.silver {
-            background: linear-gradient(135deg, var(--silver), #e0e0e0);
-            color: #424242;
-            box-shadow: 0 4px 15px rgba(192, 192, 192, 0.4);
-        }
-
-        .rank-badge.bronze {
-            background: linear-gradient(135deg, var(--bronze), #d4a066);
-            color: #5d3a00;
-            box-shadow: 0 4px 15px rgba(205, 127, 50, 0.4);
-        }
-
-        .rank-badge.normal {
-            background: var(--bg-card);
-            color: #94a3b8;
-        }
-
-        .ranking-image {
-            width: 80px;
-            height: 80px;
-            object-fit: contain;
-            background: #f8fafc;
-            border-radius: 12px;
-            flex-shrink: 0;
-        }
-
-        .ranking-info {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .ranking-brand {
-            font-size: 11px;
-            color: var(--cyan);
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            margin-bottom: 4px;
-        }
-
-        .ranking-name {
-            font-size: 16px;
-            font-weight: 600;
-            color: var(--navy);
-            line-height: 1.3;
-            margin-bottom: 8px;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-
-        .ranking-stats {
-            display: flex;
-            gap: 16px;
-            font-size: 13px;
-            color: #64748b;
-        }
-
-        .ranking-price {
-            text-align: right;
-            flex-shrink: 0;
-        }
-
-        .ranking-price-value {
-            font-size: 24px;
-            font-weight: 800;
-            color: var(--navy);
-            font-family: 'JetBrains Mono', monospace;
-        }
-
-        .ranking-price-deal {
-            font-size: 12px;
-            color: var(--green);
-            font-weight: 600;
-        }
-
-        .ranking-metric {
-            flex-shrink: 0;
-        }
-
-        /* Podium Section for Top 3 */
-        .podium-section {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 40px 20px;
-        }
-
-        .podium {
-            display: flex;
-            justify-content: center;
-            align-items: flex-end;
-            gap: 20px;
-            margin-bottom: 40px;
-        }
-
-        .podium-item {
-            background: #fff;
-            border-radius: 20px;
-            padding: 24px 20px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
-        }
-
-        .podium-item:hover {
-            transform: translateY(-8px);
-        }
-
-        .podium-item.first {
-            order: 2;
-            width: 200px;
-            border: 3px solid var(--gold);
-            background: linear-gradient(135deg, #fffef5 0%, #fff 100%);
-        }
-
-        .podium-item.second {
-            order: 1;
-            width: 180px;
-            border: 3px solid var(--silver);
-        }
-
-        .podium-item.third {
-            order: 3;
-            width: 180px;
-            border: 3px solid var(--bronze);
-        }
-
-        .podium-medal {
-            font-size: 48px;
-            margin-bottom: 12px;
-        }
-
-        .podium-image {
-            width: 120px;
-            height: 120px;
-            object-fit: contain;
-            margin: 0 auto 12px;
-            display: block;
-            background: #f8fafc;
-            border-radius: 12px;
-        }
-
-        .podium-item.first .podium-image {
-            width: 140px;
-            height: 140px;
-        }
-
-        .podium-brand {
-            font-size: 10px;
-            color: var(--cyan);
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            margin-bottom: 4px;
-        }
-
-        .podium-name {
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--navy);
-            line-height: 1.3;
-            margin-bottom: 8px;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-            min-height: 36px;
-        }
-
-        .podium-price {
-            font-size: 20px;
-            font-weight: 800;
-            color: var(--navy);
-            font-family: 'JetBrains Mono', monospace;
-            margin-bottom: 8px;
-        }
-
-        .podium-item.first .podium-price {
-            font-size: 24px;
-        }
-
-        .podium-metric {
-            display: inline-block;
-        }
-
-        /* Mobile Adjustments */
-        @media (max-width: 768px) {
-            .podium {
-                flex-direction: column;
-                align-items: center;
-                gap: 16px;
-            }
-
-            .podium-item {
-                width: 100% !important;
-                max-width: 280px;
-                order: unset !important;
-            }
-
-            .podium-item.first {
-                order: -1 !important;
-            }
-
-            .podium-medal {
-                font-size: 36px;
-            }
-
-            .podium-image {
-                width: 100px !important;
-                height: 100px !important;
-            }
-        }
-
-        @media (max-width: 640px) {
-            .ranking-item {
-                flex-wrap: wrap;
-                gap: 12px;
-                padding: 16px;
-            }
-
-            .rank-badge {
-                width: 44px;
-                height: 44px;
-                font-size: 18px;
-            }
-
-            .ranking-image {
-                width: 60px;
-                height: 60px;
-            }
-
-            .ranking-info {
-                width: 100%;
-                order: 3;
-            }
-
-            .ranking-price {
-                margin-left: auto;
-            }
-
-            .ranking-tabs {
-                flex-wrap: wrap;
-            }
-
-            .ranking-tab {
-                padding: 12px 16px;
-                font-size: 13px;
-                flex: 1;
-                min-width: 100px;
-                justify-content: center;
-            }
-
-            .ranking-tab:first-child {
-                border-radius: 14px 14px 0 0;
-            }
-
-            .ranking-tab:last-child {
-                border-radius: 0 0 14px 14px;
-            }
-        }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .cyan-glow { box-shadow: 0 0 20px rgba(63, 195, 213, 0.3); }
+        .glass-panel { background: rgba(18, 24, 61, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(63, 195, 213, 0.1); }
+        .glass-card { background: rgba(18, 24, 61, 0.8); backdrop-filter: blur(8px); border: 1px solid rgba(63, 195, 213, 0.1); }
+        .gold-glow { box-shadow: 0 0 30px rgba(255, 215, 0, 0.3); }
+        .silver-glow { box-shadow: 0 0 20px rgba(192, 192, 192, 0.3); }
+        .bronze-glow { box-shadow: 0 0 20px rgba(205, 127, 50, 0.3); }
     </style>
 </head>
-<body>
-
-<header class="site-header">
-    <nav class="nav-container">
-        <a href="index.html"><img src="https://i.imgur.com/HXSawxU.png" alt="ToyTap" class="nav-logo" /></a>
-        <button class="nav-toggle" onclick="document.querySelector('.nav-links').classList.toggle('open')">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
-        </button>
-        <div class="nav-links">
-            <a href="index.html" class="nav-link">Home</a>
-            <a href="rankings.html" class="nav-link active">Rankings</a>
-            <a href="brands.html" class="nav-link">Brands</a>
-            <a href="watchlist.html" class="nav-link">Watchlist</a>
-            <a href="login.html" class="nav-link nav-login">Sign In</a>
-        </div>
-    </nav>
-</header>
-
-<main class="page-wrapper">
-    <section class="rankings-hero">
-        <h1 class="rankings-title">Toy Rankings</h1>
-        <p class="rankings-subtitle">The best toys ranked by quality and value</p>
-    </section>
-
-    <!-- Tab Switcher -->
-    <div class="ranking-tabs">
-        <button class="ranking-tab active" data-tab="quality" onclick="setRankingTab('quality')">
-            <span class="tab-icon">&#127942;</span> Best Toys
-        </button>
-        <button class="ranking-tab" data-tab="value" onclick="setRankingTab('value')">
-            <span class="tab-icon">&#128176;</span> Best Value
-        </button>
-        <button class="ranking-tab" data-tab="hot" onclick="setRankingTab('hot')">
-            <span class="tab-icon">&#128293;</span> Hot Now
-        </button>
+<body class="bg-background-dark font-display text-white min-h-screen">
+    <!-- Background Effects -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] bg-yellow-500/10 rounded-full blur-[120px]"></div>
+        <div class="absolute bottom-[-10%] left-[-5%] w-[400px] h-[400px] bg-primary/5 rounded-full blur-[100px]"></div>
     </div>
 
-    <!-- Explanation -->
-    <div id="ranking-explanation" class="ranking-explanation">
-        <p><strong>TT Grade</strong> measures overall toy quality based on reviews, ratings, and popularity. Higher grades = better toys.</p>
-    </div>
-
-    <!-- Podium for Top 3 -->
-    <section class="podium-section" id="podium-section">
-        <div id="podium" class="podium">
-            <!-- Filled by JS -->
-        </div>
-    </section>
-
-    <!-- Ranking List (starts at #4) -->
-    <div id="ranking-list" class="ranking-list">
-        <!-- Filled by JS -->
-    </div>
-
-    <div style="text-align: center; padding-bottom: 40px;">
-        <button id="show-more-btn" class="btn btn-primary" onclick="showMore()" style="display: none;">
-            Show More
-        </button>
-    </div>
-</main>
-
-<footer class="site-footer">
-    <div class="footer-container">
-        <img src="https://i.imgur.com/HXSawxU.png" alt="ToyTap" class="footer-logo" />
-        <div class="footer-links">
-            <a href="https://gettoytap.com" class="footer-link">For Businesses</a>
-            <a href="https://gettoytap.com/privacy" class="footer-link">Privacy</a>
-        </div>
-        <p class="footer-copy">2025 ToyTap. All rights reserved.</p>
-    </div>
-</footer>
-
-<div id="toy-modal" class="toy-modal-overlay" onclick="if(event.target===this)closeToyModal()">
-    <div class="toy-modal">
-        <button class="modal-close" onclick="closeToyModal()">&times;</button>
-        <div id="modal-content-area"></div>
-    </div>
-</div>
-
-<script src="js/api.js"></script>
-<script>
-let allToys = [];
-let currentTab = 'quality';
-let visibleCount = 25;
-
-const TAB_CONFIG = {
-    quality: {
-        explanation: '<strong>TT Grade</strong> measures overall toy quality based on reviews, ratings, and popularity. Higher grades = better toys.',
-        sortKey: 'tt_grade_score',
-        showGrade: true,
-        showScore: false,
-        showPodium: true
-    },
-    value: {
-        explanation: '<strong>TT Score</strong> combines quality with current pricing. High score = great toy at a great price right now.',
-        sortKey: 'toy_tap_score',
-        showGrade: false,
-        showScore: true,
-        showPodium: true
-    },
-    hot: {
-        explanation: '<strong>Hot Now</strong> shows toys with the biggest price drops today. Fresh deals updated every few hours.',
-        sortKey: 'discount_percent',
-        showGrade: true,
-        showScore: false,
-        showPodium: false
-    }
-};
-
-document.addEventListener('DOMContentLoaded', async () => {
-    document.getElementById('ranking-list').innerHTML = `
-        <div class="loading">
-            <div class="spinner"></div>
-            <p>Loading rankings...</p>
-        </div>
-    `;
-
-    try {
-        allToys = await fetchLeaderboard(200);
-        renderRankings();
-    } catch (err) {
-        console.error('Load error:', err);
-        document.getElementById('ranking-list').innerHTML = `
-            <div class="loading">
-                <p style="color: var(--red);">Failed to load rankings</p>
-                <button class="btn btn-primary" onclick="location.reload()">Retry</button>
+    <!-- Navigation -->
+    <header class="relative z-50 border-b border-white/5 bg-navy-deep/80 backdrop-blur-md sticky top-0">
+        <div class="max-w-7xl mx-auto px-4 md:px-6 h-16 md:h-20 flex items-center justify-between">
+            <a href="index.html" class="flex items-center gap-2">
+                <img src="https://i.imgur.com/HXSawxU.png" alt="ToyTap" class="h-8 w-8 md:h-10 md:w-10" />
+                <span class="text-xl md:text-2xl font-black tracking-tighter">ToyTap</span>
+            </a>
+            <nav class="hidden md:flex items-center gap-8">
+                <a class="text-sm font-semibold text-white/70 hover:text-primary transition-colors" href="index.html">Home</a>
+                <a class="text-sm font-semibold text-primary" href="rankings.html">Rankings</a>
+                <a class="text-sm font-semibold text-white/70 hover:text-primary transition-colors" href="brands.html">Brands</a>
+                <a class="text-sm font-semibold text-white/70 hover:text-primary transition-colors" href="watchlist.html">Watchlist</a>
+            </nav>
+            <div class="flex items-center gap-2 md:gap-4">
+                <a href="login.html" class="text-sm font-bold text-white/70 hover:text-primary transition-colors px-3 py-2">Login</a>
+                <a href="login.html" class="bg-primary text-navy-deep px-4 md:px-6 py-2.5 rounded-lg font-bold text-sm hover:brightness-110 transition-all hidden md:block">Sign Up</a>
             </div>
-        `;
-    }
-});
+        </div>
+    </header>
 
-function setRankingTab(tab) {
-    currentTab = tab;
-    visibleCount = 25;
+    <main class="relative z-10">
+        <!-- Hero -->
+        <section class="text-center py-12 md:py-16 px-4">
+            <h1 class="text-4xl md:text-6xl font-black bg-gradient-to-r from-yellow-400 via-yellow-200 to-yellow-400 bg-clip-text text-transparent mb-4">
+                Toy Rankings
+            </h1>
+            <p class="text-white/60 text-lg">The best toys ranked by quality and value</p>
+        </section>
 
-    // Update tab UI
-    document.querySelectorAll('.ranking-tab').forEach(t => {
-        t.classList.remove('active', 'value', 'hot');
-        if (t.dataset.tab === tab) {
-            t.classList.add('active');
-            if (tab === 'value') t.classList.add('value');
-            if (tab === 'hot') t.classList.add('hot');
-        }
-    });
-
-    // Update explanation
-    const expEl = document.getElementById('ranking-explanation');
-    expEl.innerHTML = `<p>${TAB_CONFIG[tab].explanation}</p>`;
-    expEl.classList.remove('value', 'hot');
-    if (tab === 'value') expEl.classList.add('value');
-    if (tab === 'hot') expEl.classList.add('hot');
-
-    // Show/hide podium
-    const podiumSection = document.getElementById('podium-section');
-    podiumSection.style.display = TAB_CONFIG[tab].showPodium ? 'block' : 'none';
-
-    renderRankings();
-}
-
-function renderRankings() {
-    const config = TAB_CONFIG[currentTab];
-    let sorted = [...allToys];
-
-    // Sort based on tab
-    if (currentTab === 'quality') {
-        sorted = sorted.filter(t => t.tt_grade_score && parseFloat(t.tt_grade_score) > 0);
-        sorted.sort((a, b) => (parseFloat(b.tt_grade_score) || 0) - (parseFloat(a.tt_grade_score) || 0));
-    } else if (currentTab === 'value') {
-        sorted = sorted.filter(t => t.toy_tap_score && parseFloat(t.toy_tap_score) > 0);
-        sorted.sort((a, b) => (parseFloat(b.toy_tap_score) || 0) - (parseFloat(a.toy_tap_score) || 0));
-    } else if (currentTab === 'hot') {
-        sorted = sorted.filter(t => t.discount_percent && parseFloat(t.discount_percent) > 5);
-        sorted.sort((a, b) => (parseFloat(b.discount_percent) || 0) - (parseFloat(a.discount_percent) || 0));
-    }
-
-    // Render podium for top 3 (if enabled)
-    if (config.showPodium && sorted.length >= 3) {
-        renderPodium(sorted.slice(0, 3), config);
-    } else {
-        document.getElementById('podium').innerHTML = '';
-    }
-
-    // Start list at position 4 if podium is shown, else position 1
-    const startIndex = config.showPodium ? 3 : 0;
-    const listToys = sorted.slice(startIndex, startIndex + visibleCount);
-    const container = document.getElementById('ranking-list');
-
-    container.innerHTML = listToys.map((toy, i) => {
-        const rank = startIndex + i + 1;
-        const imageUrl = toy.image_url_proxied || toy.image_url || PLACEHOLDER_IMG;
-        const hasDiscount = toy.discount_percent && parseFloat(toy.discount_percent) > 0;
-        const discountPct = hasDiscount ? parseFloat(toy.discount_percent).toFixed(0) : 0;
-
-        // Cache for modal
-        window.toyCache[toy.asin] = toy;
-
-        // Rank badge styling (no medals needed since top 3 are on podium)
-        let rankBadgeClass = 'normal';
-        let rankContent = rank;
-
-        // Metric badge
-        let metricBadge = '';
-        if (config.showGrade) {
-            metricBadge = renderGradeBadge(toy.tt_grade, 'lg');
-        } else {
-            const score = toy.toy_tap_score ? parseFloat(toy.toy_tap_score).toFixed(1) : 'N/A';
-            metricBadge = `<span class="tt-grade-badge size-lg" style="background: linear-gradient(135deg, var(--yellow), #f59e0b); color: var(--navy);">${score}</span>`;
-        }
-
-        return `
-            <div class="ranking-item" onclick="goToToyDetail('${toy.asin}')">
-                <div class="rank-badge ${rankBadgeClass}">${rankContent}</div>
-                <img src="${imageUrl}" alt="${toy.toy_name}" class="ranking-image" onerror="this.src='${PLACEHOLDER_IMG}';">
-                <div class="ranking-info">
-                    <div class="ranking-brand">${toy.brand || 'Brand'}</div>
-                    <div class="ranking-name">${toy.toy_name}</div>
-                    <div class="ranking-stats">
-                        <span>&#11088; ${toy.rating || 'N/A'}</span>
-                        <span>&#128172; ${(toy.reviews_count || 0).toLocaleString()}</span>
-                    </div>
+        <!-- Tabs -->
+        <section class="border-y border-white/5 bg-navy-deep/50 backdrop-blur-sm sticky top-16 md:top-20 z-40">
+            <div class="max-w-4xl mx-auto px-4 flex justify-center">
+                <div class="flex gap-0 py-3">
+                    <button class="ranking-tab active px-6 md:px-10 py-3 font-semibold text-sm rounded-l-xl" data-tab="quality" onclick="setRankingTab('quality')">
+                        🏆 Best Toys
+                    </button>
+                    <button class="ranking-tab px-6 md:px-10 py-3 font-semibold text-sm" data-tab="value" onclick="setRankingTab('value')">
+                        💰 Best Value
+                    </button>
+                    <button class="ranking-tab px-6 md:px-10 py-3 font-semibold text-sm rounded-r-xl" data-tab="hot" onclick="setRankingTab('hot')">
+                        🔥 Hot Now
+                    </button>
                 </div>
-                <div class="ranking-price">
-                    <div class="ranking-price-value">$${formatPrice(toy.price)}</div>
-                    ${hasDiscount ? `<div class="ranking-price-deal">-${discountPct}% off</div>` : ''}
-                </div>
-                <div class="ranking-metric">${metricBadge}</div>
             </div>
-        `;
-    }).join('');
+        </section>
+        <style>
+            .ranking-tab { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.5); border: 1px solid rgba(255,255,255,0.1); }
+            .ranking-tab:hover { background: rgba(63,195,213,0.1); color: white; }
+            .ranking-tab.active { background: linear-gradient(135deg, #3fc3d5, #0a0e27); color: white; border-color: #3fc3d5; }
+        </style>
 
-    // Show/hide load more
-    const btn = document.getElementById('show-more-btn');
-    const totalAfterPodium = sorted.length - startIndex;
-    btn.style.display = visibleCount < totalAfterPodium ? 'inline-flex' : 'none';
-}
+        <!-- Explanation -->
+        <div class="max-w-2xl mx-auto px-4 py-6">
+            <div class="glass-panel rounded-xl p-4 text-center">
+                <p id="ranking-explanation" class="text-white/70 text-sm">
+                    <span class="text-primary font-semibold">TT Grade</span> measures overall toy quality based on reviews, ratings, and popularity.
+                </p>
+            </div>
+        </div>
 
-function renderPodium(top3, config) {
-    const medals = ['&#129351;', '&#129352;', '&#129353;'];
-    const classes = ['first', 'second', 'third'];
+        <!-- Podium -->
+        <section id="podium-section" class="max-w-4xl mx-auto px-4 py-8">
+            <div id="podium" class="flex justify-center items-end gap-4 md:gap-6">
+                <!-- Loading -->
+                <div class="text-center py-20 w-full">
+                    <div class="w-12 h-12 border-4 border-primary/30 border-t-primary rounded-full animate-spin mx-auto mb-4"></div>
+                    <p class="text-white/50">Loading rankings...</p>
+                </div>
+            </div>
+        </section>
 
-    document.getElementById('podium').innerHTML = top3.map((toy, i) => {
-        const imageUrl = toy.image_url_proxied || toy.image_url || PLACEHOLDER_IMG;
-        window.toyCache[toy.asin] = toy;
+        <!-- Rankings List -->
+        <section class="max-w-3xl mx-auto px-4 pb-12">
+            <div id="ranking-list" class="space-y-3"></div>
+            <div class="text-center mt-8">
+                <button id="show-more-btn" onclick="showMore()" class="hidden bg-white/5 hover:bg-white/10 border border-white/10 text-white font-semibold px-8 py-3 rounded-xl transition-all">
+                    Show More
+                </button>
+            </div>
+        </section>
+    </main>
 
-        // Metric badge
-        let metricBadge = '';
-        if (config.showGrade) {
-            metricBadge = renderGradeBadge(toy.tt_grade, 'sm');
-        } else {
-            const score = toy.toy_tap_score ? parseFloat(toy.toy_tap_score).toFixed(1) : 'N/A';
-            metricBadge = `<span class="tt-grade-badge size-sm" style="background: linear-gradient(135deg, var(--yellow), #f59e0b); color: var(--navy);">${score}</span>`;
+    <!-- Footer -->
+    <footer class="border-t border-white/5 bg-navy-deep/40">
+        <div class="max-w-7xl mx-auto px-4 md:px-6 py-8">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-6">
+                <div class="flex items-center gap-2">
+                    <img src="https://i.imgur.com/HXSawxU.png" alt="ToyTap" class="h-8 w-8" />
+                    <span class="text-lg font-bold">ToyTap</span>
+                </div>
+                <p class="text-white/30 text-sm">© 2025 ToyTap. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/api.js"></script>
+    <script>
+        let allToys = [];
+        let currentTab = 'quality';
+        let visibleCount = 25;
+
+        const TAB_CONFIG = {
+            quality: {
+                explanation: '<span class="text-primary font-semibold">TT Grade</span> measures overall toy quality based on reviews, ratings, and popularity.',
+                sortKey: 'tt_grade_score',
+                showPodium: true
+            },
+            value: {
+                explanation: '<span class="text-yellow-400 font-semibold">TT Score</span> combines quality with current pricing. High score = great toy at a great price.',
+                sortKey: 'toy_tap_score',
+                showPodium: true
+            },
+            hot: {
+                explanation: '<span class="text-orange-400 font-semibold">Hot Now</span> shows toys with the biggest price drops today.',
+                sortKey: 'discount_percent',
+                showPodium: false
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                allToys = await fetchLeaderboard(200);
+                renderRankings();
+            } catch (err) {
+                console.error('Load error:', err);
+                document.getElementById('podium').innerHTML = `<div class="text-center py-10 w-full"><p class="text-red-400">Failed to load</p></div>`;
+            }
+        });
+
+        function setRankingTab(tab) {
+            currentTab = tab;
+            visibleCount = 25;
+            document.querySelectorAll('.ranking-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+            document.getElementById('ranking-explanation').innerHTML = TAB_CONFIG[tab].explanation;
+            document.getElementById('podium-section').style.display = TAB_CONFIG[tab].showPodium ? 'block' : 'none';
+            renderRankings();
         }
 
-        return `
-            <div class="podium-item ${classes[i]}" onclick="goToToyDetail('${toy.asin}')">
-                <div class="podium-medal">${medals[i]}</div>
-                <img src="${imageUrl}" alt="${toy.toy_name}" class="podium-image" onerror="this.src='${PLACEHOLDER_IMG}';">
-                <div class="podium-brand">${toy.brand || 'Brand'}</div>
-                <div class="podium-name">${toy.toy_name}</div>
-                <div class="podium-price">$${formatPrice(toy.price)}</div>
-                <div class="podium-metric">${metricBadge}</div>
-            </div>
-        `;
-    }).join('');
-}
+        function renderRankings() {
+            let sorted = [...allToys];
+            if (currentTab === 'quality') {
+                sorted = sorted.filter(t => t.tt_grade_score).sort((a, b) => (parseFloat(b.tt_grade_score) || 0) - (parseFloat(a.tt_grade_score) || 0));
+            } else if (currentTab === 'value') {
+                sorted = sorted.filter(t => t.toy_tap_score).sort((a, b) => (parseFloat(b.toy_tap_score) || 0) - (parseFloat(a.toy_tap_score) || 0));
+            } else {
+                sorted = sorted.filter(t => parseFloat(t.discount_percent) > 5).sort((a, b) => (parseFloat(b.discount_percent) || 0) - (parseFloat(a.discount_percent) || 0));
+            }
 
-function showMore() {
-    visibleCount += 25;
-    renderRankings();
-}
-</script>
+            if (TAB_CONFIG[currentTab].showPodium && sorted.length >= 3) {
+                renderPodium(sorted.slice(0, 3));
+            } else {
+                document.getElementById('podium').innerHTML = '';
+            }
+
+            const startIndex = TAB_CONFIG[currentTab].showPodium ? 3 : 0;
+            const listToys = sorted.slice(startIndex, startIndex + visibleCount);
+
+            document.getElementById('ranking-list').innerHTML = listToys.map((toy, i) => {
+                const rank = startIndex + i + 1;
+                const discount = parseFloat(toy.discount_percent) || 0;
+                return `
+                    <a href="toy.html?asin=${toy.asin}" class="glass-card rounded-xl p-4 flex items-center gap-4 hover:border-primary/30 transition-all block">
+                        <div class="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center font-bold font-mono text-white/50 shrink-0">
+                            ${rank}
+                        </div>
+                        <img src="${toy.image_url_proxied || toy.image_url}" alt="" class="w-16 h-16 object-contain bg-white rounded-lg shrink-0"/>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-primary text-xs font-bold uppercase">${toy.brand || ''}</p>
+                            <p class="text-white font-semibold truncate">${toy.toy_name}</p>
+                            <p class="text-white/50 text-sm">⭐ ${toy.rating || 'N/A'} · ${(toy.reviews_count || 0).toLocaleString()} reviews</p>
+                        </div>
+                        <div class="text-right shrink-0">
+                            <p class="text-white text-xl font-bold font-mono">$${parseFloat(toy.price).toFixed(2)}</p>
+                            ${discount > 5 ? `<p class="text-emerald-400 text-sm font-semibold">-${discount.toFixed(0)}% off</p>` : ''}
+                        </div>
+                        ${toy.tt_grade ? `<div class="bg-primary text-navy-deep px-3 py-1 rounded-lg font-bold shrink-0">${toy.tt_grade}</div>` : ''}
+                    </a>
+                `;
+            }).join('');
+
+            document.getElementById('show-more-btn').classList.toggle('hidden', visibleCount >= sorted.length - startIndex);
+        }
+
+        function renderPodium(top3) {
+            const medals = ['🥇', '🥈', '🥉'];
+            const sizes = ['w-44 md:w-52', 'w-36 md:w-44', 'w-36 md:w-44'];
+            const glows = ['gold-glow', 'silver-glow', 'bronze-glow'];
+            const order = [1, 0, 2]; // 2nd, 1st, 3rd
+
+            document.getElementById('podium').innerHTML = order.map(i => {
+                const toy = top3[i];
+                return `
+                    <a href="toy.html?asin=${toy.asin}" class="glass-card ${sizes[i]} rounded-2xl p-4 text-center hover:scale-105 transition-all ${glows[i]} ${i === 0 ? 'order-2' : i === 1 ? 'order-1' : 'order-3'} block">
+                        <div class="text-4xl mb-2">${medals[i]}</div>
+                        <img src="${toy.image_url_proxied || toy.image_url}" alt="" class="w-20 h-20 md:w-28 md:h-28 object-contain mx-auto bg-white rounded-xl mb-3"/>
+                        <p class="text-primary text-[10px] font-bold uppercase">${toy.brand || ''}</p>
+                        <p class="text-white text-sm font-semibold line-clamp-2 mb-2 min-h-[2.5rem]">${toy.toy_name}</p>
+                        <p class="text-white text-xl font-bold font-mono mb-2">$${parseFloat(toy.price).toFixed(2)}</p>
+                        ${toy.tt_grade ? `<div class="inline-block bg-primary text-navy-deep px-3 py-1 rounded-lg font-bold text-sm">${toy.tt_grade}</div>` : ''}
+                    </a>
+                `;
+            }).join('');
+        }
+
+        function showMore() {
+            visibleCount += 25;
+            renderRankings();
+        }
+    </script>
 </body>
 </html>

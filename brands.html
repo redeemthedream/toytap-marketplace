@@ -1,448 +1,290 @@
 <!DOCTYPE html>
-<html lang="en">
+<html class="dark" lang="en">
 <head>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
     <title>Brands - ToyTap</title>
     <meta name="description" content="Browse toys by brand. LEGO, Fisher-Price, Melissa & Doug, and more." />
     <link rel="icon" type="image/png" href="https://i.imgur.com/HXSawxU.png" />
-    <link rel="stylesheet" href="css/styles.css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#3fc3d5",
+                        "background-dark": "#0a0e27",
+                        "navy-deep": "#0a0e27",
+                        "navy-card": "#12183d",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"],
+                        "mono": ["JetBrains Mono", "monospace"]
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        .brands-hero {
-            background: linear-gradient(135deg, #0a0e27 0%, var(--navy-dark) 50%, #1a1a2e 100%);
-            padding: 50px 20px;
-            text-align: center;
-        }
-
-        .brands-title {
-            font-size: clamp(28px, 6vw, 48px);
-            font-weight: 900;
-            color: #fff;
-            margin-bottom: 12px;
-        }
-
-        .brands-subtitle {
-            font-size: 16px;
-            color: rgba(255,255,255,0.7);
-        }
-
-        /* Brand Grid */
-        .brands-section {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 40px 20px;
-        }
-
-        .brands-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            gap: 16px;
-            margin-bottom: 40px;
-        }
-
-        .brand-card {
-            background: var(--bg-card);
-            border-radius: 16px;
-            padding: 24px 20px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s;
-            border: 1px solid rgba(109,195,213,0.15);
-        }
-
-        .brand-card:hover {
-            transform: translateY(-4px);
-            border-color: var(--cyan);
-            box-shadow: 0 12px 30px rgba(0,0,0,0.3);
-        }
-
-        .brand-card.active {
-            border-color: var(--cyan);
-            background: rgba(109,195,213,0.1);
-        }
-
-        .brand-name {
-            font-size: 16px;
-            font-weight: 700;
-            color: #fff;
-            margin-bottom: 8px;
-        }
-
-        .brand-count {
-            font-size: 13px;
-            color: var(--cyan);
-            font-weight: 600;
-        }
-
-        /* Brand Detail View */
-        .brand-detail {
-            display: none;
-        }
-
-        .brand-detail.active {
-            display: block;
-        }
-
-        .brand-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 16px;
-            margin-bottom: 24px;
-            padding-bottom: 24px;
-            border-bottom: 1px solid rgba(109,195,213,0.15);
-        }
-
-        .brand-header-left {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-
-        .back-btn {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 10px 16px;
-            background: rgba(109,195,213,0.1);
-            border: 1px solid rgba(109,195,213,0.3);
-            border-radius: 10px;
-            color: var(--cyan);
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .back-btn:hover {
-            background: var(--cyan);
-            color: var(--navy);
-        }
-
-        .brand-detail-title {
-            font-size: 28px;
-            font-weight: 800;
-            color: #fff;
-        }
-
-        .brand-stats {
-            display: flex;
-            gap: 24px;
-        }
-
-        .brand-stat {
-            text-align: center;
-        }
-
-        .brand-stat-value {
-            font-size: 24px;
-            font-weight: 800;
-            color: var(--cyan);
-            font-family: 'JetBrains Mono', monospace;
-        }
-
-        .brand-stat-label {
-            font-size: 12px;
-            color: #94a3b8;
-        }
-
-        /* Toy Grid */
-        .toy-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: 20px;
-        }
-
-        .results-info {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            gap: 12px;
-        }
-
-        .results-count {
-            font-size: 14px;
-            color: #94a3b8;
-        }
-
-        .sort-select {
-            padding: 10px 16px;
-            background: var(--bg-card);
-            border: 1px solid rgba(109,195,213,0.3);
-            border-radius: 10px;
-            color: #fff;
-            font-size: 14px;
-            cursor: pointer;
-        }
-
-        .loading {
-            text-align: center;
-            padding: 60px 20px;
-            color: #94a3b8;
-        }
-
-        @media (max-width: 640px) {
-            .brand-header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            .brand-stats {
-                width: 100%;
-                justify-content: space-around;
-            }
-        }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .cyan-glow { box-shadow: 0 0 20px rgba(63, 195, 213, 0.3); }
+        .glass-panel { background: rgba(18, 24, 61, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(63, 195, 213, 0.1); }
+        .glass-card { background: rgba(18, 24, 61, 0.8); backdrop-filter: blur(8px); border: 1px solid rgba(63, 195, 213, 0.1); }
     </style>
 </head>
-<body>
+<body class="bg-background-dark font-display text-white min-h-screen">
+    <!-- Background Effects -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] bg-primary/10 rounded-full blur-[120px]"></div>
+        <div class="absolute bottom-[-10%] left-[-5%] w-[400px] h-[400px] bg-primary/5 rounded-full blur-[100px]"></div>
+    </div>
 
-<header class="site-header">
-    <nav class="nav-container">
-        <a href="index.html"><img src="https://i.imgur.com/HXSawxU.png" alt="ToyTap" class="nav-logo" /></a>
-        <button class="nav-toggle" onclick="document.querySelector('.nav-links').classList.toggle('open')">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
-        </button>
-        <div class="nav-links">
-            <a href="index.html" class="nav-link">Home</a>
-            <a href="rankings.html" class="nav-link">Rankings</a>
-            <a href="brands.html" class="nav-link active">Brands</a>
-            <a href="watchlist.html" class="nav-link">Watchlist</a>
-            <a href="login.html" class="nav-link nav-login">Sign In</a>
-        </div>
-    </nav>
-</header>
-
-<main class="page-wrapper">
-    <section class="brands-hero">
-        <h1 class="brands-title">Shop by Brand</h1>
-        <p class="brands-subtitle">Browse toys from your favorite brands</p>
-    </section>
-
-    <div class="brands-section">
-        <!-- Brand Selection Grid -->
-        <div id="brands-view">
-            <div id="brands-grid" class="brands-grid">
-                <div class="loading">
-                    <div class="spinner"></div>
-                    <p>Loading brands...</p>
-                </div>
+    <!-- Navigation -->
+    <header class="relative z-50 border-b border-white/5 bg-navy-deep/80 backdrop-blur-md sticky top-0">
+        <div class="max-w-7xl mx-auto px-4 md:px-6 h-16 md:h-20 flex items-center justify-between">
+            <a href="index.html" class="flex items-center gap-2">
+                <img src="https://i.imgur.com/HXSawxU.png" alt="ToyTap" class="h-8 w-8 md:h-10 md:w-10" />
+                <span class="text-xl md:text-2xl font-black tracking-tighter">ToyTap</span>
+            </a>
+            <nav class="hidden md:flex items-center gap-8">
+                <a class="text-sm font-semibold text-white/70 hover:text-primary transition-colors" href="index.html">Home</a>
+                <a class="text-sm font-semibold text-white/70 hover:text-primary transition-colors" href="rankings.html">Rankings</a>
+                <a class="text-sm font-semibold text-primary" href="brands.html">Brands</a>
+                <a class="text-sm font-semibold text-white/70 hover:text-primary transition-colors" href="watchlist.html">Watchlist</a>
+            </nav>
+            <div class="flex items-center gap-2 md:gap-4">
+                <a href="login.html" class="text-sm font-bold text-white/70 hover:text-primary transition-colors px-3 py-2">Login</a>
+                <a href="login.html" class="bg-primary text-navy-deep px-4 md:px-6 py-2.5 rounded-lg font-bold text-sm hover:brightness-110 transition-all hidden md:block">Sign Up</a>
             </div>
         </div>
+    </header>
 
-        <!-- Brand Detail View -->
-        <div id="brand-detail" class="brand-detail">
-            <div class="brand-header">
-                <div class="brand-header-left">
-                    <button class="back-btn" onclick="showAllBrands()">
-                        &#8592; All Brands
+    <main class="relative z-10">
+        <!-- Hero -->
+        <section class="text-center py-12 md:py-16 px-4">
+            <h1 class="text-4xl md:text-6xl font-black text-white mb-4">Shop by Brand</h1>
+            <p class="text-white/60 text-lg">Browse toys from your favorite brands</p>
+        </section>
+
+        <!-- Content Area -->
+        <section class="max-w-7xl mx-auto px-4 md:px-6 pb-12">
+            <!-- Brand Grid View -->
+            <div id="brands-view">
+                <div id="brands-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4"></div>
+            </div>
+
+            <!-- Brand Detail View -->
+            <div id="brand-detail" class="hidden">
+                <div class="flex items-center justify-between flex-wrap gap-4 mb-8 pb-6 border-b border-white/10">
+                    <div class="flex items-center gap-4">
+                        <button onclick="showAllBrands()" class="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white/70 hover:bg-primary/20 hover:text-primary transition-all">
+                            <span class="material-symbols-outlined text-lg">arrow_back</span> All Brands
+                        </button>
+                        <h2 id="brand-title" class="text-2xl md:text-3xl font-bold"></h2>
+                    </div>
+                    <div class="flex gap-6 font-mono">
+                        <div class="text-center">
+                            <p id="brand-toy-count" class="text-2xl font-bold text-primary">0</p>
+                            <p class="text-xs text-white/50">Toys</p>
+                        </div>
+                        <div class="text-center">
+                            <p id="brand-deal-count" class="text-2xl font-bold text-emerald-400">0</p>
+                            <p class="text-xs text-white/50">On Sale</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between mb-6">
+                    <p class="text-white/50 text-sm">Showing <span class="text-white font-semibold" id="showing-count">0</span> toys</p>
+                    <select id="sort-select" onchange="handleSortChange()" class="bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-sm text-white/70 focus:outline-none focus:border-primary">
+                        <option value="score">Best Value</option>
+                        <option value="price-low">Price: Low to High</option>
+                        <option value="price-high">Price: High to Low</option>
+                        <option value="rating">Highest Rated</option>
+                    </select>
+                </div>
+
+                <div id="toy-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4"></div>
+
+                <div class="text-center mt-10">
+                    <button id="show-more-btn" onclick="showMore()" class="hidden bg-white/5 hover:bg-white/10 border border-white/10 text-white font-semibold px-8 py-3 rounded-xl transition-all">
+                        Show More
                     </button>
-                    <h2 class="brand-detail-title" id="brand-title">Brand Name</h2>
-                </div>
-                <div class="brand-stats">
-                    <div class="brand-stat">
-                        <div class="brand-stat-value" id="brand-toy-count">0</div>
-                        <div class="brand-stat-label">Toys</div>
-                    </div>
-                    <div class="brand-stat">
-                        <div class="brand-stat-value" id="brand-deal-count">0</div>
-                        <div class="brand-stat-label">On Sale</div>
-                    </div>
                 </div>
             </div>
+        </section>
+    </main>
 
-            <div class="results-info">
-                <span class="results-count">Showing <span id="showing-count">0</span> toys</span>
-                <select class="sort-select" id="sort-select" onchange="handleSortChange()">
-                    <option value="score">Best Value</option>
-                    <option value="price-low">Price: Low to High</option>
-                    <option value="price-high">Price: High to Low</option>
-                    <option value="rating">Highest Rated</option>
-                </select>
+    <!-- Footer -->
+    <footer class="border-t border-white/5 bg-navy-deep/40">
+        <div class="max-w-7xl mx-auto px-4 md:px-6 py-8">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-6">
+                <div class="flex items-center gap-2">
+                    <img src="https://i.imgur.com/HXSawxU.png" alt="ToyTap" class="h-8 w-8" />
+                    <span class="text-lg font-bold">ToyTap</span>
+                </div>
+                <p class="text-white/30 text-sm">© 2025 ToyTap. All rights reserved.</p>
             </div>
+        </div>
+    </footer>
 
-            <div id="toy-grid" class="toy-grid"></div>
+    <script src="js/api.js"></script>
+    <script>
+        const TRACKED_BRANDS = [
+            { name: 'LEGO', icon: '🧱' },
+            { name: 'Fisher-Price', icon: '👶' },
+            { name: 'Melissa & Doug', icon: '🎨' },
+            { name: 'VTech', icon: '🔊' },
+            { name: 'Play-Doh', icon: '🎭' },
+            { name: 'Hot Wheels', icon: '🏎️' },
+            { name: 'Barbie', icon: '👱‍♀️' },
+            { name: 'MAGNA-TILES', icon: '🔷' },
+            { name: 'PicassoTiles', icon: '🔶' },
+            { name: 'Green Toys', icon: '♻️' },
+            { name: 'Hape', icon: '🪵' },
+            { name: 'Little Tikes', icon: '🏠' },
+            { name: 'Step2', icon: '🎢' },
+            { name: 'KidKraft', icon: '🏡' },
+            { name: 'LeapFrog', icon: '🐸' },
+            { name: 'Learning Resources', icon: '📚' },
+            { name: 'Skillmatics', icon: '🧩' },
+            { name: 'Snap Circuits', icon: '⚡' },
+            { name: 'BRIO', icon: '🚂' },
+            { name: 'Infantino', icon: '🍼' },
+            { name: 'Playmags', icon: '🧲' },
+            { name: 'Spirograph', icon: '🌀' },
+            { name: 'CATAN', icon: '🏝️' }
+        ];
 
-            <div style="text-align: center; padding: 40px 0;">
-                <button id="show-more-btn" class="btn btn-primary" onclick="showMore()" style="display: none;">
-                    Show More
+        let currentBrand = null;
+        let brandToys = [];
+        let visibleCount = 24;
+        let currentSort = 'score';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlBrand = getUrlParam('brand');
+            if (urlBrand) {
+                selectBrand(urlBrand);
+            } else {
+                renderBrandsGrid();
+            }
+        });
+
+        function renderBrandsGrid() {
+            document.getElementById('brands-grid').innerHTML = TRACKED_BRANDS.map(brand => `
+                <button onclick="selectBrand('${brand.name}')" class="glass-card rounded-xl p-6 text-center hover:border-primary/30 hover:scale-105 transition-all">
+                    <div class="text-4xl mb-3">${brand.icon}</div>
+                    <p class="font-semibold text-white">${brand.name}</p>
+                    <p class="text-primary text-sm mt-1">View toys →</p>
                 </button>
-            </div>
-        </div>
-    </div>
-</main>
+            `).join('');
+        }
 
-<footer class="site-footer">
-    <div class="footer-container">
-        <img src="https://i.imgur.com/HXSawxU.png" alt="ToyTap" class="footer-logo" />
-        <div class="footer-links">
-            <a href="https://gettoytap.com" class="footer-link">For Businesses</a>
-            <a href="https://gettoytap.com/privacy" class="footer-link">Privacy</a>
-        </div>
-        <p class="footer-copy">2025 ToyTap. All rights reserved.</p>
-    </div>
-</footer>
+        async function selectBrand(brandName) {
+            currentBrand = brandName;
+            visibleCount = 24;
+            currentSort = 'score';
 
-<script src="js/api.js"></script>
-<script>
-// Tracked brands with display info
-const TRACKED_BRANDS = [
-    { name: 'LEGO', icon: '🧱' },
-    { name: 'Fisher-Price', icon: '👶' },
-    { name: 'Melissa & Doug', icon: '🎨' },
-    { name: 'VTech', icon: '🔊' },
-    { name: 'Play-Doh', icon: '🎭' },
-    { name: 'Hot Wheels', icon: '🏎️' },
-    { name: 'Barbie', icon: '👱‍♀️' },
-    { name: 'MAGNA-TILES', icon: '🔷' },
-    { name: 'PicassoTiles', icon: '🔶' },
-    { name: 'Green Toys', icon: '♻️' },
-    { name: 'Hape', icon: '🪵' },
-    { name: 'Little Tikes', icon: '🏠' },
-    { name: 'Step2', icon: '🎢' },
-    { name: 'KidKraft', icon: '🏡' },
-    { name: 'LeapFrog', icon: '🐸' },
-    { name: 'Learning Resources', icon: '📚' },
-    { name: 'Skillmatics', icon: '🧩' },
-    { name: 'Snap Circuits', icon: '⚡' },
-    { name: 'BRIO', icon: '🚂' },
-    { name: 'Infantino', icon: '🍼' },
-    { name: 'Playmags', icon: '🧲' },
-    { name: 'Spirograph', icon: '🌀' },
-    { name: 'CATAN', icon: '🏝️' }
-];
+            history.pushState({}, '', `brands.html?brand=${encodeURIComponent(brandName)}`);
 
-let currentBrand = null;
-let brandToys = [];
-let visibleCount = 24;
-let currentSort = 'score';
+            document.getElementById('brands-view').classList.add('hidden');
+            document.getElementById('brand-detail').classList.remove('hidden');
+            document.getElementById('brand-title').textContent = brandName;
 
-document.addEventListener('DOMContentLoaded', () => {
-    // Check URL for brand param
-    const urlBrand = getUrlParam('brand');
-    if (urlBrand) {
-        selectBrand(urlBrand);
-    } else {
-        renderBrandsGrid();
-    }
-});
+            document.getElementById('toy-grid').innerHTML = `
+                <div class="col-span-full flex flex-col items-center justify-center py-20">
+                    <div class="w-12 h-12 border-4 border-primary/30 border-t-primary rounded-full animate-spin mb-4"></div>
+                    <p class="text-white/50">Loading ${brandName} toys...</p>
+                </div>
+            `;
 
-function renderBrandsGrid() {
-    const grid = document.getElementById('brands-grid');
+            try {
+                const res = await fetch(`${API_BASE}/toys/brand/${encodeURIComponent(brandName)}?limit=100&sort=toy_tap_rank`);
+                const data = await res.json();
+                brandToys = data.toys || [];
 
-    grid.innerHTML = TRACKED_BRANDS.map(brand => `
-        <div class="brand-card" onclick="selectBrand('${brand.name}')">
-            <div style="font-size: 32px; margin-bottom: 12px;">${brand.icon || '🧸'}</div>
-            <div class="brand-name">${brand.name}</div>
-            <div class="brand-count">View toys →</div>
-        </div>
-    `).join('');
-}
+                document.getElementById('brand-toy-count').textContent = brandToys.length;
+                document.getElementById('brand-deal-count').textContent = brandToys.filter(t => parseFloat(t.discount_percent) > 10).length;
 
-async function selectBrand(brandName) {
-    currentBrand = brandName;
-    visibleCount = 24;
-    currentSort = 'score';
+                sortAndRender();
+            } catch (err) {
+                console.error('Error loading brand:', err);
+                document.getElementById('toy-grid').innerHTML = `
+                    <div class="col-span-full text-center py-20">
+                        <p class="text-red-400 mb-4">Failed to load toys</p>
+                        <button onclick="selectBrand('${brandName}')" class="bg-primary text-navy-deep px-6 py-2 rounded-lg font-semibold">Retry</button>
+                    </div>
+                `;
+            }
+        }
 
-    // Update URL
-    history.pushState({}, '', `brands.html?brand=${encodeURIComponent(brandName)}`);
+        function showAllBrands() {
+            currentBrand = null;
+            history.pushState({}, '', 'brands.html');
+            document.getElementById('brands-view').classList.remove('hidden');
+            document.getElementById('brand-detail').classList.add('hidden');
+        }
 
-    // Show detail view
-    document.getElementById('brands-view').style.display = 'none';
-    document.getElementById('brand-detail').classList.add('active');
-    document.getElementById('brand-title').textContent = brandName;
+        function sortAndRender() {
+            let sorted = [...brandToys];
+            switch (currentSort) {
+                case 'price-low': sorted.sort((a, b) => (parseFloat(a.price) || 0) - (parseFloat(b.price) || 0)); break;
+                case 'price-high': sorted.sort((a, b) => (parseFloat(b.price) || 0) - (parseFloat(a.price) || 0)); break;
+                case 'rating': sorted.sort((a, b) => (parseFloat(b.rating) || 0) - (parseFloat(a.rating) || 0)); break;
+                default: sorted.sort((a, b) => (parseFloat(b.toy_tap_score) || 0) - (parseFloat(a.toy_tap_score) || 0));
+            }
 
-    // Show loading
-    document.getElementById('toy-grid').innerHTML = `
-        <div class="loading" style="grid-column: 1/-1;">
-            <div class="spinner"></div>
-            <p>Loading ${brandName} toys...</p>
-        </div>
-    `;
+            const toShow = sorted.slice(0, visibleCount);
+            document.getElementById('showing-count').textContent = toShow.length;
 
-    try {
-        // Fetch toys for this brand
-        const res = await fetch(`${API_BASE}/toys/brand/${encodeURIComponent(brandName)}?limit=100&sort=toy_tap_rank`);
-        const data = await res.json();
-        brandToys = data.toys || [];
+            if (toShow.length === 0) {
+                document.getElementById('toy-grid').innerHTML = `<div class="col-span-full text-center py-20 text-white/50">No toys found for this brand</div>`;
+                document.getElementById('show-more-btn').classList.add('hidden');
+                return;
+            }
 
-        // Update stats
-        document.getElementById('brand-toy-count').textContent = brandToys.length;
-        const dealsCount = brandToys.filter(t => t.discount_percent && parseFloat(t.discount_percent) > 10).length;
-        document.getElementById('brand-deal-count').textContent = dealsCount;
+            document.getElementById('toy-grid').innerHTML = toShow.map(toy => {
+                const price = parseFloat(toy.price) || 0;
+                const discount = parseFloat(toy.discount_percent) || 0;
+                const hasDiscount = discount > 5;
+                return `
+                    <a href="toy.html?asin=${toy.asin}" class="glass-card rounded-xl overflow-hidden hover:border-primary/30 transition-all block">
+                        <div class="relative aspect-square bg-white/5 overflow-hidden">
+                            <img src="${toy.image_url_proxied || toy.image_url}" alt="" class="w-full h-full object-contain p-2"/>
+                            ${hasDiscount ? `<div class="absolute top-2 left-2 bg-emerald-500 text-white text-xs font-bold px-2 py-1 rounded-lg">-${discount.toFixed(0)}%</div>` : ''}
+                            ${toy.tt_grade ? `<div class="absolute top-2 right-2 bg-primary text-navy-deep text-xs font-bold px-2 py-1 rounded-lg">${toy.tt_grade}</div>` : ''}
+                        </div>
+                        <div class="p-3 md:p-4">
+                            <p class="text-primary text-[10px] md:text-xs font-bold uppercase tracking-wider mb-1">${toy.brand || ''}</p>
+                            <h3 class="text-white text-sm font-semibold leading-tight mb-2 line-clamp-2 min-h-[2.5rem]">${toy.toy_name}</h3>
+                            <div class="flex items-center justify-between">
+                                <span class="text-white text-lg font-bold font-mono">$${price.toFixed(2)}</span>
+                                ${toy.rating ? `<span class="text-white/50 text-xs">⭐ ${parseFloat(toy.rating).toFixed(1)}</span>` : ''}
+                            </div>
+                        </div>
+                    </a>
+                `;
+            }).join('');
 
-        sortAndRender();
-    } catch (err) {
-        console.error('Error loading brand:', err);
-        document.getElementById('toy-grid').innerHTML = `
-            <div class="loading" style="grid-column: 1/-1;">
-                <p style="color: var(--red);">Failed to load toys</p>
-                <button class="btn btn-primary" onclick="selectBrand('${brandName}')">Retry</button>
-            </div>
-        `;
-    }
-}
+            document.getElementById('show-more-btn').classList.toggle('hidden', visibleCount >= sorted.length);
+        }
 
-function showAllBrands() {
-    currentBrand = null;
-    history.pushState({}, '', 'brands.html');
-    document.getElementById('brands-view').style.display = 'block';
-    document.getElementById('brand-detail').classList.remove('active');
-}
+        function handleSortChange() {
+            currentSort = document.getElementById('sort-select').value;
+            sortAndRender();
+        }
 
-function sortAndRender() {
-    // Sort toys
-    let sorted = [...brandToys];
-    switch (currentSort) {
-        case 'price-low':
-            sorted.sort((a, b) => (parseFloat(a.price) || 0) - (parseFloat(b.price) || 0));
-            break;
-        case 'price-high':
-            sorted.sort((a, b) => (parseFloat(b.price) || 0) - (parseFloat(a.price) || 0));
-            break;
-        case 'rating':
-            sorted.sort((a, b) => (parseFloat(b.rating) || 0) - (parseFloat(a.rating) || 0));
-            break;
-        default: // score
-            sorted.sort((a, b) => (parseFloat(b.toy_tap_score) || 0) - (parseFloat(a.toy_tap_score) || 0));
-    }
+        function showMore() {
+            visibleCount += 24;
+            sortAndRender();
+        }
 
-    const toShow = sorted.slice(0, visibleCount);
-    document.getElementById('showing-count').textContent = toShow.length;
-
-    if (toShow.length === 0) {
-        document.getElementById('toy-grid').innerHTML = `
-            <div class="loading" style="grid-column: 1/-1;">
-                <p>No toys found for this brand</p>
-            </div>
-        `;
-        document.getElementById('show-more-btn').style.display = 'none';
-        return;
-    }
-
-    document.getElementById('toy-grid').innerHTML = toShow.map(toy =>
-        renderToyCard(toy, { showGrade: true, linkToDetail: true })
-    ).join('');
-
-    document.getElementById('show-more-btn').style.display =
-        visibleCount < sorted.length ? 'inline-flex' : 'none';
-}
-
-function handleSortChange() {
-    currentSort = document.getElementById('sort-select').value;
-    sortAndRender();
-}
-
-function showMore() {
-    visibleCount += 24;
-    sortAndRender();
-}
-
-function getUrlParam(param) {
-    const urlParams = new URLSearchParams(window.location.search);
-    return urlParams.get(param);
-}
-</script>
+        function getUrlParam(param) {
+            return new URLSearchParams(window.location.search).get(param);
+        }
+    </script>
 </body>
 </html>

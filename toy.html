@@ -1,1006 +1,663 @@
 <!DOCTYPE html>
-<html lang="en">
+<html class="dark" lang="en">
 <head>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
     <title id="page-title">Toy Details - ToyTap</title>
     <meta name="description" content="View price history, analytics, and deal analysis for this toy on ToyTap." />
     <link rel="icon" type="image/png" href="https://i.imgur.com/HXSawxU.png" />
-    <link rel="stylesheet" href="css/styles.css" />
-    <!-- Chart.js -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#3fc3d5",
+                        "background-dark": "#0a0e27",
+                        "navy-deep": "#0a0e27",
+                        "navy-card": "#12183d",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"],
+                        "mono": ["JetBrains Mono", "monospace"]
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        .toy-container {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        .back-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            color: var(--cyan);
-            font-weight: 600;
-            margin-bottom: 24px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .back-link:hover {
-            opacity: 0.8;
-            transform: translateX(-4px);
-        }
-
-        /* Product Card */
-        .product-hero {
-            background: var(--bg-card);
-            border-radius: 24px;
-            padding: 32px;
-            margin-bottom: 24px;
-            border: 1px solid rgba(109,195,213,0.15);
-            display: flex;
-            gap: 32px;
-            flex-wrap: wrap;
-            position: relative;
-        }
-
-        .product-image-wrap {
-            flex-shrink: 0;
-            position: relative;
-        }
-
-        .product-image {
-            width: 280px;
-            height: 280px;
-            object-fit: contain;
-            background: #fff;
-            border-radius: 16px;
-        }
-
-        /* Badges on Image */
-        .product-badges {
-            position: absolute;
-            top: 12px;
-            left: 12px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .badge-deal {
-            background: var(--green);
-            color: #fff;
-            padding: 8px 14px;
-            border-radius: 10px;
-            font-size: 15px;
-            font-weight: 800;
-            font-family: 'JetBrains Mono', monospace;
-        }
-
-        .badge-lowest {
-            background: linear-gradient(135deg, #fbbf24, #f59e0b);
-            color: var(--navy);
-            padding: 6px 12px;
-            border-radius: 8px;
-            font-size: 11px;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 0.03em;
-            box-shadow: 0 2px 10px rgba(251, 191, 36, 0.4);
-        }
-
-        .product-details {
-            flex: 1;
-            min-width: 280px;
-        }
-
-        .product-brand {
-            font-size: 13px;
-            color: var(--cyan);
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            margin-bottom: 10px;
-        }
-
-        .product-name {
-            font-size: 28px;
-            font-weight: 800;
-            color: #fff;
-            line-height: 1.3;
-            margin-bottom: 20px;
-        }
-
-        .product-metrics {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-
-        .product-metric {
-            background: rgba(109,195,213,0.1);
-            padding: 14px 16px;
-            border-radius: 12px;
-            text-align: center;
-        }
-
-        .product-metric.highlight {
-            background: linear-gradient(135deg, rgba(253,185,19,0.15), rgba(109,195,213,0.1));
-            border: 1px solid rgba(253,185,19,0.3);
-        }
-
-        .metric-label {
-            font-size: 10px;
-            color: #94a3b8;
-            text-transform: uppercase;
-            margin-bottom: 6px;
-            letter-spacing: 0.05em;
-        }
-
-        .metric-value {
-            font-size: 22px;
-            font-weight: 800;
-            font-family: 'JetBrains Mono', monospace;
-            color: #fff;
-        }
-
-        .metric-value.orange { color: var(--amazon-orange); }
-        .metric-value.cyan { color: var(--cyan); }
-
-        /* Price Section */
-        .price-section {
-            background: linear-gradient(135deg, rgba(109,195,213,0.1), rgba(253,185,19,0.05));
-            border-radius: 16px;
-            padding: 24px;
-            margin-bottom: 24px;
-        }
-
-        .current-price {
-            font-size: 48px;
-            font-weight: 900;
-            color: #fff;
-            font-family: 'JetBrains Mono', monospace;
-        }
-
-        .original-price {
-            font-size: 20px;
-            color: #94a3b8;
-            text-decoration: line-through;
-            margin-left: 12px;
-        }
-
-        .savings-badge {
-            display: inline-block;
-            background: var(--green);
-            color: #fff;
-            padding: 8px 16px;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: 700;
-            margin-top: 12px;
-        }
-
-        /* Price Stats */
-        .price-stats {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 16px;
-            margin-bottom: 24px;
-        }
-
-        .stat-card {
-            background: var(--bg-card);
-            padding: 24px;
-            border-radius: 16px;
-            text-align: center;
-            border: 1px solid rgba(109,195,213,0.15);
-        }
-
-        .stat-card.lowest {
-            border-color: var(--green);
-        }
-
-        .stat-card.highest {
-            border-color: var(--red);
-        }
-
-        .stat-label {
-            font-size: 12px;
-            color: #94a3b8;
-            text-transform: uppercase;
-            margin-bottom: 8px;
-        }
-
-        .stat-value {
-            font-size: 28px;
-            font-weight: 800;
-            color: #fff;
-            font-family: 'JetBrains Mono', monospace;
-        }
-
-        .stat-card.lowest .stat-value { color: var(--green); }
-        .stat-card.highest .stat-value { color: var(--red); }
-
-        .stat-note {
-            font-size: 11px;
-            color: #64748b;
-            margin-top: 4px;
-        }
-
-        /* Charts Section */
-        .charts-section {
-            margin-bottom: 24px;
-        }
-
-        .charts-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            gap: 12px;
-        }
-
-        .charts-title {
-            font-size: 20px;
-            font-weight: 700;
-            color: #fff;
-        }
-
-        .chart-period-btns {
-            display: flex;
-            gap: 8px;
-        }
-
-        .period-btn {
-            padding: 8px 16px;
-            background: rgba(109,195,213,0.1);
-            border: 1px solid transparent;
-            border-radius: 8px;
-            font-size: 13px;
-            font-weight: 600;
-            color: #94a3b8;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .period-btn:hover {
-            background: rgba(109,195,213,0.2);
-            color: #fff;
-        }
-
-        .period-btn.active {
-            background: var(--cyan);
-            color: var(--navy);
-        }
-
-        .chart-block {
-            background: var(--bg-card);
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 16px;
-            border: 1px solid rgba(109,195,213,0.15);
-        }
-
-        .chart-block-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
-        }
-
-        .chart-block-title {
-            font-size: 15px;
-            font-weight: 600;
-            color: #fff;
-        }
-
-        .chart-block-legend {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 12px;
-            color: #94a3b8;
-        }
-
-        .legend-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 3px;
-            display: inline-block;
-        }
-
-        .chart-container {
-            position: relative;
-            height: 200px;
-        }
-
-        /* ToyTap Rank Display */
-        .toytap-rank-display {
-            text-align: center;
-            padding: 24px 16px;
-        }
-
-        .toytap-rank-value {
-            font-size: 48px;
-            font-weight: 900;
-            color: var(--cyan);
-            font-family: 'JetBrains Mono', monospace;
-            margin-bottom: 8px;
-        }
-
-        .toytap-rank-label {
-            font-size: 14px;
-            color: #94a3b8;
-            margin-bottom: 8px;
-        }
-
-        .toytap-rank-note {
-            font-size: 12px;
-            color: #64748b;
-        }
-
-        /* Deal Analysis */
-        .deal-analysis {
-            background: var(--bg-card);
-            border-radius: 16px;
-            padding: 24px;
-            margin-bottom: 24px;
-            border: 1px solid rgba(109,195,213,0.15);
-        }
-
-        .deal-status {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            margin-bottom: 16px;
-        }
-
-        .deal-indicator {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 28px;
-        }
-
-        .deal-indicator.good { background: rgba(16, 185, 129, 0.2); }
-        .deal-indicator.fair { background: rgba(253, 185, 19, 0.2); }
-        .deal-indicator.poor { background: rgba(239, 68, 68, 0.2); }
-
-        .deal-text h3 {
-            font-size: 18px;
-            font-weight: 700;
-            color: #fff;
-            margin-bottom: 4px;
-        }
-
-        .deal-text p {
-            font-size: 14px;
-            color: #94a3b8;
-        }
-
-        /* Buy Buttons */
-        .buy-buttons {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .buy-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            padding: 18px;
-            border-radius: 14px;
-            font-size: 16px;
-            font-weight: 700;
-            text-decoration: none;
-            transition: all 0.2s;
-        }
-
-        .buy-btn.amazon {
-            background: var(--amazon-orange);
-            color: #111;
-        }
-
-        .buy-btn.walmart {
-            background: var(--walmart-blue);
-            color: #fff;
-        }
-
-        .buy-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
-        }
-
-        /* Loading/Error States */
-        .page-loading {
-            text-align: center;
-            padding: 100px 20px;
-        }
-
-        .page-error {
-            text-align: center;
-            padding: 60px 20px;
-        }
-
-        /* Mobile */
-        @media (max-width: 640px) {
-            .product-hero {
-                padding: 20px;
-            }
-
-            .product-image {
-                width: 150px;
-                height: 150px;
-            }
-
-            .price-stats {
-                grid-template-columns: 1fr;
-            }
-
-            .current-price {
-                font-size: 36px;
-            }
-
-            .chart-header {
-                flex-direction: column;
-                gap: 12px;
-                align-items: flex-start;
-            }
-        }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .cyan-glow { box-shadow: 0 0 20px rgba(63, 195, 213, 0.3); }
+        .glass-panel { background: rgba(18, 24, 61, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(63, 195, 213, 0.1); }
+        .glass-card { background: rgba(18, 24, 61, 0.8); backdrop-filter: blur(8px); border: 1px solid rgba(63, 195, 213, 0.1); }
     </style>
 </head>
-<body>
+<body class="bg-background-dark font-display text-white min-h-screen">
+    <!-- Background Effects -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] bg-primary/10 rounded-full blur-[120px]"></div>
+        <div class="absolute bottom-[-10%] left-[-5%] w-[400px] h-[400px] bg-primary/5 rounded-full blur-[100px]"></div>
+    </div>
 
-<header class="site-header">
-    <nav class="nav-container">
-        <a href="index.html"><img src="https://i.imgur.com/HXSawxU.png" alt="ToyTap" class="nav-logo" /></a>
-        <button class="nav-toggle" onclick="document.querySelector('.nav-links').classList.toggle('open')">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
-        </button>
-        <div class="nav-links">
-            <a href="index.html" class="nav-link">Home</a>
-            <a href="rankings.html" class="nav-link">Rankings</a>
-            <a href="brands.html" class="nav-link">Brands</a>
-            <a href="watchlist.html" class="nav-link">Watchlist</a>
-            <a href="login.html" class="nav-link nav-login">Sign In</a>
+    <!-- Navigation -->
+    <header class="relative z-50 border-b border-white/5 bg-navy-deep/80 backdrop-blur-md sticky top-0">
+        <div class="max-w-7xl mx-auto px-4 md:px-6 h-16 md:h-20 flex items-center justify-between">
+            <a href="index.html" class="flex items-center gap-2">
+                <img src="https://i.imgur.com/HXSawxU.png" alt="ToyTap" class="h-8 w-8 md:h-10 md:w-10" />
+                <span class="text-xl md:text-2xl font-black tracking-tighter">ToyTap</span>
+            </a>
+            <nav class="hidden md:flex items-center gap-8">
+                <a class="text-sm font-semibold text-white/70 hover:text-primary transition-colors" href="index.html">Home</a>
+                <a class="text-sm font-semibold text-white/70 hover:text-primary transition-colors" href="rankings.html">Rankings</a>
+                <a class="text-sm font-semibold text-white/70 hover:text-primary transition-colors" href="brands.html">Brands</a>
+                <a class="text-sm font-semibold text-white/70 hover:text-primary transition-colors" href="watchlist.html">Watchlist</a>
+            </nav>
+            <div id="nav-auth" class="flex items-center gap-2 md:gap-4">
+                <a href="login.html" class="text-sm font-bold text-white/70 hover:text-primary transition-colors px-3 py-2">Login</a>
+                <a href="login.html" class="bg-primary text-navy-deep px-4 md:px-6 py-2.5 rounded-lg font-bold text-sm hover:brightness-110 transition-all hidden md:block">Sign Up</a>
+            </div>
         </div>
-    </nav>
-</header>
+    </header>
 
-<main class="page-wrapper">
-    <div class="toy-container">
-        <a href="index.html" class="back-link">&#8592; Back to Deals</a>
+    <main class="relative z-10">
+        <div class="max-w-5xl mx-auto px-4 py-6 md:py-10">
+            <!-- Back Link -->
+            <a href="index.html" class="inline-flex items-center gap-2 text-primary font-semibold mb-6 hover:opacity-80 transition-opacity">
+                <span class="material-symbols-outlined">arrow_back</span> Back to Deals
+            </a>
 
-        <!-- Loading State -->
-        <div id="loading" class="page-loading">
-            <div class="spinner"></div>
-            <p style="color: #94a3b8; margin-top: 16px;">Loading toy details...</p>
-        </div>
-
-        <!-- Content (hidden until loaded) -->
-        <div id="content" style="display: none;">
-            <!-- Product Hero -->
-            <div class="product-hero">
-                <div class="product-image-wrap">
-                    <img id="product-image" class="product-image" src="" alt="">
-                    <div class="product-badges" id="product-badges"></div>
-                </div>
-                <div class="product-details">
-                    <div id="product-brand" class="product-brand"></div>
-                    <h1 id="product-name" class="product-name"></h1>
-                    <div class="product-metrics">
-                        <div class="product-metric highlight">
-                            <div class="metric-label">TT Grade</div>
-                            <div class="metric-value" id="metric-grade"></div>
-                        </div>
-                        <div class="product-metric highlight">
-                            <div class="metric-label">TT Score</div>
-                            <div class="metric-value orange" id="metric-score">--</div>
-                        </div>
-                        <div class="product-metric">
-                            <div class="metric-label">Rating</div>
-                            <div class="metric-value" id="metric-rating"></div>
-                        </div>
-                        <div class="product-metric">
-                            <div class="metric-label">Reviews</div>
-                            <div class="metric-value cyan" id="metric-reviews"></div>
-                        </div>
-                        <div class="product-metric">
-                            <div class="metric-label">Amazon Rank</div>
-                            <div class="metric-value orange" id="metric-rank">#--</div>
-                        </div>
-                        <div class="product-metric">
-                            <div class="metric-label">Category</div>
-                            <div class="metric-value" id="metric-category" style="font-size: 14px;">--</div>
-                        </div>
-                    </div>
-                </div>
+            <!-- Loading State -->
+            <div id="loading" class="text-center py-32">
+                <div class="w-12 h-12 border-4 border-primary/30 border-t-primary rounded-full animate-spin mx-auto mb-4"></div>
+                <p class="text-white/50">Loading toy details...</p>
             </div>
 
-            <!-- Price Section -->
-            <div class="price-section">
-                <div>
-                    <span class="current-price" id="current-price">$0.00</span>
-                    <span class="original-price" id="original-price" style="display: none;">$0.00</span>
+            <!-- Content (hidden until loaded) -->
+            <div id="content" class="hidden">
+                <!-- Product Hero -->
+                <div class="glass-panel rounded-2xl p-4 md:p-8 mb-6">
+                    <div class="flex flex-col md:flex-row gap-6 md:gap-10">
+                        <!-- Image -->
+                        <div class="relative shrink-0 mx-auto md:mx-0">
+                            <img id="product-image" class="w-48 h-48 md:w-72 md:h-72 object-contain bg-white rounded-2xl" src="" alt="">
+                            <div id="product-badges" class="absolute top-3 left-3 flex flex-col gap-2"></div>
+                        </div>
+
+                        <!-- Details -->
+                        <div class="flex-1">
+                            <p id="product-brand" class="text-primary text-xs md:text-sm font-bold uppercase tracking-wider mb-2"></p>
+                            <h1 id="product-name" class="text-xl md:text-3xl font-bold text-white mb-6 leading-tight"></h1>
+
+                            <!-- Metrics Grid -->
+                            <div class="grid grid-cols-2 md:grid-cols-3 gap-3 mb-6">
+                                <div class="glass-card rounded-xl p-3 md:p-4 text-center">
+                                    <p class="text-[10px] md:text-xs text-white/50 uppercase mb-1">TT Grade</p>
+                                    <p class="text-xl md:text-2xl font-bold font-mono" id="metric-grade">--</p>
+                                </div>
+                                <div class="glass-card rounded-xl p-3 md:p-4 text-center">
+                                    <p class="text-[10px] md:text-xs text-white/50 uppercase mb-1">TT Score</p>
+                                    <p class="text-xl md:text-2xl font-bold font-mono text-yellow-400" id="metric-score">--</p>
+                                </div>
+                                <div class="glass-card rounded-xl p-3 md:p-4 text-center">
+                                    <p class="text-[10px] md:text-xs text-white/50 uppercase mb-1">Rating</p>
+                                    <p class="text-xl md:text-2xl font-bold font-mono" id="metric-rating">--</p>
+                                </div>
+                                <div class="glass-card rounded-xl p-3 md:p-4 text-center">
+                                    <p class="text-[10px] md:text-xs text-white/50 uppercase mb-1">Reviews</p>
+                                    <p class="text-xl md:text-2xl font-bold font-mono text-primary" id="metric-reviews">--</p>
+                                </div>
+                                <div class="glass-card rounded-xl p-3 md:p-4 text-center">
+                                    <p class="text-[10px] md:text-xs text-white/50 uppercase mb-1">Amazon Rank</p>
+                                    <p class="text-xl md:text-2xl font-bold font-mono text-orange-400" id="metric-rank">#--</p>
+                                </div>
+                                <div class="glass-card rounded-xl p-3 md:p-4 text-center">
+                                    <p class="text-[10px] md:text-xs text-white/50 uppercase mb-1">Category</p>
+                                    <p class="text-sm md:text-base font-semibold text-white/70 truncate" id="metric-category">--</p>
+                                </div>
+                            </div>
+
+                            <!-- Price Section -->
+                            <div class="bg-gradient-to-r from-primary/10 to-yellow-500/10 rounded-xl p-4 md:p-6">
+                                <div class="flex items-baseline gap-3 mb-2">
+                                    <span class="text-3xl md:text-5xl font-black font-mono text-white" id="current-price">$0.00</span>
+                                    <span class="text-lg md:text-xl text-white/40 line-through hidden" id="original-price">$0.00</span>
+                                </div>
+                                <div id="savings-badge" class="hidden inline-block bg-emerald-500 text-white px-3 py-1.5 rounded-lg text-sm font-bold">
+                                    Save 0%
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div id="savings-badge" class="savings-badge" style="display: none;">Save 0%</div>
+
+                <!-- Price Stats -->
+                <div class="grid grid-cols-3 gap-3 md:gap-4 mb-6">
+                    <div class="glass-card rounded-xl p-4 md:p-6 text-center border-emerald-500/30">
+                        <p class="text-xs text-white/50 uppercase mb-2">Lowest Price</p>
+                        <p class="text-xl md:text-3xl font-bold font-mono text-emerald-400" id="stat-lowest">--</p>
+                        <p class="text-[10px] md:text-xs text-white/40 mt-1" id="stat-lowest-note">All time low</p>
+                    </div>
+                    <div class="glass-card rounded-xl p-4 md:p-6 text-center">
+                        <p class="text-xs text-white/50 uppercase mb-2">Average Price</p>
+                        <p class="text-xl md:text-3xl font-bold font-mono text-white" id="stat-average">--</p>
+                        <p class="text-[10px] md:text-xs text-white/40 mt-1">90-day average</p>
+                    </div>
+                    <div class="glass-card rounded-xl p-4 md:p-6 text-center border-red-500/30">
+                        <p class="text-xs text-white/50 uppercase mb-2">Highest Price</p>
+                        <p class="text-xl md:text-3xl font-bold font-mono text-red-400" id="stat-highest">--</p>
+                        <p class="text-[10px] md:text-xs text-white/40 mt-1">All time high</p>
+                    </div>
+                </div>
+
+                <!-- Charts Section -->
+                <div class="glass-panel rounded-2xl p-4 md:p-6 mb-6">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                        <h3 class="text-lg md:text-xl font-bold">Price & Rank History</h3>
+                        <div class="flex gap-2">
+                            <button class="period-btn px-4 py-2 rounded-lg text-sm font-semibold bg-white/5 border border-white/10 text-white/50 hover:bg-primary/20 hover:text-primary transition-all" data-days="30" onclick="setPeriod(30)">30D</button>
+                            <button class="period-btn px-4 py-2 rounded-lg text-sm font-semibold bg-primary text-navy-deep" data-days="90" onclick="setPeriod(90)">90D</button>
+                            <button class="period-btn px-4 py-2 rounded-lg text-sm font-semibold bg-white/5 border border-white/10 text-white/50 hover:bg-primary/20 hover:text-primary transition-all" data-days="365" onclick="setPeriod(365)">1Y</button>
+                        </div>
+                    </div>
+
+                    <!-- Price Chart -->
+                    <div class="glass-card rounded-xl p-4 mb-4">
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="text-sm font-semibold text-white">Price History</span>
+                            <span class="flex items-center gap-2 text-xs text-white/50">
+                                <span class="w-3 h-3 rounded bg-orange-500"></span> Amazon Price
+                            </span>
+                        </div>
+                        <div class="h-48 md:h-56">
+                            <canvas id="price-chart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Amazon Rank Chart -->
+                    <div class="glass-card rounded-xl p-4 mb-4">
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="text-sm font-semibold text-white">Amazon Best Seller Rank</span>
+                            <span class="flex items-center gap-2 text-xs text-white/50">
+                                <span class="w-3 h-3 rounded bg-emerald-500"></span> Lower is better
+                            </span>
+                        </div>
+                        <div class="h-48 md:h-56">
+                            <canvas id="amazon-rank-chart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- ToyTap Rank -->
+                    <div class="glass-card rounded-xl p-4">
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="text-sm font-semibold text-white">ToyTap Global Rank</span>
+                            <span class="flex items-center gap-2 text-xs text-white/50">
+                                <span class="w-3 h-3 rounded bg-primary"></span> Current ranking
+                            </span>
+                        </div>
+                        <div class="text-center py-6">
+                            <p class="text-5xl md:text-6xl font-black font-mono text-primary mb-2" id="toytap-rank-value">#--</p>
+                            <p class="text-white/50 text-sm">out of 14,000+ toys tracked</p>
+                            <p class="text-white/30 text-xs mt-2">Based on TT Grade score combining reviews, ratings, and popularity</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Deal Analysis -->
+                <div class="glass-panel rounded-2xl p-4 md:p-6 mb-6">
+                    <div class="flex items-center gap-4">
+                        <div class="w-16 h-16 rounded-full flex items-center justify-center text-3xl" id="deal-indicator">
+                            &#128176;
+                        </div>
+                        <div>
+                            <h3 class="text-lg md:text-xl font-bold mb-1" id="deal-title">Checking deal...</h3>
+                            <p class="text-white/50 text-sm" id="deal-description">Analyzing current price against historical data.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex flex-col sm:flex-row gap-3 mb-6">
+                    <a id="buy-amazon" href="#" target="_blank" class="flex-1 flex items-center justify-center gap-3 bg-orange-500 hover:bg-orange-400 text-white py-4 px-6 rounded-xl font-bold text-base transition-all">
+                        <span class="material-symbols-outlined">shopping_cart</span> Buy on Amazon
+                    </a>
+                    <button onclick="addToWatchlist()" id="watchlist-btn" class="flex-1 flex items-center justify-center gap-3 bg-white/5 hover:bg-primary/20 border border-white/10 hover:border-primary/30 text-white py-4 px-6 rounded-xl font-bold text-base transition-all">
+                        <span class="material-symbols-outlined" id="watchlist-icon">bookmark_add</span>
+                        <span id="watchlist-text">Add to Watchlist</span>
+                    </button>
+                </div>
+
+                <!-- Affiliate Disclosure -->
+                <p class="text-center text-white/30 text-xs leading-relaxed">
+                    ToyTap participates in the Amazon Associates program. We may earn commissions on qualifying purchases at no extra cost to you. Prices update every 24 hours.
+                </p>
             </div>
 
-            <!-- Price Stats -->
-            <div class="price-stats">
-                <div class="stat-card lowest">
-                    <div class="stat-label">Lowest Price</div>
-                    <div class="stat-value" id="stat-lowest">--</div>
-                    <div class="stat-note" id="stat-lowest-note">All time low</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Average Price</div>
-                    <div class="stat-value" id="stat-average">--</div>
-                    <div class="stat-note">90-day average</div>
-                </div>
-                <div class="stat-card highest">
-                    <div class="stat-label">Highest Price</div>
-                    <div class="stat-value" id="stat-highest">--</div>
-                    <div class="stat-note">All time high</div>
-                </div>
-            </div>
-
-            <!-- Charts Section - All 3 Stacked -->
-            <div class="charts-section">
-                <div class="charts-header">
-                    <h3 class="charts-title">Price & Rank History</h3>
-                    <div class="chart-period-btns">
-                        <button class="period-btn" data-days="30" onclick="setPeriod(30)">30D</button>
-                        <button class="period-btn active" data-days="90" onclick="setPeriod(90)">90D</button>
-                        <button class="period-btn" data-days="365" onclick="setPeriod(365)">1Y</button>
-                    </div>
-                </div>
-
-                <!-- Price Chart -->
-                <div class="chart-block">
-                    <div class="chart-block-header">
-                        <span class="chart-block-title">Price History</span>
-                        <span class="chart-block-legend"><span class="legend-dot" style="background: #ff9900;"></span> Amazon Price</span>
-                    </div>
-                    <div class="chart-container">
-                        <canvas id="price-chart"></canvas>
-                    </div>
-                </div>
-
-                <!-- Amazon Rank Chart -->
-                <div class="chart-block">
-                    <div class="chart-block-header">
-                        <span class="chart-block-title">Amazon Best Seller Rank</span>
-                        <span class="chart-block-legend"><span class="legend-dot" style="background: #10b981;"></span> Lower is better</span>
-                    </div>
-                    <div class="chart-container">
-                        <canvas id="amazon-rank-chart"></canvas>
-                    </div>
-                </div>
-
-                <!-- ToyTap Rank -->
-                <div class="chart-block toytap-rank-block">
-                    <div class="chart-block-header">
-                        <span class="chart-block-title">ToyTap Global Rank</span>
-                        <span class="chart-block-legend"><span class="legend-dot" style="background: #6DC3D5;"></span> Current ranking</span>
-                    </div>
-                    <div class="toytap-rank-display">
-                        <div class="toytap-rank-value" id="toytap-rank-value">#--</div>
-                        <div class="toytap-rank-label">out of 14,000+ toys tracked</div>
-                        <div class="toytap-rank-note">Based on TT Grade score combining reviews, ratings, and popularity</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Deal Analysis -->
-            <div class="deal-analysis">
-                <div class="deal-status">
-                    <div class="deal-indicator" id="deal-indicator">&#128176;</div>
-                    <div class="deal-text">
-                        <h3 id="deal-title">Checking deal...</h3>
-                        <p id="deal-description">Analyzing current price against historical data.</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Buy Buttons -->
-            <div class="buy-buttons">
-                <a id="buy-amazon" href="#" target="_blank" class="buy-btn amazon">
-                    &#128722; Buy on Amazon
+            <!-- Error State -->
+            <div id="error" class="hidden text-center py-32">
+                <div class="text-5xl mb-4">&#128533;</div>
+                <p class="text-red-400 text-lg mb-6">Could not load toy details</p>
+                <a href="index.html" class="inline-block bg-primary text-navy-deep px-6 py-3 rounded-xl font-bold hover:brightness-110 transition-all">
+                    Browse Toys
                 </a>
             </div>
-
-            <!-- Affiliate Disclosure -->
-            <p style="font-size: 11px; color: #64748b; text-align: center; margin-top: 24px; line-height: 1.6;">
-                ToyTap participates in the Amazon Associates program. We may earn commissions on qualifying purchases at no extra cost to you. Prices update every 24 hours.
-            </p>
         </div>
+    </main>
 
-        <!-- Error State -->
-        <div id="error" class="page-error" style="display: none;">
-            <div style="font-size: 48px; margin-bottom: 16px;">&#128533;</div>
-            <p style="color: var(--red); margin-bottom: 20px;">Could not load toy details</p>
-            <a href="index.html" class="btn btn-primary">Browse Toys</a>
+    <!-- Footer -->
+    <footer class="border-t border-white/5 bg-navy-deep/40 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 md:px-6 py-8">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-6">
+                <div class="flex items-center gap-2">
+                    <img src="https://i.imgur.com/HXSawxU.png" alt="ToyTap" class="h-8 w-8" />
+                    <span class="text-lg font-bold">ToyTap</span>
+                </div>
+                <p class="text-white/30 text-sm">© 2025 ToyTap. All rights reserved.</p>
+            </div>
         </div>
-    </div>
-</main>
+    </footer>
 
-<footer class="site-footer">
-    <div class="footer-container">
-        <img src="https://i.imgur.com/HXSawxU.png" alt="ToyTap" class="footer-logo" />
-        <div class="footer-links">
-            <a href="https://gettoytap.com" class="footer-link">For Businesses</a>
-            <a href="https://gettoytap.com/privacy" class="footer-link">Privacy</a>
-            <a href="https://gettoytap.com/terms" class="footer-link">Terms</a>
-            <a href="mailto:info@gettoytap.com" class="footer-link">Contact</a>
-        </div>
-        <p class="footer-copy">2025 ToyTap. All rights reserved.</p>
-    </div>
-</footer>
+    <script src="js/api.js"></script>
+    <script>
+        const SUPABASE_URL = 'https://ehuwltjozobbbzsdygbo.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVodXdsdGpvem9iYmJ6c2R5Z2JvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ5NjAzNDQsImV4cCI6MjA4MDUzNjM0NH0.xSRT_UkN4RLK40R51mHtksb1u90M8y2FjzS45aXLGSI';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-<script src="js/api.js"></script>
-<script>
-let priceChart = null;
-let amazonRankChart = null;
-let priceHistory = [];
-let priceStats = {};
-let dealAnalysis = {};
-let currentPeriod = 90;
-let toyData = null;
+        let priceChart = null;
+        let amazonRankChart = null;
+        let priceHistory = [];
+        let priceStats = {};
+        let dealAnalysis = {};
+        let currentPeriod = 90;
+        let toyData = null;
+        let currentUser = null;
+        let watchlist = [];
 
-document.addEventListener('DOMContentLoaded', async () => {
-    const asin = getUrlParam('asin');
-    if (!asin) {
-        showError();
-        return;
-    }
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Check auth
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session) {
+                currentUser = session.user;
+                updateNavAuth();
+                loadWatchlist();
+            }
 
-    try {
-        // Fetch both price history AND full toy data (for tt_grade)
-        const [priceData, fullToyData] = await Promise.all([
-            fetchPriceHistory(asin),
-            fetchToyByAsin(asin)
-        ]);
+            const asin = getUrlParam('asin');
+            if (!asin) {
+                showError();
+                return;
+            }
 
-        if (!priceData || !priceData.toy) {
-            showError();
-            return;
+            try {
+                const [priceData, fullToyData] = await Promise.all([
+                    fetchPriceHistory(asin),
+                    fetchToyByAsin(asin)
+                ]);
+
+                if (!priceData || !priceData.toy) {
+                    showError();
+                    return;
+                }
+
+                toyData = {
+                    ...priceData.toy,
+                    tt_grade: fullToyData.tt_grade || priceData.toy.tt_grade,
+                    tt_grade_score: fullToyData.tt_grade_score || priceData.toy.tt_grade_score,
+                    category_toytap: fullToyData.category_toytap || priceData.toy.category_toytap,
+                    discount_percent: fullToyData.discount_percent,
+                    compare_price: fullToyData.compare_price,
+                    is_lowest_price_ever: fullToyData.is_lowest_price_ever
+                };
+                priceStats = priceData.price_stats || {};
+                dealAnalysis = priceData.deal_analysis || {};
+                priceHistory = priceData.price_history || [];
+
+                renderProduct();
+                renderCharts();
+                renderDealAnalysis();
+                updateWatchlistButton();
+
+                document.getElementById('loading').classList.add('hidden');
+                document.getElementById('content').classList.remove('hidden');
+            } catch (err) {
+                console.error('Load error:', err);
+                showError();
+            }
+        });
+
+        function updateNavAuth() {
+            if (currentUser) {
+                document.getElementById('nav-auth').innerHTML = `
+                    <span class="text-sm text-white/50 hidden md:inline">${currentUser.email}</span>
+                    <a href="watchlist.html" class="text-sm font-bold text-primary hover:brightness-110 transition-colors px-3 py-2">Watchlist</a>
+                `;
+            }
         }
 
-        // Merge data - fullToyData has tt_grade, but priceData.toy has correct image
-        // Only take tt_grade and other missing fields from fullToyData
-        toyData = {
-            ...priceData.toy,
-            tt_grade: fullToyData.tt_grade || priceData.toy.tt_grade,
-            tt_grade_score: fullToyData.tt_grade_score || priceData.toy.tt_grade_score,
-            category_toytap: fullToyData.category_toytap || priceData.toy.category_toytap,
-            discount_percent: fullToyData.discount_percent,
-            compare_price: fullToyData.compare_price,
-            is_lowest_price_ever: fullToyData.is_lowest_price_ever
+        function loadWatchlist() {
+            if (currentUser) {
+                const saved = localStorage.getItem('toytap_watchlist_' + currentUser.id);
+                watchlist = saved ? JSON.parse(saved) : [];
+            }
+        }
+
+        function updateWatchlistButton() {
+            if (!toyData) return;
+            const isInWatchlist = watchlist.find(t => t.asin === toyData.asin);
+            const icon = document.getElementById('watchlist-icon');
+            const text = document.getElementById('watchlist-text');
+            if (isInWatchlist) {
+                icon.textContent = 'bookmark_added';
+                text.textContent = 'In Watchlist';
+            } else {
+                icon.textContent = 'bookmark_add';
+                text.textContent = 'Add to Watchlist';
+            }
+        }
+
+        window.addToWatchlist = function() {
+            if (!currentUser) {
+                window.location.href = 'login.html?redirect=toy.html?asin=' + toyData.asin;
+                return;
+            }
+            const isInWatchlist = watchlist.find(t => t.asin === toyData.asin);
+            if (isInWatchlist) {
+                watchlist = watchlist.filter(t => t.asin !== toyData.asin);
+            } else {
+                watchlist.push(toyData);
+            }
+            localStorage.setItem('toytap_watchlist_' + currentUser.id, JSON.stringify(watchlist));
+            updateWatchlistButton();
         };
-        priceStats = priceData.price_stats || {};
-        dealAnalysis = priceData.deal_analysis || {};
-        priceHistory = priceData.price_history || [];
 
-        renderProduct();
-        renderCharts();
-        renderDealAnalysis();
-
-        document.getElementById('loading').style.display = 'none';
-        document.getElementById('content').style.display = 'block';
-    } catch (err) {
-        console.error('Load error:', err);
-        showError();
-    }
-});
-
-// Fetch full toy data by ASIN (includes tt_grade)
-async function fetchToyByAsin(asin) {
-    try {
-        // Check cache first - this has correct data from homepage/leaderboard
-        if (window.toyCache && window.toyCache[asin]) {
-            return window.toyCache[asin];
-        }
-        // Fetch from search API - but verify ASIN matches!
-        const res = await fetch(`${API_BASE}/toys/search?q=${asin}&limit=5`);
-        const data = await res.json();
-        if (data.toys && data.toys.length > 0) {
-            // Find exact ASIN match
-            const match = data.toys.find(t => t.asin === asin);
-            if (match) return match;
-        }
-        return {};
-    } catch (err) {
-        console.error('Fetch toy error:', err);
-        return {};
-    }
-}
-
-function renderProduct() {
-    const toy = toyData;
-
-    // Update page title
-    document.getElementById('page-title').textContent = `${toy.toy_name} - ToyTap`;
-
-    document.getElementById('product-image').src = toy.image_url_proxied || toy.image_url || PLACEHOLDER_IMG;
-    document.getElementById('product-brand').textContent = toy.brand || 'Unknown Brand';
-    document.getElementById('product-name').textContent = toy.toy_name;
-
-    // Metrics - note: tt_grade may not be in price-history response
-    const ttGrade = toy.tt_grade || '--';
-    if (ttGrade && ttGrade !== '--') {
-        document.getElementById('metric-grade').innerHTML = renderGradeBadge(ttGrade, 'sm');
-    } else {
-        document.getElementById('metric-grade').textContent = '--';
-    }
-    document.getElementById('metric-score').textContent = toy.toy_tap_score ? parseFloat(toy.toy_tap_score).toFixed(1) : '--';
-    document.getElementById('metric-rating').innerHTML = `${toy.rating || 'N/A'} &#11088;`;
-    document.getElementById('metric-reviews').textContent = (toy.reviews_count || 0).toLocaleString();
-
-    // Amazon Rank
-    const rank = parseInt(toy.rank) || 0;
-    if (rank > 0) {
-        document.getElementById('metric-rank').textContent = formatRank(rank);
-    }
-
-    // Category
-    const category = toy.category_toytap || toy.category || '--';
-    document.getElementById('metric-category').textContent = category;
-
-    // Current price - use priceStats from API
-    const price = parseFloat(priceStats.current) || parseFloat(toy.price) || 0;
-    document.getElementById('current-price').textContent = '$' + price.toFixed(2);
-
-    // Discount and badges - use dealAnalysis from API
-    const previousPrice = parseFloat(priceStats.previous) || 0;
-    const discount = dealAnalysis.vs_previous ? Math.abs(dealAnalysis.vs_previous.change_percent) : 0;
-    const isLowestEver = dealAnalysis.vs_historical?.is_near_low || false;
-    let badgesHtml = '';
-
-    if (discount > 5 && previousPrice > price) {
-        document.getElementById('original-price').textContent = '$' + previousPrice.toFixed(2);
-        document.getElementById('original-price').style.display = 'inline';
-        document.getElementById('savings-badge').textContent = `Save ${discount.toFixed(0)}%`;
-        document.getElementById('savings-badge').style.display = 'inline-block';
-        badgesHtml += `<div class="badge-deal">-${discount.toFixed(0)}%</div>`;
-    }
-
-    if (isLowestEver) {
-        badgesHtml += `<div class="badge-lowest">LOWEST EVER</div>`;
-    }
-
-    document.getElementById('product-badges').innerHTML = badgesHtml;
-
-    // Buy link
-    document.getElementById('buy-amazon').href = toy.affiliate_url || `https://amazon.com/dp/${toy.asin}?tag=redeemer0d0-20`;
-
-    // Price stats - use priceStats from API
-    if (priceStats.lowest !== undefined) {
-        document.getElementById('stat-lowest').textContent = '$' + parseFloat(priceStats.lowest).toFixed(2);
-        document.getElementById('stat-highest').textContent = '$' + parseFloat(priceStats.highest).toFixed(2);
-        document.getElementById('stat-average').textContent = '$' + parseFloat(priceStats.average).toFixed(2);
-
-        // Check if current is at/near lowest
-        if (price <= priceStats.lowest * 1.05) {
-            document.getElementById('stat-lowest-note').innerHTML = '&#10003; At lowest!';
-            document.getElementById('stat-lowest-note').style.color = 'var(--green)';
-        }
-    }
-}
-
-// Format Amazon rank nicely
-function formatRank(rank) {
-    if (rank >= 1000000) {
-        return '#' + (rank / 1000000).toFixed(1) + 'M';
-    } else if (rank >= 1000) {
-        return '#' + (rank / 1000).toFixed(1) + 'K';
-    }
-    return '#' + rank;
-}
-
-function renderCharts() {
-    // Filter by period
-    const cutoffDate = new Date();
-    cutoffDate.setDate(cutoffDate.getDate() - currentPeriod);
-
-    const filteredHistory = priceHistory.filter(h => {
-        if (!h.date) return true;
-        return new Date(h.date) >= cutoffDate;
-    });
-
-    // Prepare labels
-    const labels = filteredHistory.map(h => {
-        if (!h.date) return '';
-        const d = new Date(h.date);
-        return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-    });
-
-    // Destroy existing charts
-    if (priceChart) priceChart.destroy();
-    if (amazonRankChart) amazonRankChart.destroy();
-
-    // Common chart options
-    const commonOptions = {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-            legend: { display: false }
-        },
-        scales: {
-            x: {
-                grid: { color: 'rgba(255,255,255,0.05)' },
-                ticks: { color: '#64748b', maxTicksLimit: 8 }
-            }
-        },
-        interaction: { mode: 'nearest', axis: 'x', intersect: false }
-    };
-
-    // 1. Price Chart
-    const priceCtx = document.getElementById('price-chart').getContext('2d');
-    const amazonPrices = filteredHistory.map(h => h.price);
-    priceChart = new Chart(priceCtx, {
-        type: 'line',
-        data: {
-            labels,
-            datasets: [{
-                label: 'Price',
-                data: amazonPrices,
-                borderColor: '#ff9900',
-                backgroundColor: 'rgba(255, 153, 0, 0.1)',
-                fill: true,
-                tension: 0.3,
-                pointRadius: 2,
-                pointHoverRadius: 6
-            }]
-        },
-        options: {
-            ...commonOptions,
-            plugins: {
-                ...commonOptions.plugins,
-                tooltip: {
-                    mode: 'index',
-                    intersect: false,
-                    backgroundColor: '#1a2234',
-                    titleColor: '#fff',
-                    bodyColor: '#94a3b8',
-                    borderColor: 'rgba(109,195,213,0.3)',
-                    borderWidth: 1,
-                    padding: 12,
-                    callbacks: {
-                        label: (context) => context.raw ? 'Price: $' + context.raw.toFixed(2) : ''
-                    }
+        async function fetchToyByAsin(asin) {
+            try {
+                if (window.toyCache && window.toyCache[asin]) {
+                    return window.toyCache[asin];
                 }
-            },
-            scales: {
-                ...commonOptions.scales,
-                y: {
-                    grid: { color: 'rgba(255,255,255,0.05)' },
-                    ticks: {
-                        color: '#64748b',
-                        callback: (value) => '$' + value.toFixed(0)
-                    }
+                const res = await fetch(`${API_BASE}/toys/search?q=${asin}&limit=5`);
+                const data = await res.json();
+                if (data.toys && data.toys.length > 0) {
+                    const match = data.toys.find(t => t.asin === asin);
+                    if (match) return match;
+                }
+                return {};
+            } catch (err) {
+                console.error('Fetch toy error:', err);
+                return {};
+            }
+        }
+
+        function renderProduct() {
+            const toy = toyData;
+
+            document.getElementById('page-title').textContent = `${toy.toy_name} - ToyTap`;
+            document.getElementById('product-image').src = toy.image_url_proxied || toy.image_url || PLACEHOLDER_IMG;
+            document.getElementById('product-brand').textContent = toy.brand || 'Unknown Brand';
+            document.getElementById('product-name').textContent = toy.toy_name;
+
+            // Metrics
+            const ttGrade = toy.tt_grade || '--';
+            if (ttGrade && ttGrade !== '--') {
+                document.getElementById('metric-grade').innerHTML = `<span class="text-primary">${ttGrade}</span>`;
+            } else {
+                document.getElementById('metric-grade').textContent = '--';
+            }
+            document.getElementById('metric-score').textContent = toy.toy_tap_score ? parseFloat(toy.toy_tap_score).toFixed(1) : '--';
+            document.getElementById('metric-rating').innerHTML = `${toy.rating || 'N/A'} <span class="text-yellow-400">&#9733;</span>`;
+            document.getElementById('metric-reviews').textContent = (toy.reviews_count || 0).toLocaleString();
+
+            const rank = parseInt(toy.rank) || 0;
+            if (rank > 0) {
+                document.getElementById('metric-rank').textContent = formatRank(rank);
+            }
+
+            const category = toy.category_toytap || toy.category || '--';
+            document.getElementById('metric-category').textContent = category;
+
+            // Current price
+            const price = parseFloat(priceStats.current) || parseFloat(toy.price) || 0;
+            document.getElementById('current-price').textContent = '$' + price.toFixed(2);
+
+            // Discount and badges
+            const previousPrice = parseFloat(priceStats.previous) || 0;
+            const discount = dealAnalysis.vs_previous ? Math.abs(dealAnalysis.vs_previous.change_percent) : 0;
+            const isLowestEver = dealAnalysis.vs_historical?.is_near_low || false;
+            let badgesHtml = '';
+
+            if (discount > 5 && previousPrice > price) {
+                document.getElementById('original-price').textContent = '$' + previousPrice.toFixed(2);
+                document.getElementById('original-price').classList.remove('hidden');
+                document.getElementById('savings-badge').textContent = `Save ${discount.toFixed(0)}%`;
+                document.getElementById('savings-badge').classList.remove('hidden');
+                badgesHtml += `<div class="bg-emerald-500 text-white text-xs font-bold px-2 py-1 rounded-lg">-${discount.toFixed(0)}%</div>`;
+            }
+
+            if (isLowestEver) {
+                badgesHtml += `<div class="bg-gradient-to-r from-yellow-400 to-orange-500 text-navy-deep text-xs font-bold px-2 py-1 rounded-lg uppercase">Lowest Ever</div>`;
+            }
+
+            document.getElementById('product-badges').innerHTML = badgesHtml;
+
+            // Buy link
+            document.getElementById('buy-amazon').href = toy.affiliate_url || `https://amazon.com/dp/${toy.asin}?tag=redeemer0d0-20`;
+
+            // Price stats
+            if (priceStats.lowest !== undefined) {
+                document.getElementById('stat-lowest').textContent = '$' + parseFloat(priceStats.lowest).toFixed(2);
+                document.getElementById('stat-highest').textContent = '$' + parseFloat(priceStats.highest).toFixed(2);
+                document.getElementById('stat-average').textContent = '$' + parseFloat(priceStats.average).toFixed(2);
+
+                if (price <= priceStats.lowest * 1.05) {
+                    document.getElementById('stat-lowest-note').innerHTML = '<span class="text-emerald-400">&#10003; At lowest!</span>';
                 }
             }
         }
-    });
 
-    // 2. Amazon Rank Chart
-    const rankCtx = document.getElementById('amazon-rank-chart').getContext('2d');
-    const ranks = filteredHistory.map(h => h.rank || null);
-    amazonRankChart = new Chart(rankCtx, {
-        type: 'line',
-        data: {
-            labels,
-            datasets: [{
-                label: 'Amazon Rank',
-                data: ranks,
-                borderColor: '#10b981',
-                backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                fill: true,
-                tension: 0.3,
-                pointRadius: 2,
-                pointHoverRadius: 6
-            }]
-        },
-        options: {
-            ...commonOptions,
-            plugins: {
-                ...commonOptions.plugins,
-                tooltip: {
-                    mode: 'index',
-                    intersect: false,
-                    backgroundColor: '#1a2234',
-                    titleColor: '#fff',
-                    bodyColor: '#94a3b8',
-                    borderColor: 'rgba(109,195,213,0.3)',
-                    borderWidth: 1,
-                    padding: 12,
-                    callbacks: {
-                        label: (context) => context.raw ? 'Rank: #' + context.raw.toLocaleString() : ''
+        function formatRank(rank) {
+            if (rank >= 1000000) {
+                return '#' + (rank / 1000000).toFixed(1) + 'M';
+            } else if (rank >= 1000) {
+                return '#' + (rank / 1000).toFixed(1) + 'K';
+            }
+            return '#' + rank;
+        }
+
+        function renderCharts() {
+            const cutoffDate = new Date();
+            cutoffDate.setDate(cutoffDate.getDate() - currentPeriod);
+
+            const filteredHistory = priceHistory.filter(h => {
+                if (!h.date) return true;
+                return new Date(h.date) >= cutoffDate;
+            });
+
+            const labels = filteredHistory.map(h => {
+                if (!h.date) return '';
+                const d = new Date(h.date);
+                return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+            });
+
+            if (priceChart) priceChart.destroy();
+            if (amazonRankChart) amazonRankChart.destroy();
+
+            const commonOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: {
+                        grid: { color: 'rgba(255,255,255,0.05)' },
+                        ticks: { color: '#64748b', maxTicksLimit: 8 }
+                    }
+                },
+                interaction: { mode: 'nearest', axis: 'x', intersect: false }
+            };
+
+            // Price Chart
+            const priceCtx = document.getElementById('price-chart').getContext('2d');
+            const amazonPrices = filteredHistory.map(h => h.price);
+            priceChart = new Chart(priceCtx, {
+                type: 'line',
+                data: {
+                    labels,
+                    datasets: [{
+                        label: 'Price',
+                        data: amazonPrices,
+                        borderColor: '#f97316',
+                        backgroundColor: 'rgba(249, 115, 22, 0.1)',
+                        fill: true,
+                        tension: 0.3,
+                        pointRadius: 2,
+                        pointHoverRadius: 6
+                    }]
+                },
+                options: {
+                    ...commonOptions,
+                    plugins: {
+                        ...commonOptions.plugins,
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                            backgroundColor: '#12183d',
+                            titleColor: '#fff',
+                            bodyColor: '#94a3b8',
+                            borderColor: 'rgba(63,195,213,0.3)',
+                            borderWidth: 1,
+                            padding: 12,
+                            callbacks: {
+                                label: (context) => context.raw ? 'Price: $' + context.raw.toFixed(2) : ''
+                            }
+                        }
+                    },
+                    scales: {
+                        ...commonOptions.scales,
+                        y: {
+                            grid: { color: 'rgba(255,255,255,0.05)' },
+                            ticks: {
+                                color: '#64748b',
+                                callback: (value) => '$' + value.toFixed(0)
+                            }
+                        }
                     }
                 }
-            },
-            scales: {
-                ...commonOptions.scales,
-                y: {
-                    reverse: true,
-                    grid: { color: 'rgba(255,255,255,0.05)' },
-                    ticks: {
-                        color: '#64748b',
-                        callback: (value) => '#' + value.toLocaleString()
+            });
+
+            // Amazon Rank Chart
+            const rankCtx = document.getElementById('amazon-rank-chart').getContext('2d');
+            const ranks = filteredHistory.map(h => h.rank || null);
+            amazonRankChart = new Chart(rankCtx, {
+                type: 'line',
+                data: {
+                    labels,
+                    datasets: [{
+                        label: 'Amazon Rank',
+                        data: ranks,
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        fill: true,
+                        tension: 0.3,
+                        pointRadius: 2,
+                        pointHoverRadius: 6
+                    }]
+                },
+                options: {
+                    ...commonOptions,
+                    plugins: {
+                        ...commonOptions.plugins,
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                            backgroundColor: '#12183d',
+                            titleColor: '#fff',
+                            bodyColor: '#94a3b8',
+                            borderColor: 'rgba(63,195,213,0.3)',
+                            borderWidth: 1,
+                            padding: 12,
+                            callbacks: {
+                                label: (context) => context.raw ? 'Rank: #' + context.raw.toLocaleString() : ''
+                            }
+                        }
+                    },
+                    scales: {
+                        ...commonOptions.scales,
+                        y: {
+                            reverse: true,
+                            grid: { color: 'rgba(255,255,255,0.05)' },
+                            ticks: {
+                                color: '#64748b',
+                                callback: (value) => '#' + value.toLocaleString()
+                            }
+                        }
                     }
                 }
+            });
+
+            // ToyTap Rank Display
+            const toytapRank = toyData.toy_tap_rank_global || toyData.tt_rank || null;
+            const rankEl = document.getElementById('toytap-rank-value');
+            if (toytapRank) {
+                rankEl.textContent = '#' + toytapRank.toLocaleString();
+            } else {
+                rankEl.textContent = 'N/A';
             }
         }
-    });
 
-    // 3. ToyTap Rank Display (not a chart - just current value)
-    const toytapRank = toyData.toy_tap_rank_global || toyData.tt_rank || null;
-    const rankEl = document.getElementById('toytap-rank-value');
-    if (toytapRank) {
-        rankEl.textContent = '#' + toytapRank.toLocaleString();
-    } else {
-        rankEl.textContent = 'N/A';
-    }
-}
+        function setPeriod(days) {
+            currentPeriod = days;
+            document.querySelectorAll('.period-btn').forEach(btn => {
+                const isActive = parseInt(btn.dataset.days) === days;
+                btn.classList.toggle('bg-primary', isActive);
+                btn.classList.toggle('text-navy-deep', isActive);
+                btn.classList.toggle('bg-white/5', !isActive);
+                btn.classList.toggle('text-white/50', !isActive);
+                btn.classList.toggle('border', !isActive);
+                btn.classList.toggle('border-white/10', !isActive);
+            });
+            renderCharts();
+        }
 
-function setPeriod(days) {
-    currentPeriod = days;
+        function renderDealAnalysis() {
+            const indicator = document.getElementById('deal-indicator');
+            const title = document.getElementById('deal-title');
+            const desc = document.getElementById('deal-description');
 
-    // Update buttons
-    document.querySelectorAll('.period-btn').forEach(btn => {
-        btn.classList.toggle('active', parseInt(btn.dataset.days) === days);
-    });
+            const recommendation = dealAnalysis.recommendation || '';
+            const isNearLow = dealAnalysis.vs_historical?.is_near_low || false;
+            const vsHighestPercent = dealAnalysis.vs_historical?.vs_highest_percent || 0;
+            const changePercent = dealAnalysis.vs_previous?.change_percent || 0;
 
-    renderCharts();
-}
+            if (recommendation.includes('Excellent') || isNearLow) {
+                indicator.className = 'w-16 h-16 rounded-full flex items-center justify-center text-3xl bg-emerald-500/20';
+                indicator.innerHTML = '&#129321;';
+                title.textContent = 'Great Deal!';
+                desc.textContent = recommendation || `Near all-time low price. This is a great time to buy!`;
+            } else if (recommendation.includes('Good') || Math.abs(vsHighestPercent) > 30) {
+                indicator.className = 'w-16 h-16 rounded-full flex items-center justify-center text-3xl bg-emerald-500/20';
+                indicator.innerHTML = '&#128077;';
+                title.textContent = 'Good Deal';
+                desc.textContent = recommendation || `Price is well below the highest. Solid deal.`;
+            } else if (changePercent < -10) {
+                indicator.className = 'w-16 h-16 rounded-full flex items-center justify-center text-3xl bg-red-500/20';
+                indicator.innerHTML = '&#128528;';
+                title.textContent = 'Above Average';
+                desc.textContent = 'Current price is higher than recent history. Consider waiting.';
+            } else {
+                indicator.className = 'w-16 h-16 rounded-full flex items-center justify-center text-3xl bg-yellow-500/20';
+                indicator.innerHTML = '&#128578;';
+                title.textContent = 'Average Price';
+                desc.textContent = recommendation || 'Price is close to the historical average.';
+            }
+        }
 
-function renderDealAnalysis() {
-    const indicator = document.getElementById('deal-indicator');
-    const title = document.getElementById('deal-title');
-    const desc = document.getElementById('deal-description');
-
-    // Use recommendation from API if available
-    const recommendation = dealAnalysis.recommendation || '';
-    const isNearLow = dealAnalysis.vs_historical?.is_near_low || false;
-    const vsHighestPercent = dealAnalysis.vs_historical?.vs_highest_percent || 0;
-    const changePercent = dealAnalysis.vs_previous?.change_percent || 0;
-
-    if (recommendation.includes('Excellent') || isNearLow) {
-        indicator.className = 'deal-indicator good';
-        indicator.innerHTML = '&#129321;';
-        title.textContent = 'Great Deal!';
-        desc.textContent = recommendation || `Near all-time low price. This is a great time to buy!`;
-    } else if (recommendation.includes('Good') || Math.abs(vsHighestPercent) > 30) {
-        indicator.className = 'deal-indicator good';
-        indicator.innerHTML = '&#128077;';
-        title.textContent = 'Good Deal';
-        desc.textContent = recommendation || `Price is well below the highest. Solid deal.`;
-    } else if (changePercent < -10) {
-        indicator.className = 'deal-indicator poor';
-        indicator.innerHTML = '&#128528;';
-        title.textContent = 'Above Average';
-        desc.textContent = 'Current price is higher than recent history. Consider waiting.';
-    } else {
-        indicator.className = 'deal-indicator fair';
-        indicator.innerHTML = '&#128578;';
-        title.textContent = 'Average Price';
-        desc.textContent = recommendation || 'Price is close to the historical average.';
-    }
-}
-
-function showError() {
-    document.getElementById('loading').style.display = 'none';
-    document.getElementById('error').style.display = 'block';
-}
-</script>
+        function showError() {
+            document.getElementById('loading').classList.add('hidden');
+            document.getElementById('error').classList.remove('hidden');
+        }
+    </script>
 </body>
 </html>

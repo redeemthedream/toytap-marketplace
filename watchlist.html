@@ -1,196 +1,266 @@
 <!DOCTYPE html>
-<html lang="en">
+<html class="dark" lang="en">
 <head>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
     <title>Watchlist - ToyTap</title>
     <meta name="description" content="Track your favorite toys and get notified when prices drop." />
     <link rel="icon" type="image/png" href="https://i.imgur.com/HXSawxU.png" />
-    <link rel="stylesheet" href="css/styles.css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#3fc3d5",
+                        "background-dark": "#0a0e27",
+                        "navy-deep": "#0a0e27",
+                        "navy-card": "#12183d",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"],
+                        "mono": ["JetBrains Mono", "monospace"]
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        .watchlist-container { max-width: 800px; margin: 0 auto; padding: 40px 20px; }
-        .auth-card { background: var(--bg-card); border-radius: 20px; padding: 48px; text-align: center; border: 1px solid rgba(109,195,213,0.15); }
-        .auth-icon { font-size: 64px; margin-bottom: 20px; }
-        .auth-title { font-size: 24px; font-weight: 700; margin-bottom: 12px; }
-        .auth-text { color: #94a3b8; margin-bottom: 32px; }
-        .auth-input { width: 100%; max-width: 320px; padding: 16px; background: rgba(255,255,255,0.1); border: 1px solid rgba(109,195,213,0.3); border-radius: 12px; color: #fff; font-size: 16px; margin-bottom: 16px; }
-        .auth-input:focus { outline: none; border-color: var(--cyan); }
-        .auth-btn { width: 100%; max-width: 320px; padding: 16px; background: var(--cyan); color: var(--navy); font-size: 16px; font-weight: 700; border: none; border-radius: 12px; cursor: pointer; }
-        .auth-btn:hover { opacity: 0.9; }
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px; margin-bottom: 32px; }
-        .stat-card { background: var(--bg-card); padding: 24px; border-radius: 16px; text-align: center; border: 1px solid rgba(109,195,213,0.15); }
-        .stat-value { font-size: 32px; font-weight: 800; color: var(--cyan); font-family: 'JetBrains Mono', monospace; }
-        .stat-label { font-size: 12px; color: #94a3b8; margin-top: 8px; }
-        .empty-state { text-align: center; padding: 60px 20px; }
-        .empty-icon { font-size: 64px; margin-bottom: 20px; opacity: 0.5; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .cyan-glow { box-shadow: 0 0 20px rgba(63, 195, 213, 0.3); }
+        .glass-panel { background: rgba(18, 24, 61, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(63, 195, 213, 0.1); }
+        .glass-card { background: rgba(18, 24, 61, 0.8); backdrop-filter: blur(8px); border: 1px solid rgba(63, 195, 213, 0.1); }
     </style>
 </head>
-<body>
+<body class="bg-background-dark font-display text-white min-h-screen">
+    <!-- Background Effects -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] bg-primary/10 rounded-full blur-[120px]"></div>
+        <div class="absolute bottom-[-10%] left-[-5%] w-[400px] h-[400px] bg-primary/5 rounded-full blur-[100px]"></div>
+    </div>
 
-<header class="site-header">
-    <nav class="nav-container">
-        <a href="index.html"><img src="https://i.imgur.com/HXSawxU.png" alt="ToyTap" class="nav-logo" /></a>
-        <button class="nav-toggle" onclick="document.querySelector('.nav-links').classList.toggle('open')">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
-        </button>
-        <div class="nav-links">
-            <a href="index.html" class="nav-link">Home</a>
-            <a href="rankings.html" class="nav-link">Rankings</a>
-            <a href="brands.html" class="nav-link">Brands</a>
-            <a href="watchlist.html" class="nav-link active">Watchlist</a>
-            <a href="login.html" class="nav-link nav-login">Sign In</a>
-        </div>
-    </nav>
-</header>
-
-<main class="page-wrapper">
-    <section class="hero">
-        <h1 class="hero-title">Your Watchlist</h1>
-        <p class="hero-subtitle">Track toys and get notified when prices drop</p>
-    </section>
-
-    <div class="watchlist-container">
-        <!-- Not logged in state -->
-        <div id="auth-view" class="auth-card">
-            <div class="auth-icon">&#128270;</div>
-            <h2 class="auth-title">Track Your Favorite Toys</h2>
-            <p class="auth-text">Sign in to save toys to your watchlist and get price drop alerts.</p>
-            <input type="email" id="auth-email" class="auth-input" placeholder="Enter your email" />
-            <br />
-            <button class="auth-btn" onclick="handleAuth()">Continue with Email</button>
-            <p style="color: #64748b; font-size: 12px; margin-top: 16px;">We'll send you a magic link to sign in</p>
-        </div>
-
-        <!-- Logged in state -->
-        <div id="watchlist-view" style="display: none;">
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-value" id="stat-count">0</div>
-                    <div class="stat-label">Toys Watching</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="stat-drops">0</div>
-                    <div class="stat-label">Price Drops</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="stat-saved">$0</div>
-                    <div class="stat-label">Potential Savings</div>
-                </div>
-            </div>
-
-            <div id="watchlist-toys"></div>
-
-            <div id="empty-state" class="empty-state" style="display: none;">
-                <div class="empty-icon">&#128269;</div>
-                <h3 style="font-size: 20px; margin-bottom: 12px;">No toys yet</h3>
-                <p style="color: #94a3b8; margin-bottom: 24px;">Start browsing and add toys to your watchlist</p>
-                <a href="index.html" class="btn btn-primary">Browse Toys</a>
+    <!-- Navigation -->
+    <header class="relative z-50 border-b border-white/5 bg-navy-deep/80 backdrop-blur-md sticky top-0">
+        <div class="max-w-7xl mx-auto px-4 md:px-6 h-16 md:h-20 flex items-center justify-between">
+            <a href="index.html" class="flex items-center gap-2">
+                <img src="https://i.imgur.com/HXSawxU.png" alt="ToyTap" class="h-8 w-8 md:h-10 md:w-10" />
+                <span class="text-xl md:text-2xl font-black tracking-tighter">ToyTap</span>
+            </a>
+            <nav class="hidden md:flex items-center gap-8">
+                <a class="text-sm font-semibold text-white/70 hover:text-primary transition-colors" href="index.html">Home</a>
+                <a class="text-sm font-semibold text-white/70 hover:text-primary transition-colors" href="rankings.html">Rankings</a>
+                <a class="text-sm font-semibold text-white/70 hover:text-primary transition-colors" href="brands.html">Brands</a>
+                <a class="text-sm font-semibold text-primary" href="watchlist.html">Watchlist</a>
+            </nav>
+            <div id="nav-auth" class="flex items-center gap-2 md:gap-4">
+                <a href="login.html" class="text-sm font-bold text-white/70 hover:text-primary transition-colors px-3 py-2">Login</a>
+                <a href="login.html" class="bg-primary text-navy-deep px-4 md:px-6 py-2.5 rounded-lg font-bold text-sm hover:brightness-110 transition-all hidden md:block">Sign Up</a>
             </div>
         </div>
-    </div>
-</main>
+    </header>
 
-<footer class="site-footer">
-    <div class="footer-container">
-        <img src="https://i.imgur.com/HXSawxU.png" alt="ToyTap" class="footer-logo" />
-        <div class="footer-links">
-            <a href="https://gettoytap.com" class="footer-link">For Businesses</a>
-            <a href="https://gettoytap.com/privacy" class="footer-link">Privacy</a>
+    <main class="relative z-10">
+        <!-- Hero -->
+        <section class="text-center py-12 md:py-16 px-4">
+            <h1 class="text-4xl md:text-6xl font-black text-white mb-4">Your Watchlist</h1>
+            <p class="text-white/60 text-lg">Track toys and get notified when prices drop</p>
+        </section>
+
+        <section class="max-w-4xl mx-auto px-4 pb-12">
+            <!-- Not Logged In State -->
+            <div id="auth-view" class="glass-panel rounded-2xl p-8 md:p-12 text-center max-w-md mx-auto">
+                <div class="w-20 h-20 mx-auto mb-6 rounded-full bg-primary/20 flex items-center justify-center">
+                    <span class="material-symbols-outlined text-primary text-4xl">bookmark</span>
+                </div>
+                <h2 class="text-2xl font-bold mb-3">Track Your Favorite Toys</h2>
+                <p class="text-white/50 mb-8">Sign in to save toys to your watchlist and get price drop alerts.</p>
+                <a href="login.html?redirect=watchlist.html" class="inline-block bg-primary text-navy-deep px-8 py-4 rounded-xl font-bold text-base hover:brightness-110 transition-all cyan-glow">
+                    Sign In to Continue
+                </a>
+            </div>
+
+            <!-- Logged In State -->
+            <div id="watchlist-view" class="hidden">
+                <!-- User Info Bar -->
+                <div class="flex items-center justify-between mb-8 p-4 glass-panel rounded-xl">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+                            <span class="material-symbols-outlined text-primary">person</span>
+                        </div>
+                        <div>
+                            <p class="text-white font-semibold" id="user-email">user@example.com</p>
+                            <p class="text-white/40 text-xs">Signed in</p>
+                        </div>
+                    </div>
+                    <button onclick="signOut()" class="text-white/50 hover:text-red-400 transition-colors text-sm font-semibold">
+                        Sign Out
+                    </button>
+                </div>
+
+                <!-- Stats -->
+                <div class="grid grid-cols-3 gap-4 mb-8">
+                    <div class="glass-card rounded-xl p-4 text-center">
+                        <p class="text-3xl font-bold text-primary font-mono" id="stat-count">0</p>
+                        <p class="text-white/50 text-xs mt-1">Toys Watching</p>
+                    </div>
+                    <div class="glass-card rounded-xl p-4 text-center">
+                        <p class="text-3xl font-bold text-emerald-400 font-mono" id="stat-drops">0</p>
+                        <p class="text-white/50 text-xs mt-1">Price Drops</p>
+                    </div>
+                    <div class="glass-card rounded-xl p-4 text-center">
+                        <p class="text-3xl font-bold text-yellow-400 font-mono" id="stat-saved">$0</p>
+                        <p class="text-white/50 text-xs mt-1">Potential Savings</p>
+                    </div>
+                </div>
+
+                <!-- Watchlist Toys -->
+                <div id="watchlist-toys" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"></div>
+
+                <!-- Empty State -->
+                <div id="empty-state" class="hidden text-center py-16">
+                    <div class="w-20 h-20 mx-auto mb-6 rounded-full bg-white/5 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-white/30 text-4xl">search</span>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">No toys yet</h3>
+                    <p class="text-white/50 mb-6">Start browsing and add toys to your watchlist</p>
+                    <a href="index.html" class="inline-block bg-primary text-navy-deep px-6 py-3 rounded-xl font-bold hover:brightness-110 transition-all">
+                        Browse Toys
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-white/5 bg-navy-deep/40 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 md:px-6 py-8">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-6">
+                <div class="flex items-center gap-2">
+                    <img src="https://i.imgur.com/HXSawxU.png" alt="ToyTap" class="h-8 w-8" />
+                    <span class="text-lg font-bold">ToyTap</span>
+                </div>
+                <p class="text-white/30 text-sm">© 2025 ToyTap. All rights reserved.</p>
+            </div>
         </div>
-        <p class="footer-copy">2025 ToyTap. All rights reserved.</p>
-    </div>
-</footer>
+    </footer>
 
-<div id="toy-modal" class="toy-modal-overlay">
-    <div class="toy-modal">
-        <button class="modal-close" onclick="closeToyModal()">&times;</button>
-        <div id="modal-content-area"></div>
-    </div>
-</div>
+    <script src="js/api.js"></script>
+    <script>
+        const SUPABASE_URL = 'https://ehuwltjozobbbzsdygbo.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVodXdsdGpvem9iYmJ6c2R5Z2JvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ5NjAzNDQsImV4cCI6MjA4MDUzNjM0NH0.xSRT_UkN4RLK40R51mHtksb1u90M8y2FjzS45aXLGSI';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-<script src="js/api.js"></script>
-<script>
-// Supabase config - replace with your actual keys
-const SUPABASE_URL = 'https://ehuwltjozobbbzsdygbo.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVodXdsdGpvem9iYmJ6c2R5Z2JvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzA2NjY0MzIsImV4cCI6MjA0NjI0MjQzMn0.example';
+        let currentUser = null;
+        let watchlist = [];
 
-let currentUser = null;
-let watchlist = [];
+        document.addEventListener('DOMContentLoaded', async () => {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session) {
+                currentUser = session.user;
+                showWatchlist();
+            }
+        });
 
-document.addEventListener('DOMContentLoaded', () => {
-    // Check for existing session
-    const savedUser = localStorage.getItem('toytap_user');
-    if (savedUser) {
-        try {
-            currentUser = JSON.parse(savedUser);
-            showWatchlist();
-        } catch (e) {
-            localStorage.removeItem('toytap_user');
+        supabase.auth.onAuthStateChange(async (event, session) => {
+            if (event === 'SIGNED_IN' && session) {
+                currentUser = session.user;
+                showWatchlist();
+            } else if (event === 'SIGNED_OUT') {
+                currentUser = null;
+                document.getElementById('auth-view').classList.remove('hidden');
+                document.getElementById('watchlist-view').classList.add('hidden');
+            }
+        });
+
+        function showWatchlist() {
+            document.getElementById('auth-view').classList.add('hidden');
+            document.getElementById('watchlist-view').classList.remove('hidden');
+            document.getElementById('user-email').textContent = currentUser.email;
+
+            // Update nav
+            document.getElementById('nav-auth').innerHTML = `
+                <span class="text-sm text-white/50 hidden md:inline">${currentUser.email}</span>
+                <button onclick="signOut()" class="text-sm font-bold text-white/70 hover:text-red-400 transition-colors px-3 py-2">Sign Out</button>
+            `;
+
+            // Load watchlist from localStorage
+            const saved = localStorage.getItem('toytap_watchlist_' + currentUser.id);
+            watchlist = saved ? JSON.parse(saved) : [];
+            renderWatchlist();
         }
-    }
-});
 
-async function handleAuth() {
-    const email = document.getElementById('auth-email').value.trim();
-    if (!email || !email.includes('@')) {
-        alert('Please enter a valid email');
-        return;
-    }
+        function renderWatchlist() {
+            document.getElementById('stat-count').textContent = watchlist.length;
 
-    // For demo purposes, create a simple user object
-    // In production, this would use Supabase auth
-    currentUser = { email, id: btoa(email) };
-    localStorage.setItem('toytap_user', JSON.stringify(currentUser));
-    showWatchlist();
-}
+            const drops = watchlist.filter(t => parseFloat(t.discount_percent) > 5).length;
+            document.getElementById('stat-drops').textContent = drops;
 
-async function showWatchlist() {
-    document.getElementById('auth-view').style.display = 'none';
-    document.getElementById('watchlist-view').style.display = 'block';
+            const savings = watchlist.reduce((sum, t) => {
+                const discount = parseFloat(t.discount_percent) || 0;
+                const price = parseFloat(t.price) || 0;
+                return sum + (price * discount / 100);
+            }, 0);
+            document.getElementById('stat-saved').textContent = '$' + savings.toFixed(0);
 
-    // Load watchlist from localStorage (or Supabase in production)
-    const saved = localStorage.getItem('toytap_watchlist_' + currentUser.id);
-    watchlist = saved ? JSON.parse(saved) : [];
+            if (watchlist.length === 0) {
+                document.getElementById('watchlist-toys').innerHTML = '';
+                document.getElementById('empty-state').classList.remove('hidden');
+                return;
+            }
 
-    renderWatchlist();
-}
+            document.getElementById('empty-state').classList.add('hidden');
+            document.getElementById('watchlist-toys').innerHTML = watchlist.map(toy => {
+                const price = parseFloat(toy.price) || 0;
+                const discount = parseFloat(toy.discount_percent) || 0;
+                const hasDiscount = discount > 5;
+                return `
+                    <div class="glass-card rounded-xl overflow-hidden relative group">
+                        <button onclick="removeFromWatchlist('${toy.asin}')" class="absolute top-2 right-2 z-10 w-8 h-8 rounded-full bg-red-500/20 text-red-400 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <span class="material-symbols-outlined text-lg">close</span>
+                        </button>
+                        <a href="toy.html?asin=${toy.asin}" class="block">
+                            <div class="relative aspect-square bg-white/5">
+                                <img src="${toy.image_url_proxied || toy.image_url}" alt="" class="w-full h-full object-contain p-2"/>
+                                ${hasDiscount ? `<div class="absolute top-2 left-2 bg-emerald-500 text-white text-xs font-bold px-2 py-1 rounded-lg">-${discount.toFixed(0)}%</div>` : ''}
+                            </div>
+                            <div class="p-3">
+                                <p class="text-primary text-[10px] font-bold uppercase">${toy.brand || ''}</p>
+                                <h3 class="text-white text-sm font-semibold line-clamp-2 mb-2">${toy.toy_name}</h3>
+                                <p class="text-white text-lg font-bold font-mono">$${price.toFixed(2)}</p>
+                            </div>
+                        </a>
+                    </div>
+                `;
+            }).join('');
+        }
 
-function renderWatchlist() {
-    document.getElementById('stat-count').textContent = watchlist.length;
+        async function signOut() {
+            await supabase.auth.signOut();
+            localStorage.removeItem('toytap_user');
+            window.location.href = 'index.html';
+        }
 
-    if (watchlist.length === 0) {
-        document.getElementById('watchlist-toys').innerHTML = '';
-        document.getElementById('empty-state').style.display = 'block';
-        return;
-    }
+        window.addToWatchlist = function(toy) {
+            if (!currentUser) {
+                window.location.href = 'login.html?redirect=watchlist.html';
+                return;
+            }
+            if (!watchlist.find(t => t.asin === toy.asin)) {
+                watchlist.push(toy);
+                localStorage.setItem('toytap_watchlist_' + currentUser.id, JSON.stringify(watchlist));
+                renderWatchlist();
+            }
+        };
 
-    document.getElementById('empty-state').style.display = 'none';
-    document.getElementById('watchlist-toys').innerHTML = `
-        <div class="toy-grid">
-            ${watchlist.map(toy => renderToyCard(toy, { showGrade: true })).join('')}
-        </div>
-    `;
-}
-
-// Function to add toy to watchlist (called from other pages)
-window.addToWatchlist = function(toy) {
-    if (!currentUser) {
-        window.location = 'watchlist.html';
-        return;
-    }
-
-    if (!watchlist.find(t => t.asin === toy.asin)) {
-        watchlist.push(toy);
-        localStorage.setItem('toytap_watchlist_' + currentUser.id, JSON.stringify(watchlist));
-        alert('Added to watchlist!');
-    }
-};
-
-window.removeFromWatchlist = function(asin) {
-    watchlist = watchlist.filter(t => t.asin !== asin);
-    localStorage.setItem('toytap_watchlist_' + currentUser.id, JSON.stringify(watchlist));
-    renderWatchlist();
-};
-</script>
+        window.removeFromWatchlist = function(asin) {
+            watchlist = watchlist.filter(t => t.asin !== asin);
+            localStorage.setItem('toytap_watchlist_' + currentUser.id, JSON.stringify(watchlist));
+            renderWatchlist();
+        };
+    </script>
 </body>
 </html>
