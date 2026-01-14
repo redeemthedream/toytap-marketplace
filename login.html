@@ -1,374 +1,265 @@
 <!DOCTYPE html>
-<html lang="en">
+<html class="dark" lang="en">
 <head>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
     <title>Sign In - ToyTap</title>
     <meta name="description" content="Sign in to ToyTap to save toys to your watchlist and get price drop alerts." />
     <link rel="icon" type="image/png" href="https://i.imgur.com/HXSawxU.png" />
-    <link rel="stylesheet" href="css/styles.css" />
-    <style>
-        .login-page {
-            min-height: calc(100vh - 70px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 40px 20px;
-            background: linear-gradient(135deg, #0a0e27 0%, var(--navy-dark) 50%, #1a1a2e 100%);
-        }
-
-        .login-card {
-            background: var(--bg-card);
-            border-radius: 24px;
-            padding: 48px 40px;
-            width: 100%;
-            max-width: 420px;
-            border: 1px solid rgba(109,195,213,0.2);
-            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
-        }
-
-        .login-logo {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            margin-bottom: 32px;
-        }
-
-        .login-logo img {
-            height: 48px;
-        }
-
-        .login-logo-text {
-            font-size: 28px;
-            font-weight: 900;
-            background: linear-gradient(135deg, var(--cyan), #fff, var(--yellow));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .login-title {
-            font-size: 24px;
-            font-weight: 700;
-            color: #fff;
-            text-align: center;
-            margin-bottom: 8px;
-        }
-
-        .login-subtitle {
-            font-size: 15px;
-            color: #94a3b8;
-            text-align: center;
-            margin-bottom: 32px;
-        }
-
-        .login-form {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-
-        .login-input {
-            width: 100%;
-            padding: 16px 20px;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(109,195,213,0.3);
-            border-radius: 12px;
-            color: #fff;
-            font-size: 16px;
-            font-family: 'Inter', sans-serif;
-            transition: all 0.2s;
-        }
-
-        .login-input:focus {
-            outline: none;
-            border-color: var(--cyan);
-            background: rgba(109,195,213,0.1);
-        }
-
-        .login-input::placeholder {
-            color: #64748b;
-        }
-
-        .login-btn {
-            width: 100%;
-            padding: 16px;
-            background: var(--cyan);
-            color: var(--navy);
-            font-size: 16px;
-            font-weight: 700;
-            border: none;
-            border-radius: 12px;
-            cursor: pointer;
-            font-family: 'Inter', sans-serif;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        .login-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(109,195,213,0.3);
-        }
-
-        .login-btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .login-divider {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            margin: 24px 0;
-        }
-
-        .login-divider::before,
-        .login-divider::after {
-            content: '';
-            flex: 1;
-            height: 1px;
-            background: rgba(255,255,255,0.1);
-        }
-
-        .login-divider span {
-            font-size: 13px;
-            color: #64748b;
-        }
-
-        .google-btn {
-            background: #fff;
-            color: #333;
-        }
-
-        .google-btn:hover {
-            background: #f8f8f8;
-        }
-
-        .google-btn svg {
-            width: 20px;
-            height: 20px;
-        }
-
-        .login-footer {
-            text-align: center;
-            margin-top: 24px;
-            font-size: 13px;
-            color: #64748b;
-        }
-
-        .login-footer a {
-            color: var(--cyan);
-        }
-
-        .login-note {
-            font-size: 12px;
-            color: #64748b;
-            text-align: center;
-            margin-top: 16px;
-            line-height: 1.5;
-        }
-
-        .login-success {
-            text-align: center;
-            padding: 20px;
-        }
-
-        .login-success-icon {
-            font-size: 64px;
-            margin-bottom: 16px;
-        }
-
-        .login-success h3 {
-            font-size: 20px;
-            margin-bottom: 12px;
-        }
-
-        .login-success p {
-            color: #94a3b8;
-        }
-
-        .login-error {
-            background: rgba(239, 68, 68, 0.1);
-            border: 1px solid rgba(239, 68, 68, 0.3);
-            color: #ef4444;
-            padding: 12px 16px;
-            border-radius: 10px;
-            font-size: 14px;
-            margin-bottom: 16px;
-            display: none;
-        }
-
-        @media (max-width: 480px) {
-            .login-card {
-                padding: 32px 24px;
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <!-- Supabase JS Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#3fc3d5",
+                        "background-dark": "#0a0e27",
+                        "navy-deep": "#0a0e27",
+                        "navy-card": "#12183d",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"],
+                        "mono": ["JetBrains Mono", "monospace"]
+                    }
+                }
             }
+        }
+    </script>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .cyan-glow {
+            box-shadow: 0 0 20px rgba(63, 195, 213, 0.3);
+        }
+        .glass-panel {
+            background: rgba(18, 24, 61, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(63, 195, 213, 0.1);
         }
     </style>
 </head>
-<body>
-
-<header class="site-header">
-    <nav class="nav-container">
-        <a href="index.html"><img src="https://i.imgur.com/HXSawxU.png" alt="ToyTap" class="nav-logo" /></a>
-        <button class="nav-toggle" onclick="document.querySelector('.nav-links').classList.toggle('open')">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
-        </button>
-        <div class="nav-links">
-            <a href="index.html" class="nav-link">Home</a>
-            <a href="rankings.html" class="nav-link">Rankings</a>
-            <a href="categories.html" class="nav-link">Categories</a>
-            <a href="brands.html" class="nav-link">Brands</a>
-            <a href="watchlist.html" class="nav-link">Watchlist</a>
-        </div>
-    </nav>
-</header>
-
-<main class="login-page">
-    <div class="login-card">
-        <div class="login-logo">
-            <img src="https://i.imgur.com/HXSawxU.png" alt="ToyTap" />
-            <span class="login-logo-text">TOYTAP</span>
-        </div>
-
-        <!-- Login Form -->
-        <div id="login-form-view">
-            <h1 class="login-title">Welcome back</h1>
-            <p class="login-subtitle">Sign in to track toys and get price alerts</p>
-
-            <div id="login-error" class="login-error"></div>
-
-            <form class="login-form" onsubmit="handleEmailLogin(event)">
-                <input
-                    type="email"
-                    id="login-email"
-                    class="login-input"
-                    placeholder="Enter your email"
-                    required
-                />
-                <button type="submit" class="login-btn" id="login-btn">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-                    Continue with Email
-                </button>
-            </form>
-
-            <p class="login-note">We'll send you a magic link to sign in instantly - no password needed.</p>
-
-            <div class="login-divider"><span>or</span></div>
-
-            <button class="login-btn google-btn" onclick="handleGoogleLogin()">
-                <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
-                Continue with Google
-            </button>
-
-            <div class="login-footer">
-                By signing in, you agree to our <a href="https://gettoytap.com/terms">Terms</a> and <a href="https://gettoytap.com/privacy">Privacy Policy</a>
-            </div>
-        </div>
-
-        <!-- Success View -->
-        <div id="login-success-view" style="display: none;">
-            <div class="login-success">
-                <div class="login-success-icon">&#9993;</div>
-                <h3>Check your email</h3>
-                <p>We sent a magic link to <strong id="sent-email"></strong></p>
-                <p style="margin-top: 12px;">Click the link to sign in.</p>
-            </div>
-            <button class="login-btn" style="margin-top: 24px;" onclick="showLoginForm()">
-                Use a different email
-            </button>
-        </div>
+<body class="bg-background-dark font-display text-white min-h-screen">
+    <!-- Background Effects -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute top-[-20%] right-[-10%] w-[600px] h-[600px] bg-primary/10 rounded-full blur-[150px]"></div>
+        <div class="absolute bottom-[-20%] left-[-10%] w-[500px] h-[500px] bg-primary/5 rounded-full blur-[120px]"></div>
     </div>
-</main>
 
-<script src="js/api.js"></script>
-<script>
-// Supabase config
-const SUPABASE_URL = 'https://ehuwltjozobbbzsdygbo.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVodXdsdGpvem9iYmJ6c2R5Z2JvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzA2NjY0MzIsImV4cCI6MjA0NjI0MjQzMn0.example';
+    <!-- Navigation -->
+    <header class="relative z-50 border-b border-white/5 bg-navy-deep/80 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+            <a href="index.html" class="flex items-center gap-2">
+                <img src="https://i.imgur.com/HXSawxU.png" alt="ToyTap" class="h-10 w-10" />
+                <span class="text-2xl font-black tracking-tighter">ToyTap</span>
+            </a>
+            <nav class="hidden md:flex items-center gap-10">
+                <a class="text-sm font-semibold text-white/70 hover:text-primary transition-colors" href="index.html">Home</a>
+                <a class="text-sm font-semibold text-white/70 hover:text-primary transition-colors" href="rankings.html">Rankings</a>
+                <a class="text-sm font-semibold text-white/70 hover:text-primary transition-colors" href="brands.html">Brands</a>
+                <a class="text-sm font-semibold text-white/70 hover:text-primary transition-colors" href="watchlist.html">Watchlist</a>
+            </nav>
+        </div>
+    </header>
 
-// Check if already logged in
-document.addEventListener('DOMContentLoaded', () => {
-    const savedUser = localStorage.getItem('toytap_user');
-    if (savedUser) {
-        // Already logged in, redirect
-        const redirect = getUrlParam('redirect') || 'watchlist.html';
-        window.location.href = redirect;
-    }
-});
+    <!-- Main Content -->
+    <main class="relative z-10 flex items-center justify-center min-h-[calc(100vh-80px)] px-6 py-12">
+        <div class="w-full max-w-md">
+            <!-- Login Card -->
+            <div class="glass-panel rounded-2xl p-8 md:p-10">
+                <!-- Logo -->
+                <div class="flex items-center justify-center gap-3 mb-8">
+                    <img src="https://i.imgur.com/HXSawxU.png" alt="ToyTap" class="h-12 w-12" />
+                    <span class="text-3xl font-black tracking-tighter bg-gradient-to-r from-primary via-white to-yellow-400 bg-clip-text text-transparent">TOYTAP</span>
+                </div>
 
-async function handleEmailLogin(event) {
-    event.preventDefault();
+                <!-- Login Form View -->
+                <div id="login-form-view">
+                    <h1 class="text-2xl font-bold text-center mb-2">Welcome back</h1>
+                    <p class="text-white/50 text-center mb-8">Sign in to track toys and get price alerts</p>
 
-    const email = document.getElementById('login-email').value.trim();
-    const btn = document.getElementById('login-btn');
-    const errorEl = document.getElementById('login-error');
+                    <!-- Error Message -->
+                    <div id="login-error" class="hidden mb-4 p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-sm"></div>
 
-    if (!email || !email.includes('@')) {
-        showError('Please enter a valid email address');
-        return;
-    }
+                    <!-- Email Form -->
+                    <form id="email-form" onsubmit="handleEmailLogin(event)" class="space-y-4">
+                        <div class="relative">
+                            <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-white/30">mail</span>
+                            <input
+                                type="email"
+                                id="login-email"
+                                class="w-full bg-white/5 border border-white/10 rounded-xl py-4 pl-12 pr-4 text-white placeholder:text-white/30 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
+                                placeholder="Enter your email"
+                                required
+                            />
+                        </div>
+                        <button
+                            type="submit"
+                            id="login-btn"
+                            class="w-full bg-primary text-navy-deep py-4 rounded-xl font-bold text-base hover:brightness-110 transition-all cyan-glow flex items-center justify-center gap-2"
+                        >
+                            <span class="material-symbols-outlined text-xl">mail</span>
+                            Continue with Email
+                        </button>
+                    </form>
 
-    btn.disabled = true;
-    btn.textContent = 'Sending...';
-    errorEl.style.display = 'none';
+                    <p class="text-white/40 text-xs text-center mt-4">We'll send you a magic link to sign in instantly</p>
 
-    try {
-        // In production, this would call Supabase auth.signInWithOtp()
-        // For demo, we'll simulate the magic link flow
+                    <!-- Divider -->
+                    <div class="flex items-center gap-4 my-6">
+                        <div class="flex-1 h-px bg-white/10"></div>
+                        <span class="text-white/30 text-xs font-medium">or</span>
+                        <div class="flex-1 h-px bg-white/10"></div>
+                    </div>
 
-        // Simulate API call delay
-        await new Promise(resolve => setTimeout(resolve, 1000));
+                    <!-- Google Login -->
+                    <button
+                        onclick="handleGoogleLogin()"
+                        class="w-full bg-white text-gray-800 py-4 rounded-xl font-bold text-base hover:bg-gray-100 transition-all flex items-center justify-center gap-3"
+                    >
+                        <svg class="w-5 h-5" viewBox="0 0 24 24">
+                            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                        </svg>
+                        Continue with Google
+                    </button>
 
-        // For demo purposes, auto-login
-        const user = { email, id: btoa(email), created_at: new Date().toISOString() };
-        localStorage.setItem('toytap_user', JSON.stringify(user));
+                    <p class="text-white/30 text-xs text-center mt-6">
+                        By signing in, you agree to our <a href="https://gettoytap.com/terms" class="text-primary hover:underline">Terms</a> and <a href="https://gettoytap.com/privacy" class="text-primary hover:underline">Privacy Policy</a>
+                    </p>
+                </div>
 
-        // Show success and redirect
-        document.getElementById('sent-email').textContent = email;
-        document.getElementById('login-form-view').style.display = 'none';
-        document.getElementById('login-success-view').style.display = 'block';
+                <!-- Success View -->
+                <div id="login-success-view" class="hidden text-center">
+                    <div class="w-20 h-20 mx-auto mb-6 rounded-full bg-primary/20 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-primary text-4xl">mark_email_read</span>
+                    </div>
+                    <h2 class="text-2xl font-bold mb-2">Check your email</h2>
+                    <p class="text-white/50 mb-2">We sent a magic link to</p>
+                    <p class="text-primary font-semibold mb-6" id="sent-email"></p>
+                    <p class="text-white/40 text-sm mb-8">Click the link in your email to sign in</p>
+                    <button
+                        onclick="showLoginForm()"
+                        class="text-primary font-semibold hover:underline"
+                    >
+                        Use a different email
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
 
-        // Auto redirect after 2 seconds (for demo)
-        setTimeout(() => {
-            const redirect = getUrlParam('redirect') || 'watchlist.html';
-            window.location.href = redirect;
-        }, 2000);
+    <script>
+        // Supabase Configuration
+        const SUPABASE_URL = 'https://ehuwltjozobbbzsdygbo.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVodXdsdGpvem9iYmJ6c2R5Z2JvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ5NjAzNDQsImV4cCI6MjA4MDUzNjM0NH0.xSRT_UkN4RLK40R51mHtksb1u90M8y2FjzS45aXLGSI';
 
-    } catch (err) {
-        console.error('Login error:', err);
-        showError('Something went wrong. Please try again.');
-    } finally {
-        btn.disabled = false;
-        btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg> Continue with Email`;
-    }
-}
+        // Initialize Supabase client
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-async function handleGoogleLogin() {
-    // In production, this would call Supabase auth.signInWithOAuth({ provider: 'google' })
-    // For demo, show a message
-    alert('Google login coming soon! Use email for now.');
-}
+        // Check if already logged in
+        document.addEventListener('DOMContentLoaded', async () => {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session) {
+                // Already logged in, redirect
+                const redirect = getUrlParam('redirect') || 'watchlist.html';
+                window.location.href = redirect;
+            }
+        });
 
-function showError(message) {
-    const errorEl = document.getElementById('login-error');
-    errorEl.textContent = message;
-    errorEl.style.display = 'block';
-}
+        // Handle magic link auth callback
+        supabase.auth.onAuthStateChange(async (event, session) => {
+            if (event === 'SIGNED_IN' && session) {
+                // Save user to localStorage for easy access
+                localStorage.setItem('toytap_user', JSON.stringify({
+                    id: session.user.id,
+                    email: session.user.email,
+                    created_at: session.user.created_at
+                }));
 
-function showLoginForm() {
-    document.getElementById('login-form-view').style.display = 'block';
-    document.getElementById('login-success-view').style.display = 'none';
-}
+                const redirect = getUrlParam('redirect') || 'watchlist.html';
+                window.location.href = redirect;
+            }
+        });
 
-function getUrlParam(param) {
-    const urlParams = new URLSearchParams(window.location.search);
-    return urlParams.get(param);
-}
-</script>
+        async function handleEmailLogin(event) {
+            event.preventDefault();
+
+            const email = document.getElementById('login-email').value.trim();
+            const btn = document.getElementById('login-btn');
+            const errorEl = document.getElementById('login-error');
+
+            if (!email || !email.includes('@')) {
+                showError('Please enter a valid email address');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = '<span class="material-symbols-outlined animate-spin">progress_activity</span> Sending...';
+            errorEl.classList.add('hidden');
+
+            try {
+                const { error } = await supabase.auth.signInWithOtp({
+                    email: email,
+                    options: {
+                        emailRedirectTo: window.location.origin + '/watchlist.html'
+                    }
+                });
+
+                if (error) throw error;
+
+                // Show success view
+                document.getElementById('sent-email').textContent = email;
+                document.getElementById('login-form-view').classList.add('hidden');
+                document.getElementById('login-success-view').classList.remove('hidden');
+
+            } catch (err) {
+                console.error('Login error:', err);
+                showError(err.message || 'Something went wrong. Please try again.');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<span class="material-symbols-outlined text-xl">mail</span> Continue with Email';
+            }
+        }
+
+        async function handleGoogleLogin() {
+            try {
+                const { error } = await supabase.auth.signInWithOAuth({
+                    provider: 'google',
+                    options: {
+                        redirectTo: window.location.origin + '/watchlist.html'
+                    }
+                });
+
+                if (error) throw error;
+            } catch (err) {
+                console.error('Google login error:', err);
+                showError(err.message || 'Google login failed. Please try again.');
+            }
+        }
+
+        function showError(message) {
+            const errorEl = document.getElementById('login-error');
+            errorEl.textContent = message;
+            errorEl.classList.remove('hidden');
+        }
+
+        function showLoginForm() {
+            document.getElementById('login-form-view').classList.remove('hidden');
+            document.getElementById('login-success-view').classList.add('hidden');
+        }
+
+        function getUrlParam(param) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(param);
+        }
+    </script>
 </body>
 </html>
