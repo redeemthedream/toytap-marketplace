@@ -120,6 +120,22 @@ img {
     background: rgba(109, 195, 213, 0.15);
 }
 
+.nav-login {
+    background: var(--cyan);
+    color: var(--navy) !important;
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.2s;
+    margin-left: 8px;
+}
+
+.nav-login:hover {
+    background: #fff;
+    transform: translateY(-2px);
+}
+
 /* Mobile nav toggle */
 .nav-toggle {
     display: none;
