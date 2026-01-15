@@ -69,9 +69,11 @@
                 <a class="text-sm font-semibold text-white/70 hover:text-primary transition-colors" href="index.html">Home</a>
                 <a class="text-sm font-semibold text-white/70 hover:text-primary transition-colors" href="rankings.html">Rankings</a>
                 <a class="text-sm font-semibold text-primary" href="brands.html">Brands</a>
+                <a class="text-sm font-semibold text-white/70 hover:text-primary transition-colors" href="blog.html">Blog</a>
                 <a class="text-sm font-semibold text-white/70 hover:text-primary transition-colors" href="watchlist.html">Watchlist</a>
+                <a class="text-sm font-semibold text-yellow-400 hover:text-yellow-300 transition-colors" href="https://gettoytap.com" target="_blank">Partner ↗</a>
             </nav>
-            <div class="flex items-center gap-2 md:gap-4">
+            <div id="nav-auth" class="flex items-center gap-2 md:gap-4">
                 <a href="login.html" class="text-sm font-bold text-white/70 hover:text-primary transition-colors px-3 py-2">Login</a>
                 <a href="login.html" class="bg-primary text-navy-deep px-4 md:px-6 py-2.5 rounded-lg font-bold text-sm hover:brightness-110 transition-all hidden md:block">Sign Up</a>
             </div>
@@ -135,11 +137,11 @@
 
                 <div class="flex items-center justify-between mb-6">
                     <p class="text-white/50 text-sm">Showing <span class="text-white font-semibold" id="showing-count">0</span> toys</p>
-                    <select id="sort-select" onchange="handleSortChange()" class="bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-sm text-white/70 focus:outline-none focus:border-primary">
-                        <option value="score">Best Value</option>
-                        <option value="price-low">Price: Low to High</option>
-                        <option value="price-high">Price: High to Low</option>
-                        <option value="rating">Highest Rated</option>
+                    <select id="sort-select" onchange="handleSortChange()" class="bg-navy-card border border-white/10 rounded-lg px-4 py-2 text-sm text-white focus:outline-none focus:border-primary cursor-pointer" style="color-scheme: dark;">
+                        <option value="score" class="bg-navy-card text-white">Best Value</option>
+                        <option value="price-low" class="bg-navy-card text-white">Price: Low to High</option>
+                        <option value="price-high" class="bg-navy-card text-white">Price: High to Low</option>
+                        <option value="rating" class="bg-navy-card text-white">Highest Rated</option>
                     </select>
                 </div>
 
@@ -167,8 +169,30 @@
         </div>
     </footer>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/api.js"></script>
     <script>
+        // Auth
+        const SUPABASE_URL = 'https://ehuwltjozobbbzsdygbo.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVodXdsdGpvem9iYmJ6c2R5Z2JvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ5NjAzNDQsImV4cCI6MjA4MDUzNjM0NH0.xSRT_UkN4RLK40R51mHtksb1u90M8y2FjzS45aXLGSI';
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        let currentUser = null;
+
+        supabaseClient.auth.getSession().then(({ data }) => {
+            if (data?.session) {
+                currentUser = data.session.user;
+                document.getElementById('nav-auth').innerHTML = `
+                    <span class="text-sm text-white/50 hidden md:inline">${currentUser.email}</span>
+                    <button onclick="signOut()" class="text-sm font-bold text-white/70 hover:text-red-400 transition-colors px-3 py-2">Sign Out</button>
+                `;
+            }
+        });
+
+        async function signOut() {
+            await supabaseClient.auth.signOut();
+            window.location.reload();
+        }
+
         // Only brands we actually track (sorted by toy count)
         const TRACKED_BRANDS = [
             { name: 'Melissa & Doug', initials: 'M&D', color: '#e31937' },
@@ -217,16 +241,8 @@
 
         function renderBrandsGrid() {
             document.getElementById('brands-grid').innerHTML = TRACKED_BRANDS.map(brand => `
-                <button onclick="selectBrand('${brand.name}')" class="group relative">
-                    <!-- Block studs -->
-                    <div class="absolute -top-2 left-1/2 -translate-x-1/2 flex gap-2">
-                        <div class="w-4 h-4 rounded-full" style="background: ${brand.color}; box-shadow: inset 0 -2px 4px rgba(0,0,0,0.3)"></div>
-                        <div class="w-4 h-4 rounded-full" style="background: ${brand.color}; box-shadow: inset 0 -2px 4px rgba(0,0,0,0.3)"></div>
-                    </div>
-                    <!-- Block body -->
-                    <div class="pt-4 pb-5 px-4 rounded-xl text-center transition-all group-hover:scale-105 group-hover:-translate-y-1" style="background: ${brand.color}; box-shadow: 0 4px 0 ${adjustColor(brand.color, -30)}, 0 6px 20px rgba(0,0,0,0.3)">
-                        <span class="font-bold text-sm leading-tight block" style="color: ${brand.textColor || '#fff'}; text-shadow: 0 1px 2px rgba(0,0,0,0.2)">${brand.name}</span>
-                    </div>
+                <button onclick="selectBrand('${brand.name}')" class="glass-card rounded-xl p-4 text-center transition-all duration-200 hover:scale-105 hover:-translate-y-1 hover:border-primary/50 group" style="border-left: 3px solid ${brand.color}">
+                    <span class="font-bold text-sm text-white group-hover:text-primary transition-colors">${brand.name}</span>
                 </button>
             `).join('');
         }

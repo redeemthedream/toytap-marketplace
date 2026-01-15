@@ -69,9 +69,11 @@
                 <a class="text-sm font-semibold text-white/70 hover:text-primary transition-colors" href="index.html">Home</a>
                 <a class="text-sm font-semibold text-primary" href="rankings.html">Rankings</a>
                 <a class="text-sm font-semibold text-white/70 hover:text-primary transition-colors" href="brands.html">Brands</a>
+                <a class="text-sm font-semibold text-white/70 hover:text-primary transition-colors" href="blog.html">Blog</a>
                 <a class="text-sm font-semibold text-white/70 hover:text-primary transition-colors" href="watchlist.html">Watchlist</a>
+                <a class="text-sm font-semibold text-yellow-400 hover:text-yellow-300 transition-colors" href="https://gettoytap.com" target="_blank">Partner ↗</a>
             </nav>
-            <div class="flex items-center gap-2 md:gap-4">
+            <div id="nav-auth" class="flex items-center gap-2 md:gap-4">
                 <a href="login.html" class="text-sm font-bold text-white/70 hover:text-primary transition-colors px-3 py-2">Login</a>
                 <a href="login.html" class="bg-primary text-navy-deep px-4 md:px-6 py-2.5 rounded-lg font-bold text-sm hover:brightness-110 transition-all hidden md:block">Sign Up</a>
             </div>
@@ -150,8 +152,30 @@
         </div>
     </footer>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/api.js"></script>
     <script>
+        // Auth
+        const SUPABASE_URL = 'https://ehuwltjozobbbzsdygbo.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVodXdsdGpvem9iYmJ6c2R5Z2JvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ5NjAzNDQsImV4cCI6MjA4MDUzNjM0NH0.xSRT_UkN4RLK40R51mHtksb1u90M8y2FjzS45aXLGSI';
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        let currentUser = null;
+
+        supabaseClient.auth.getSession().then(({ data }) => {
+            if (data?.session) {
+                currentUser = data.session.user;
+                document.getElementById('nav-auth').innerHTML = `
+                    <span class="text-sm text-white/50 hidden md:inline">${currentUser.email}</span>
+                    <button onclick="signOut()" class="text-sm font-bold text-white/70 hover:text-red-400 transition-colors px-3 py-2">Sign Out</button>
+                `;
+            }
+        });
+
+        async function signOut() {
+            await supabaseClient.auth.signOut();
+            window.location.reload();
+        }
+
         let allToys = [];
         let currentTab = 'quality';
         let visibleCount = 25;

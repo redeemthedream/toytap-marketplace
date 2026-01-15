@@ -87,9 +87,11 @@
                 <a class="text-sm font-semibold text-primary" href="index.html">Home</a>
                 <a class="text-sm font-semibold text-white/70 hover:text-primary transition-colors" href="rankings.html">Rankings</a>
                 <a class="text-sm font-semibold text-white/70 hover:text-primary transition-colors" href="brands.html">Brands</a>
+                <a class="text-sm font-semibold text-white/70 hover:text-primary transition-colors" href="blog.html">Blog</a>
                 <a class="text-sm font-semibold text-white/70 hover:text-primary transition-colors" href="watchlist.html">Watchlist</a>
+                <a class="text-sm font-semibold text-yellow-400 hover:text-yellow-300 transition-colors" href="https://gettoytap.com" target="_blank">Partner ↗</a>
             </nav>
-            <div class="flex items-center gap-2 md:gap-4">
+            <div id="nav-auth" class="flex items-center gap-2 md:gap-4">
                 <a href="login.html" class="text-sm font-bold text-white/70 hover:text-primary transition-colors px-3 py-2">Login</a>
                 <a href="login.html" class="bg-primary text-navy-deep px-4 md:px-6 py-2.5 rounded-lg font-bold text-sm hover:brightness-110 transition-all cyan-glow-sm hidden md:block">
                     Sign Up
@@ -164,6 +166,33 @@
             </div>
         </section>
 
+        <!-- Live Ticker -->
+        <section class="border-y border-white/5 bg-navy-card/50 overflow-hidden">
+            <div class="flex items-center">
+                <div class="shrink-0 flex items-center gap-2 px-4 py-2 bg-red-500/20 border-r border-white/10">
+                    <span class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+                    <span class="text-red-400 text-xs font-bold uppercase tracking-wider">Live</span>
+                </div>
+                <div class="overflow-hidden flex-1">
+                    <div id="live-ticker" class="flex gap-8 animate-scroll whitespace-nowrap py-2 px-4">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+        </section>
+        <style>
+            @keyframes scroll {
+                0% { transform: translateX(0); }
+                100% { transform: translateX(-50%); }
+            }
+            .animate-scroll {
+                animation: scroll 30s linear infinite;
+            }
+            .animate-scroll:hover {
+                animation-play-state: paused;
+            }
+        </style>
+
         <!-- Filter Tabs -->
         <section class="border-y border-white/5 bg-navy-deep/50 backdrop-blur-sm sticky top-16 md:top-20 z-40">
             <div class="max-w-7xl mx-auto px-4 md:px-6">
@@ -191,12 +220,12 @@
             <!-- Results Header -->
             <div class="flex items-center justify-between mb-6">
                 <p class="text-white/50 text-sm">Showing <span class="text-white font-semibold" id="showing-count">0</span> toys</p>
-                <select id="sort-select" onchange="handleSortChange()" class="bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-sm text-white/70 focus:outline-none focus:border-primary">
-                    <option value="default">Sort by: Default</option>
-                    <option value="price-low">Price: Low to High</option>
-                    <option value="price-high">Price: High to Low</option>
-                    <option value="discount">Biggest Discount</option>
-                    <option value="rating">Highest Rated</option>
+                <select id="sort-select" onchange="handleSortChange()" class="bg-navy-card border border-white/10 rounded-lg px-4 py-2 text-sm text-white focus:outline-none focus:border-primary cursor-pointer" style="color-scheme: dark;">
+                    <option value="default" class="bg-navy-card text-white">Sort by: Default</option>
+                    <option value="price-low" class="bg-navy-card text-white">Price: Low to High</option>
+                    <option value="price-high" class="bg-navy-card text-white">Price: High to Low</option>
+                    <option value="discount" class="bg-navy-card text-white">Biggest Discount</option>
+                    <option value="rating" class="bg-navy-card text-white">Highest Rated</option>
                 </select>
             </div>
 
@@ -262,8 +291,23 @@
         supabaseClient.auth.getSession().then(({ data }) => {
             if (data?.session) {
                 currentUser = data.session.user;
+                updateNavAuth();
             }
         });
+
+        function updateNavAuth() {
+            if (currentUser) {
+                document.getElementById('nav-auth').innerHTML = `
+                    <span class="text-sm text-white/50 hidden md:inline">${currentUser.email}</span>
+                    <button onclick="signOut()" class="text-sm font-bold text-white/70 hover:text-red-400 transition-colors px-3 py-2">Sign Out</button>
+                `;
+            }
+        }
+
+        async function signOut() {
+            await supabaseClient.auth.signOut();
+            window.location.reload();
+        }
 
         // State
         let allToys = [];
@@ -333,9 +377,50 @@
                 avgSavings = Math.round(toysWithDeals.reduce((sum, t) => sum + (parseFloat(t.discount_percent) || 0), 0) / toysWithDeals.length);
             }
             document.getElementById('stat-toys').textContent = totalToys.toLocaleString();
+
+            // Populate live ticker with recent deals
+            populateTicker();
             document.getElementById('stat-deals').textContent = dealsCount.toLocaleString();
             document.getElementById('stat-savings').textContent = avgSavings + '%';
             document.getElementById('fresh-count').textContent = freshCount;
+        }
+
+        function populateTicker() {
+            const deals = allToys
+                .filter(t => parseFloat(t.discount_percent) > 10)
+                .sort((a, b) => new Date(b.updated_at || 0) - new Date(a.updated_at || 0))
+                .slice(0, 15);
+
+            if (deals.length === 0) return;
+
+            const tickerHTML = deals.map(toy => {
+                const discount = parseFloat(toy.discount_percent) || 0;
+                const price = parseFloat(toy.price) || 0;
+                const name = toy.toy_name.length > 40 ? toy.toy_name.substring(0, 40) + '...' : toy.toy_name;
+                const timeAgo = getTimeAgo(toy.updated_at);
+                return `
+                    <a href="toy.html?asin=${toy.asin}" class="flex items-center gap-3 text-sm hover:text-primary transition-colors">
+                        <span class="text-emerald-400 font-bold">-${discount.toFixed(0)}%</span>
+                        <span class="text-white/70">${name}</span>
+                        <span class="text-primary font-mono font-bold">$${price.toFixed(2)}</span>
+                        <span class="text-white/30 text-xs">${timeAgo}</span>
+                    </a>
+                `;
+            }).join('');
+
+            // Duplicate for seamless loop
+            document.getElementById('live-ticker').innerHTML = tickerHTML + tickerHTML;
+        }
+
+        function getTimeAgo(dateStr) {
+            if (!dateStr) return '';
+            const date = new Date(dateStr + (dateStr.includes('Z') ? '' : 'Z'));
+            const now = new Date();
+            const mins = Math.floor((now - date) / 60000);
+            if (mins < 60) return mins + 'm ago';
+            const hrs = Math.floor(mins / 60);
+            if (hrs < 24) return hrs + 'h ago';
+            return Math.floor(hrs / 24) + 'd ago';
         }
 
         function setFilter(filter) {
@@ -402,10 +487,11 @@
             toyCache[toy.asin] = toy; // Cache for modal
             const imageUrl = toy.image_url_proxied || toy.image_url || 'https://via.placeholder.com/300x300?text=No+Image';
             const price = parseFloat(toy.price) || 0;
+            const prevPrice = parseFloat(toy.compare_price) || parseFloat(toy.price_previous_distinct) || 0;
+            const highPrice = parseFloat(toy.highest_price) || 0;
             const discount = parseFloat(toy.discount_percent) || 0;
-            const rating = parseFloat(toy.rating) || 0;
             const grade = toy.tt_grade || '';
-            const hasDiscount = discount > 5;
+            const hasDiscount = discount > 5 && prevPrice > price;
 
             return `
                 <div onclick="openModal('${toy.asin}')" class="glass-card rounded-xl overflow-hidden toy-card transition-all duration-300 hover:border-primary/30 group cursor-pointer">
@@ -419,9 +505,12 @@
                     <div class="p-3 md:p-4">
                         <p class="text-primary text-[10px] md:text-xs font-bold uppercase tracking-wider mb-1 truncate">${toy.brand || 'Brand'}</p>
                         <h3 class="text-white text-sm font-semibold leading-tight mb-2 line-clamp-2 min-h-[2.5rem]">${toy.toy_name}</h3>
-                        <div class="flex items-center justify-between">
-                            <span class="text-white text-lg md:text-xl font-bold font-mono">$${price.toFixed(2)}</span>
-                            ${rating ? `<span class="text-white/50 text-xs flex items-center gap-1">⭐ ${rating.toFixed(1)}</span>` : ''}
+                        <div class="space-y-1">
+                            <div class="flex items-baseline gap-2">
+                                <span class="text-white text-lg md:text-xl font-bold font-mono">$${price.toFixed(2)}</span>
+                                ${hasDiscount ? `<span class="text-white/40 text-sm line-through">$${prevPrice.toFixed(2)}</span>` : ''}
+                            </div>
+                            ${highPrice > price ? `<p class="text-white/30 text-[10px]">High: $${highPrice.toFixed(2)}</p>` : ''}
                         </div>
                     </div>
                 </div>
