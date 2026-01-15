@@ -174,23 +174,23 @@
     <script>
         // Only brands we actually track (sorted by toy count)
         const TRACKED_BRANDS = [
-            { name: 'Melissa & Doug', logo: 'https://upload.wikimedia.org/wikipedia/commons/f/f2/Melissa_%26_Doug_logo.png' },
-            { name: 'Learning Resources', logo: 'https://m.media-amazon.com/images/S/abs-image-upload-na/2/AmazonStores/ATVPDKIKX0DER/507e3f05f22eea6de4d46d2ff6f26e18.w400.h400.png' },
-            { name: 'VTech', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/VTech_logo.svg/512px-VTech_logo.svg.png' },
-            { name: 'LEGO', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/LEGO_logo.svg/512px-LEGO_logo.svg.png' },
-            { name: 'Play-Doh', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Play-Doh_logo.svg/512px-Play-Doh_logo.svg.png' },
-            { name: 'Green Toys', logo: 'https://m.media-amazon.com/images/S/abs-image-upload-na/9/AmazonStores/ATVPDKIKX0DER/fbbc68107f8f8eb85a9f1e6cc2bd5fc7.w400.h400.png' },
-            { name: 'LeapFrog', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/LeapFrog_Enterprises_logo.svg/512px-LeapFrog_Enterprises_logo.svg.png' },
-            { name: 'Fisher-Price', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/84/Fisher-Price-Logo.svg/512px-Fisher-Price-Logo.svg.png' },
-            { name: 'PicassoTiles', logo: 'https://m.media-amazon.com/images/S/abs-image-upload-na/6/AmazonStores/ATVPDKIKX0DER/1e8de5b2d1fe61c6c59dc9a72c67fbd8.w400.h400.png' },
-            { name: 'Hape', logo: 'https://upload.wikimedia.org/wikipedia/commons/5/5f/Hape_Toys_Logo.jpg' },
-            { name: 'Skillmatics', logo: 'https://m.media-amazon.com/images/S/abs-image-upload-na/8/AmazonStores/ATVPDKIKX0DER/46a36eba56c6cfda26f3e2d34bcce2e2.w400.h400.png' },
-            { name: 'KidKraft', logo: 'https://m.media-amazon.com/images/S/abs-image-upload-na/1/AmazonStores/ATVPDKIKX0DER/a28e4f3fa0b2e58af51b9d8adf36ff78.w400.h400.png' },
-            { name: 'Little Tikes', logo: 'https://upload.wikimedia.org/wikipedia/commons/6/63/Little_Tikes_logo_2021.png' },
-            { name: 'BRIO', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/99/Brio_logo.svg/512px-Brio_logo.svg.png' },
-            { name: 'Step2', logo: 'https://m.media-amazon.com/images/S/abs-image-upload-na/b/AmazonStores/ATVPDKIKX0DER/52a6af2c80ab9bfca6b0caeca4c7fe3b.w400.h400.png' },
-            { name: 'MAGNA-TILES', logo: 'https://www.magnatiles.com/wp-content/uploads/2021/04/magna-tiles-logo.png' },
-            { name: 'Infantino', logo: 'https://m.media-amazon.com/images/S/abs-image-upload-na/9/AmazonStores/ATVPDKIKX0DER/e75d55c6cf8b8df7e40e6f95b9d2e2cd.w400.h400.png' }
+            { name: 'Melissa & Doug', logo: 'https://logo.clearbit.com/melissaanddoug.com', color: '#e31937' },
+            { name: 'Learning Resources', logo: 'https://logo.clearbit.com/learningresources.com', color: '#0066b3' },
+            { name: 'VTech', logo: 'https://logo.clearbit.com/vtech.com', color: '#e4002b' },
+            { name: 'LEGO', logo: 'https://logo.clearbit.com/lego.com', color: '#ffcd00' },
+            { name: 'Play-Doh', logo: 'https://logo.clearbit.com/hasbro.com', color: '#ffd100' },
+            { name: 'Green Toys', logo: 'https://logo.clearbit.com/greentoys.com', color: '#4caf50' },
+            { name: 'LeapFrog', logo: 'https://logo.clearbit.com/leapfrog.com', color: '#7cb342' },
+            { name: 'Fisher-Price', logo: 'https://logo.clearbit.com/fisher-price.com', color: '#e31937' },
+            { name: 'PicassoTiles', logo: 'https://logo.clearbit.com/picassotiles.com', color: '#ff6f00' },
+            { name: 'Hape', logo: 'https://logo.clearbit.com/hape.com', color: '#e4002b' },
+            { name: 'Skillmatics', logo: 'https://logo.clearbit.com/skillmatics.com', color: '#6a1b9a' },
+            { name: 'KidKraft', logo: 'https://logo.clearbit.com/kidkraft.com', color: '#f44336' },
+            { name: 'Little Tikes', logo: 'https://logo.clearbit.com/littletikes.com', color: '#e31937' },
+            { name: 'BRIO', logo: 'https://logo.clearbit.com/brio.net', color: '#c62828' },
+            { name: 'Step2', logo: 'https://logo.clearbit.com/step2.com', color: '#1976d2' },
+            { name: 'MAGNA-TILES', logo: 'https://logo.clearbit.com/magnatiles.com', color: '#ff5722' },
+            { name: 'Infantino', logo: 'https://logo.clearbit.com/infantino.com', color: '#00bcd4' }
         ];
 
         let currentBrand = null;
@@ -222,7 +222,7 @@
             document.getElementById('brands-grid').innerHTML = TRACKED_BRANDS.map(brand => `
                 <button onclick="selectBrand('${brand.name}')" class="glass-card rounded-xl p-6 text-center hover:border-primary/30 hover:scale-105 transition-all group">
                     <div class="w-16 h-16 mx-auto mb-3 rounded-xl bg-white flex items-center justify-center overflow-hidden p-2">
-                        <img src="${brand.logo}" alt="${brand.name}" class="w-full h-full object-contain" onerror="this.style.display='none'; this.parentElement.innerHTML='<span class=\\'text-navy-deep font-bold text-lg\\'>${brand.name.charAt(0)}</span>'"/>
+                        <img src="${brand.logo}" alt="${brand.name}" class="w-full h-full object-contain" onerror="this.style.display='none'; this.parentElement.style.background='${brand.color || '#3fc3d5'}'; this.parentElement.innerHTML='<span class=\\'text-white font-bold text-2xl\\'>${brand.name.charAt(0)}</span>'"/>
                     </div>
                     <p class="font-semibold text-white">${brand.name}</p>
                     <p class="text-primary text-sm mt-1 group-hover:underline">View toys →</p>
