@@ -50,7 +50,7 @@
         <div class="max-w-7xl mx-auto px-4 md:px-6 h-16 md:h-20 flex items-center justify-between">
             <a href="index.html" class="flex items-center gap-2">
                 <img src="https://i.imgur.com/HXSawxU.png" alt="Toy Tap" class="h-8 w-8 md:h-10 md:w-10" />
-                <span class="text-xl md:text-2xl font-black tracking-tighter">Toy Tap</span>
+                <span class="text-xl md:text-2xl font-black tracking-tighter bg-gradient-to-r from-primary via-white to-yellow-400 bg-clip-text text-transparent">Toy Tap</span>
             </a>
             <nav class="hidden md:flex items-center gap-8">
                 <a class="text-sm font-semibold text-white/70 hover:text-primary transition-colors" href="index.html">Home</a>
@@ -81,11 +81,8 @@
                     <button class="ranking-tab active px-6 md:px-10 py-3 font-semibold text-sm rounded-l-xl" data-tab="quality" onclick="setRankingTab('quality')">
                         🏆 Best Toys
                     </button>
-                    <button class="ranking-tab px-6 md:px-10 py-3 font-semibold text-sm" data-tab="value" onclick="setRankingTab('value')">
+                    <button class="ranking-tab px-6 md:px-10 py-3 font-semibold text-sm rounded-r-xl" data-tab="value" onclick="setRankingTab('value')">
                         💰 Best Value
-                    </button>
-                    <button class="ranking-tab px-6 md:px-10 py-3 font-semibold text-sm rounded-r-xl" data-tab="hot" onclick="setRankingTab('hot')">
-                        🔥 Hot Now
                     </button>
                 </div>
             </div>
@@ -148,19 +145,14 @@
 
         const TAB_CONFIG = {
             quality: {
-                explanation: '<span class="text-primary font-semibold">TT Grade</span> measures overall toy quality based on reviews, ratings, and popularity.',
+                explanation: '<span class="text-primary font-semibold">TT Grade</span> — Our quality rating based on reviews, ratings, and popularity.',
                 sortKey: 'tt_grade_score',
                 showPodium: true
             },
             value: {
-                explanation: '<span class="text-yellow-400 font-semibold">TT Score</span> combines quality with current pricing. High score = great toy at a great price.',
+                explanation: '<span class="text-yellow-400 font-semibold">TT Score</span> — Quality + deal combined. The best toy for your money right now.',
                 sortKey: 'toy_tap_score',
                 showPodium: true
-            },
-            hot: {
-                explanation: '<span class="text-orange-400 font-semibold">Hot Now</span> shows toys with the biggest price drops today.',
-                sortKey: 'discount_percent',
-                showPodium: false
             }
         };
 
@@ -186,11 +178,11 @@
         function renderRankings() {
             let sorted = [...allToys];
             if (currentTab === 'quality') {
+                // Best Toys: Sort by TT Grade score (quality rating)
                 sorted = sorted.filter(t => t.tt_grade_score).sort((a, b) => (parseFloat(b.tt_grade_score) || 0) - (parseFloat(a.tt_grade_score) || 0));
             } else if (currentTab === 'value') {
+                // Best Value: Sort by TT Score (quality + deal combined)
                 sorted = sorted.filter(t => t.toy_tap_score).sort((a, b) => (parseFloat(b.toy_tap_score) || 0) - (parseFloat(a.toy_tap_score) || 0));
-            } else {
-                sorted = sorted.filter(t => parseFloat(t.discount_percent) > 5).sort((a, b) => (parseFloat(b.discount_percent) || 0) - (parseFloat(a.discount_percent) || 0));
             }
 
             if (TAB_CONFIG[currentTab].showPodium && sorted.length >= 3) {

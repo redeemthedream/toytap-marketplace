@@ -48,7 +48,7 @@
         <div class="max-w-7xl mx-auto px-4 md:px-6 h-16 md:h-20 flex items-center justify-between">
             <a href="index.html" class="flex items-center gap-2">
                 <img src="https://i.imgur.com/HXSawxU.png" alt="Toy Tap" class="h-8 w-8 md:h-10 md:w-10" />
-                <span class="text-xl md:text-2xl font-black tracking-tighter">Toy Tap</span>
+                <span class="text-xl md:text-2xl font-black tracking-tighter bg-gradient-to-r from-primary via-white to-yellow-400 bg-clip-text text-transparent">Toy Tap</span>
             </a>
             <nav class="hidden md:flex items-center gap-8">
                 <a class="text-sm font-semibold text-white/70 hover:text-primary transition-colors" href="index.html">Home</a>
@@ -152,20 +152,20 @@
     <script>
         const SUPABASE_URL = 'https://ehuwltjozobbbzsdygbo.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVodXdsdGpvem9iYmJ6c2R5Z2JvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ5NjAzNDQsImV4cCI6MjA4MDUzNjM0NH0.xSRT_UkN4RLK40R51mHtksb1u90M8y2FjzS45aXLGSI';
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         let currentUser = null;
         let watchlist = [];
 
         document.addEventListener('DOMContentLoaded', async () => {
-            const { data: { session } } = await supabase.auth.getSession();
+            const { data: { session } } = await supabaseClient.auth.getSession();
             if (session) {
                 currentUser = session.user;
                 showWatchlist();
             }
         });
 
-        supabase.auth.onAuthStateChange(async (event, session) => {
+        supabaseClient.auth.onAuthStateChange(async (event, session) => {
             if (event === 'SIGNED_IN' && session) {
                 currentUser = session.user;
                 showWatchlist();
@@ -239,7 +239,7 @@
         }
 
         async function signOut() {
-            await supabase.auth.signOut();
+            await supabaseClient.auth.signOut();
             localStorage.removeItem('toytap_user');
             window.location.href = 'index.html';
         }

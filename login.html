@@ -75,7 +75,7 @@
                 <!-- Logo -->
                 <div class="flex items-center justify-center gap-3 mb-8">
                     <img src="https://i.imgur.com/HXSawxU.png" alt="Toy Tap" class="h-12 w-12" />
-                    <span class="text-3xl font-black tracking-tighter bg-gradient-to-r from-primary via-white to-yellow-400 bg-clip-text text-transparent">TOYTAP</span>
+                    <span class="text-3xl font-black tracking-tighter bg-gradient-to-r from-primary via-white to-yellow-400 bg-clip-text text-transparent">Toy Tap</span>
                 </div>
 
                 <!-- Login Form View -->
@@ -162,11 +162,11 @@
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVodXdsdGpvem9iYmJ6c2R5Z2JvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ5NjAzNDQsImV4cCI6MjA4MDUzNjM0NH0.xSRT_UkN4RLK40R51mHtksb1u90M8y2FjzS45aXLGSI';
 
         // Initialize Supabase client
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         // Check if already logged in
         document.addEventListener('DOMContentLoaded', async () => {
-            const { data: { session } } = await supabase.auth.getSession();
+            const { data: { session } } = await supabaseClient.auth.getSession();
             if (session) {
                 // Already logged in, redirect
                 const redirect = getUrlParam('redirect') || 'watchlist.html';
@@ -175,8 +175,25 @@
         });
 
         // Handle magic link auth callback
-        supabase.auth.onAuthStateChange(async (event, session) => {
+        supabaseClient.auth.onAuthStateChange(async (event, session) => {
             if (event === 'SIGNED_IN' && session) {
+                // Upsert user to public.users table
+                try {
+                    const { error } = await supabaseClient
+                        .from('users')
+                        .upsert({
+                            id: session.user.id,
+                            email: session.user.email,
+                            name: session.user.user_metadata?.full_name || null,
+                            display_name: session.user.user_metadata?.name || null,
+                            profile_pic: session.user.user_metadata?.avatar_url || null
+                        }, { onConflict: 'id' });
+
+                    if (error) console.error('Error saving user:', error);
+                } catch (err) {
+                    console.error('Error upserting user:', err);
+                }
+
                 // Save user to localStorage for easy access
                 localStorage.setItem('toytap_user', JSON.stringify({
                     id: session.user.id,
@@ -191,10 +208,13 @@
 
         async function handleEmailLogin(event) {
             event.preventDefault();
+            console.log('Form submitted');
 
             const email = document.getElementById('login-email').value.trim();
             const btn = document.getElementById('login-btn');
             const errorEl = document.getElementById('login-error');
+
+            console.log('Email:', email);
 
             if (!email || !email.includes('@')) {
                 showError('Please enter a valid email address');
@@ -206,12 +226,15 @@
             errorEl.classList.add('hidden');
 
             try {
-                const { error } = await supabase.auth.signInWithOtp({
+                console.log('Calling Supabase signInWithOtp...');
+                const { data, error } = await supabaseClient.auth.signInWithOtp({
                     email: email,
                     options: {
                         emailRedirectTo: window.location.origin + '/watchlist.html'
                     }
                 });
+
+                console.log('Supabase response:', { data, error });
 
                 if (error) throw error;
 
@@ -231,7 +254,7 @@
 
         async function handleGoogleLogin() {
             try {
-                const { error } = await supabase.auth.signInWithOAuth({
+                const { error } = await supabaseClient.auth.signInWithOAuth({
                     provider: 'google',
                     options: {
                         redirectTo: window.location.origin + '/watchlist.html'
