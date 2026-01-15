@@ -89,7 +89,7 @@
         <section class="max-w-7xl mx-auto px-4 md:px-6 pb-12">
             <!-- Brand Grid View -->
             <div id="brands-view">
-                <div id="brands-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4"></div>
+                <div id="brands-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"></div>
             </div>
 
             <!-- Brand Detail View -->
@@ -100,10 +100,7 @@
                         <button onclick="showAllBrands()" class="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white/70 hover:bg-primary/20 hover:text-primary transition-all">
                             <span class="material-symbols-outlined text-lg">arrow_back</span> All Brands
                         </button>
-                        <div class="flex items-center gap-3">
-                            <div id="brand-badge" class="w-12 h-12 rounded-xl flex items-center justify-center"></div>
-                            <h2 id="brand-title" class="text-2xl md:text-3xl font-bold"></h2>
-                        </div>
+                        <h2 id="brand-title" class="text-2xl md:text-3xl font-bold"></h2>
                     </div>
                     <div class="flex gap-6 font-mono">
                         <div class="text-center">
@@ -220,12 +217,9 @@
 
         function renderBrandsGrid() {
             document.getElementById('brands-grid').innerHTML = TRACKED_BRANDS.map(brand => `
-                <button onclick="selectBrand('${brand.name}')" class="glass-card rounded-xl p-6 text-center hover:border-primary/30 hover:scale-105 transition-all group">
-                    <div class="w-16 h-16 mx-auto mb-3 rounded-2xl flex items-center justify-center" style="background: ${brand.color}">
-                        <span class="font-black text-xl" style="color: ${brand.textColor || '#fff'}">${brand.initials}</span>
-                    </div>
-                    <p class="font-semibold text-white">${brand.name}</p>
-                    <p class="text-primary text-sm mt-1 group-hover:underline">View toys →</p>
+                <button onclick="selectBrand('${brand.name}')" class="glass-card rounded-xl px-6 py-5 text-left hover:border-primary/50 hover:bg-primary/5 transition-all group flex items-center justify-between">
+                    <span class="text-lg font-bold text-white group-hover:text-primary transition-colors">${brand.name}</span>
+                    <span class="material-symbols-outlined text-white/30 group-hover:text-primary group-hover:translate-x-1 transition-all">arrow_forward</span>
                 </button>
             `).join('');
         }
@@ -246,13 +240,8 @@
             document.getElementById('brand-detail').classList.remove('hidden');
             document.getElementById('brand-title').textContent = brandName;
 
-            // Set brand badge
+            // Brand info for potential future use
             const brandInfo = TRACKED_BRANDS.find(b => b.name === brandName);
-            const badgeEl = document.getElementById('brand-badge');
-            if (brandInfo) {
-                badgeEl.style.background = brandInfo.color;
-                badgeEl.innerHTML = `<span class="font-black text-lg" style="color: ${brandInfo.textColor || '#fff'}">${brandInfo.initials}</span>`;
-            }
 
             document.getElementById('toy-grid').innerHTML = `
                 <div class="col-span-full flex flex-col items-center justify-center py-20">
