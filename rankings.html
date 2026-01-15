@@ -6,9 +6,13 @@
     <title>Rankings - Toy Tap</title>
     <meta name="description" content="See the top-ranked toys based on TT Grade (quality) and TT Score (value). Find the best toys and best deals." />
     <link rel="icon" type="image/png" href="https://i.imgur.com/HXSawxU.png" />
+    <!-- Preconnect for faster resource loading -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://cdn.tailwindcss.com" />
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL@24,400,0..1&icon_names=menu,close,favorite,schedule,verified,new_releases,star,emoji_events,trending_up,arrow_back&display=swap" rel="stylesheet"/>
     <script>
         tailwind.config = {
             darkMode: "class",
@@ -258,7 +262,7 @@
                         <div class="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center font-bold font-mono text-white/50 shrink-0">
                             ${rank}
                         </div>
-                        <img src="${toy.image_url_proxied || toy.image_url}" alt="" class="w-20 h-20 md:w-24 md:h-24 object-contain bg-white rounded-xl shrink-0"/>
+                        <img src="${toy.image_url_proxied || toy.image_url}" alt="" loading="lazy" class="w-20 h-20 md:w-24 md:h-24 object-contain bg-white rounded-xl shrink-0"/>
                         <div class="flex-1 min-w-0">
                             <p class="text-primary text-xs font-bold uppercase">${toy.brand || ''}</p>
                             <p class="text-white font-semibold truncate">${toy.toy_name}</p>
@@ -287,7 +291,7 @@
                 return `
                     <a href="toy.html?asin=${toy.asin}" class="glass-card ${sizes[i]} rounded-2xl p-4 text-center hover:scale-105 transition-all ${glows[i]} ${i === 0 ? 'order-2' : i === 1 ? 'order-1' : 'order-3'} block">
                         <div class="text-4xl mb-2">${medals[i]}</div>
-                        <img src="${toy.image_url_proxied || toy.image_url}" alt="" class="w-28 h-28 md:w-36 md:h-36 object-contain mx-auto bg-white rounded-xl mb-3"/>
+                        <img src="${toy.image_url_proxied || toy.image_url}" alt="" loading="lazy" class="w-28 h-28 md:w-36 md:h-36 object-contain mx-auto bg-white rounded-xl mb-3"/>
                         <p class="text-primary text-[10px] font-bold uppercase">${toy.brand || ''}</p>
                         <p class="text-white text-sm font-semibold line-clamp-2 mb-2 min-h-[2.5rem]">${toy.toy_name}</p>
                         <p class="text-white text-xl font-bold font-mono mb-2">$${parseFloat(toy.price).toFixed(2)}</p>

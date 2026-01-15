@@ -6,9 +6,13 @@
     <title id="page-title">Blog Post - Toy Tap</title>
     <meta name="description" id="page-desc" content="Read this article on Toy Tap." />
     <link rel="icon" type="image/png" href="https://i.imgur.com/HXSawxU.png" />
+    <!-- Preconnect for faster resource loading -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://cdn.tailwindcss.com" />
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL@24,400,0..1&icon_names=menu,close,arrow_back&display=swap" rel="stylesheet"/>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         tailwind.config = {
@@ -241,7 +245,7 @@
                     return `
                         <a href="toy.html?asin=${toy.asin}" class="glass-card rounded-xl overflow-hidden hover:border-primary/30 transition-all block">
                             <div class="relative aspect-square bg-white/5">
-                                <img src="${imageUrl}" alt="${toy.toy_name}" class="w-full h-full object-contain p-2"/>
+                                <img src="${imageUrl}" alt="${toy.toy_name}" loading="lazy" class="w-full h-full object-contain p-2"/>
                                 ${hasDiscount ? `<div class="absolute top-2 left-2 bg-emerald-500 text-white text-xs font-bold px-2 py-1 rounded-lg">-${discount.toFixed(0)}%</div>` : ''}
                                 ${toy.tt_grade ? `<div class="absolute top-2 right-2 bg-primary text-navy-deep text-xs font-bold px-2 py-1 rounded-lg">${toy.tt_grade}</div>` : ''}
                             </div>

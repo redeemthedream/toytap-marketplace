@@ -6,9 +6,14 @@
     <title>Watchlist - Toy Tap</title>
     <meta name="description" content="Track your favorite toys and get notified when prices drop." />
     <link rel="icon" type="image/png" href="https://i.imgur.com/HXSawxU.png" />
+    <!-- Preconnect for faster loading -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://hub.gettoytap.com">
+    <link rel="preconnect" href="https://ehuwltjozobbbzsdygbo.supabase.co">
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;700;800&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL@20..48,100..700,0..1&icon_names=add_alert,bookmark,close,menu,notifications_active,person,schedule,search&display=swap" rel="stylesheet"/>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         tailwind.config = {
@@ -392,7 +397,7 @@
                         <a href="toy.html?asin=${toy.asin}" class="block">
                             <!-- Image -->
                             <div class="relative aspect-square bg-white/5">
-                                <img src="${toy.image_url_proxied || toy.image_url || ''}" alt="" class="w-full h-full object-contain p-2" onerror="this.style.display='none'"/>
+                                <img src="${toy.image_url_proxied || toy.image_url || ''}" alt="" class="w-full h-full object-contain p-2" loading="lazy" onerror="this.style.display='none'"/>
                                 <!-- Tags - max 2 shown -->
                                 ${tags.length > 0 ? `<div class="absolute top-2 left-2 flex flex-col gap-1">${tags.slice(0,2).join('')}</div>` : ''}
                             </div>
