@@ -573,6 +573,20 @@
             }
         }
 
+        // Get freshness info from updated_at
+        function getFreshnessInfo(updatedAt) {
+            if (!updatedAt) return { class: 'bg-white/10 text-white/40', label: 'Unknown', icon: 'schedule' };
+            const now = new Date();
+            const updated = new Date(updatedAt);
+            const hoursAgo = (now - updated) / (1000 * 60 * 60);
+
+            if (hoursAgo < 6) return { class: 'bg-emerald-500/20 text-emerald-400', label: 'Just now', icon: 'bolt' };
+            if (hoursAgo < 24) return { class: 'bg-emerald-500/20 text-emerald-400', label: 'Today', icon: 'schedule' };
+            if (hoursAgo < 48) return { class: 'bg-blue-500/20 text-blue-400', label: 'Yesterday', icon: 'schedule' };
+            if (hoursAgo < 168) return { class: 'bg-yellow-500/20 text-yellow-400', label: `${Math.floor(hoursAgo / 24)}d ago`, icon: 'history' };
+            return { class: 'bg-white/10 text-white/40', label: `${Math.floor(hoursAgo / 24)}d ago`, icon: 'history' };
+        }
+
         function renderToyCard(toy) {
             toyCache[toy.asin] = toy; // Cache for modal
             const imageUrl = toy.image_url_proxied || toy.image_url || 'https://via.placeholder.com/300x300?text=No+Image';
@@ -585,6 +599,8 @@
             // Show previous price with strikethrough if it's different from current
             const showPrevPrice = prevPrice > 0 && Math.abs(prevPrice - price) > 0.01;
             const inWatchlist = isInWatchlist(toy.asin);
+            const freshness = getFreshnessInfo(toy.updated_at);
+            const isLowestEver = toy.is_lowest_price_ever || false;
 
             return `
                 <div onclick="openModal('${toy.asin}')" class="glass-card rounded-xl overflow-hidden toy-card transition-all duration-300 hover:border-primary/30 group cursor-pointer relative">
@@ -593,6 +609,7 @@
                         <img src="${imageUrl}" alt="${toy.toy_name}" class="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-300" onerror="this.src='https://via.placeholder.com/300x300?text=No+Image'"/>
                         ${hasDiscount ? `<div class="absolute top-2 left-2 bg-emerald-500 text-white text-xs font-bold px-2 py-1 rounded-lg">-${discount.toFixed(0)}%</div>` : ''}
                         ${grade ? `<div class="absolute top-2 right-2 bg-primary text-navy-deep text-xs font-bold px-2 py-1 rounded-lg">${grade}</div>` : ''}
+                        ${isLowestEver ? `<div class="absolute top-2 ${grade ? 'right-14' : 'right-2'} bg-yellow-500 text-navy-deep text-[10px] font-bold px-1.5 py-0.5 rounded">LOWEST</div>` : ''}
                         <!-- Heart Icon (visible when logged in) -->
                         ${currentUser ? `
                         <button onclick="toggleWatchlist(event, '${toy.asin}')" class="absolute bottom-2 right-2 z-10 w-8 h-8 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center hover:bg-black/60 transition-colors opacity-0 group-hover:opacity-100 md:opacity-100">
@@ -602,7 +619,12 @@
                     </div>
                     <!-- Info -->
                     <div class="p-3 md:p-4">
-                        <p class="text-primary text-[10px] md:text-xs font-bold uppercase tracking-wider mb-1 truncate">${toy.brand || 'Brand'}</p>
+                        <div class="flex items-center justify-between mb-1">
+                            <p class="text-primary text-[10px] md:text-xs font-bold uppercase tracking-wider truncate">${toy.brand || 'Brand'}</p>
+                            <span class="text-[10px] px-1.5 py-0.5 rounded ${freshness.class} flex items-center gap-1">
+                                <span class="material-symbols-outlined text-[10px]">${freshness.icon}</span>${freshness.label}
+                            </span>
+                        </div>
                         <h3 class="text-white text-sm font-semibold leading-tight mb-2 line-clamp-2 min-h-[2.5rem]">${toy.toy_name}</h3>
                         <div class="flex items-baseline gap-2">
                             <span class="text-white text-lg md:text-xl font-bold font-mono">$${price.toFixed(2)}</span>

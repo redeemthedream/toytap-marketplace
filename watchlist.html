@@ -71,10 +71,29 @@
                 <a class="text-sm font-semibold text-primary" href="watchlist.html">Watchlist</a>
                 <a class="text-sm font-semibold text-yellow-400 hover:text-yellow-300 transition-colors" href="https://gettoytap.com" target="_blank">Partner ↗</a>
             </nav>
-            <div id="nav-auth" class="flex items-center gap-2 md:gap-4">
-                <a href="login.html" class="text-sm font-bold text-white/70 hover:text-primary transition-colors px-3 py-2">Login</a>
-                <a href="login.html" class="bg-primary text-navy-deep px-4 md:px-6 py-2.5 rounded-lg font-bold text-sm hover:brightness-110 transition-all hidden md:block">Sign Up</a>
+            <div class="flex items-center gap-2">
+                <div id="nav-auth" class="flex items-center gap-2 md:gap-4">
+                    <a href="login.html" class="text-sm font-bold text-white/70 hover:text-primary transition-colors px-3 py-2">Login</a>
+                    <a href="login.html" class="bg-primary text-navy-deep px-4 md:px-6 py-2.5 rounded-lg font-bold text-sm hover:brightness-110 transition-all hidden md:block">Sign Up</a>
+                </div>
+                <button onclick="document.getElementById('mobile-menu').classList.toggle('hidden')" class="md:hidden p-2 text-white/70 hover:text-primary">
+                    <span class="material-symbols-outlined text-2xl">menu</span>
+                </button>
             </div>
+        </div>
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden border-t border-white/5 bg-navy-deep/95 backdrop-blur-md">
+            <nav class="flex flex-col p-4 gap-1">
+                <a class="text-sm font-semibold text-white/70 py-3 px-4 rounded-lg hover:bg-white/5" href="index.html">Home</a>
+                <a class="text-sm font-semibold text-white/70 py-3 px-4 rounded-lg hover:bg-white/5" href="rankings.html">Rankings</a>
+                <a class="text-sm font-semibold text-white/70 py-3 px-4 rounded-lg hover:bg-white/5" href="brands.html">Brands</a>
+                <a class="text-sm font-semibold text-white/70 py-3 px-4 rounded-lg hover:bg-white/5" href="blog.html">Blog</a>
+                <a class="text-sm font-semibold text-primary py-3 px-4 rounded-lg bg-white/5" href="watchlist.html">Watchlist</a>
+                <a class="text-sm font-semibold text-yellow-400 py-3 px-4 rounded-lg hover:bg-white/5" href="https://gettoytap.com" target="_blank">Partner ↗</a>
+                <div id="mobile-auth" class="border-t border-white/10 mt-2 pt-2">
+                    <a class="text-sm font-semibold text-primary py-3 px-4 rounded-lg hover:bg-white/5 block" href="login.html">Sign In / Sign Up</a>
+                </div>
+            </nav>
         </div>
     </header>
 
@@ -150,6 +169,42 @@
         </section>
     </main>
 
+    <!-- Target Price Modal -->
+    <div id="target-modal" class="fixed inset-0 z-[100] hidden">
+        <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="closeTargetModal()"></div>
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-sm glass-panel rounded-2xl p-6">
+            <button onclick="closeTargetModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white/70 hover:text-white transition-all">
+                <span class="material-symbols-outlined text-lg">close</span>
+            </button>
+            <div class="text-center mb-6">
+                <div class="w-14 h-14 mx-auto mb-4 rounded-full bg-primary/20 flex items-center justify-center">
+                    <span class="material-symbols-outlined text-primary text-2xl">notifications_active</span>
+                </div>
+                <h3 class="text-white text-xl font-bold">Set Price Alert</h3>
+                <p class="text-white/50 text-sm mt-1">Get notified when price drops below your target</p>
+            </div>
+            <div id="target-toy-info" class="mb-4 text-center">
+                <!-- Populated by JS -->
+            </div>
+            <div class="mb-6">
+                <label class="text-white/70 text-sm mb-2 block">Target Price</label>
+                <div class="relative">
+                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-white/40 text-lg font-bold">$</span>
+                    <input type="number" id="target-price-input" step="0.01" min="0" class="w-full bg-white/5 border border-white/10 rounded-xl pl-8 pr-4 py-4 text-white text-2xl font-bold font-mono focus:outline-none focus:border-primary text-center" placeholder="0.00" />
+                </div>
+                <p id="target-hint" class="text-white/40 text-xs mt-2 text-center"></p>
+            </div>
+            <div class="space-y-2">
+                <button onclick="saveTargetPrice()" class="w-full bg-primary text-navy-deep py-3 rounded-xl font-bold hover:brightness-110 transition-all">
+                    Save Alert
+                </button>
+                <button onclick="clearTargetPrice()" id="clear-target-btn" class="hidden w-full bg-white/5 text-white/70 py-3 rounded-xl font-semibold hover:bg-white/10 transition-all">
+                    Remove Alert
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Footer -->
     <footer class="border-t border-white/5 bg-navy-deep/40 mt-auto">
         <div class="max-w-7xl mx-auto px-4 md:px-6 py-8">
@@ -171,6 +226,8 @@
 
         let currentUser = null;
         let watchlist = [];
+        let priceTargets = {}; // { asin: targetPrice }
+        let currentTargetAsin = null;
 
         document.addEventListener('DOMContentLoaded', async () => {
             const { data: { session } } = await supabaseClient.auth.getSession();
@@ -201,6 +258,12 @@
                 <span class="text-sm text-white/50 hidden md:inline">${currentUser.email}</span>
                 <button onclick="signOut()" class="text-sm font-bold text-white/70 hover:text-red-400 transition-colors px-3 py-2">Sign Out</button>
             `;
+
+            // Load price targets from localStorage
+            const savedTargets = localStorage.getItem('toytap_targets_' + currentUser.id);
+            if (savedTargets) {
+                priceTargets = JSON.parse(savedTargets);
+            }
 
             // Load watchlist from Supabase
             const API_BASE = 'https://hub.gettoytap.com';
@@ -240,16 +303,39 @@
             renderWatchlist();
         }
 
+        // Get freshness info
+        function getFreshnessInfo(updatedAt) {
+            if (!updatedAt) return { class: 'bg-white/10 text-white/40', label: 'Unknown' };
+            const now = new Date();
+            const updated = new Date(updatedAt);
+            const hoursAgo = (now - updated) / (1000 * 60 * 60);
+
+            if (hoursAgo < 6) return { class: 'bg-emerald-500/20 text-emerald-400', label: 'Just now' };
+            if (hoursAgo < 24) return { class: 'bg-emerald-500/20 text-emerald-400', label: 'Today' };
+            if (hoursAgo < 48) return { class: 'bg-blue-500/20 text-blue-400', label: 'Yesterday' };
+            if (hoursAgo < 168) return { class: 'bg-yellow-500/20 text-yellow-400', label: `${Math.floor(hoursAgo / 24)}d ago` };
+            return { class: 'bg-white/10 text-white/40', label: `${Math.floor(hoursAgo / 24)}d ago` };
+        }
+
         function renderWatchlist() {
             document.getElementById('stat-count').textContent = watchlist.length;
 
-            const drops = watchlist.filter(t => parseFloat(t.discount_percent) > 5).length;
+            // Calculate price drops (current price < price when added)
+            const drops = watchlist.filter(t => {
+                const current = parseFloat(t.price) || 0;
+                const whenAdded = parseFloat(t.price_when_added) || current;
+                return current < whenAdded;
+            }).length;
             document.getElementById('stat-drops').textContent = drops;
 
+            // Calculate total savings from price drops
             const savings = watchlist.reduce((sum, t) => {
-                const discount = parseFloat(t.discount_percent) || 0;
-                const price = parseFloat(t.price) || 0;
-                return sum + (price * discount / 100);
+                const current = parseFloat(t.price) || 0;
+                const whenAdded = parseFloat(t.price_when_added) || current;
+                if (current < whenAdded) {
+                    return sum + (whenAdded - current);
+                }
+                return sum;
             }, 0);
             document.getElementById('stat-saved').textContent = '$' + savings.toFixed(0);
 
@@ -259,27 +345,80 @@
                 return;
             }
 
+            // Count items below target for stats
+            let belowTargetCount = 0;
+            watchlist.forEach(toy => {
+                const price = parseFloat(toy.price) || 0;
+                const target = priceTargets[toy.asin];
+                if (target && price <= target) belowTargetCount++;
+            });
+
             document.getElementById('empty-state').classList.add('hidden');
             document.getElementById('watchlist-toys').innerHTML = watchlist.map(toy => {
                 const price = parseFloat(toy.price) || 0;
+                const priceWhenAdded = parseFloat(toy.price_when_added) || price;
+                const priceDiff = price - priceWhenAdded;
+                const priceDiffPercent = priceWhenAdded > 0 ? ((priceDiff / priceWhenAdded) * 100).toFixed(0) : 0;
+                const isPriceDrop = priceDiff < -0.01;
+                const isPriceUp = priceDiff > 0.01;
+                const isLowestEver = toy.is_lowest_price_ever || false;
+                const freshness = getFreshnessInfo(toy.updated_at);
                 const discount = parseFloat(toy.discount_percent) || 0;
-                const hasDiscount = discount > 5;
+                const targetPrice = priceTargets[toy.asin];
+                const isBelowTarget = targetPrice && price <= targetPrice;
+                const hasTarget = targetPrice !== undefined && targetPrice !== null;
+
+                // Build tags
+                let tags = [];
+                if (isBelowTarget) tags.push(`<span class="bg-purple-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded animate-pulse">BELOW TARGET!</span>`);
+                if (isPriceDrop) tags.push(`<span class="bg-emerald-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded">PRICE DROP!</span>`);
+                if (isLowestEver) tags.push(`<span class="bg-yellow-500 text-navy-deep text-[10px] font-bold px-1.5 py-0.5 rounded">LOWEST EVER</span>`);
+                if (discount > 20) tags.push(`<span class="bg-orange-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded">HOT DEAL</span>`);
+
                 return `
-                    <div class="glass-card rounded-xl overflow-hidden relative group">
+                    <div class="glass-card rounded-xl overflow-hidden relative group ${isBelowTarget ? 'ring-2 ring-purple-500/50' : ''}">
                         <button onclick="removeFromWatchlist('${toy.asin}')" class="absolute top-2 right-2 z-10 w-8 h-8 rounded-full bg-red-500/20 text-red-400 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                             <span class="material-symbols-outlined text-lg">close</span>
                         </button>
                         <a href="toy.html?asin=${toy.asin}" class="block">
                             <div class="relative aspect-square bg-white/5">
                                 <img src="${toy.image_url_proxied || toy.image_url}" alt="" class="w-full h-full object-contain p-2"/>
-                                ${hasDiscount ? `<div class="absolute top-2 left-2 bg-emerald-500 text-white text-xs font-bold px-2 py-1 rounded-lg">-${discount.toFixed(0)}%</div>` : ''}
+                                <!-- Tags -->
+                                ${tags.length > 0 ? `<div class="absolute top-2 left-2 flex flex-wrap gap-1">${tags.join('')}</div>` : ''}
                             </div>
                             <div class="p-3">
-                                <p class="text-primary text-[10px] font-bold uppercase">${toy.brand || ''}</p>
-                                <h3 class="text-white text-sm font-semibold line-clamp-2 mb-2">${toy.toy_name}</h3>
-                                <p class="text-white text-lg font-bold font-mono">$${price.toFixed(2)}</p>
+                                <div class="flex items-center justify-between mb-1">
+                                    <p class="text-primary text-[10px] font-bold uppercase truncate">${toy.brand || ''}</p>
+                                    <span class="text-[10px] px-1.5 py-0.5 rounded ${freshness.class}">${freshness.label}</span>
+                                </div>
+                                <h3 class="text-white text-sm font-semibold line-clamp-2 mb-2">${toy.toy_name || 'Unknown Toy'}</h3>
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p class="text-white text-lg font-bold font-mono">$${price.toFixed(2)}</p>
+                                        ${priceWhenAdded !== price ? `
+                                        <p class="text-white/40 text-xs">
+                                            Added at $${priceWhenAdded.toFixed(2)}
+                                        </p>
+                                        ` : ''}
+                                    </div>
+                                    ${priceDiff !== 0 ? `
+                                    <div class="text-right">
+                                        <span class="text-sm font-bold ${isPriceDrop ? 'text-emerald-400' : 'text-red-400'}">
+                                            ${isPriceDrop ? '↓' : '↑'} $${Math.abs(priceDiff).toFixed(2)}
+                                        </span>
+                                        <p class="text-[10px] ${isPriceDrop ? 'text-emerald-400/70' : 'text-red-400/70'}">
+                                            ${isPriceDrop ? '' : '+'}${priceDiffPercent}%
+                                        </p>
+                                    </div>
+                                    ` : ''}
+                                </div>
                             </div>
                         </a>
+                        <!-- Target Price Button -->
+                        <button onclick="event.stopPropagation(); openTargetModal('${toy.asin}')" class="absolute bottom-3 right-3 z-10 px-2 py-1 rounded-lg text-[10px] font-bold flex items-center gap-1 transition-all ${hasTarget ? (isBelowTarget ? 'bg-purple-500 text-white' : 'bg-white/10 text-white/70') : 'bg-white/5 text-white/50 hover:bg-primary/20 hover:text-primary'}">
+                            <span class="material-symbols-outlined text-xs" style="font-size: 12px">${hasTarget ? 'notifications_active' : 'add_alert'}</span>
+                            ${hasTarget ? `$${targetPrice.toFixed(2)}` : 'Set Alert'}
+                        </button>
                     </div>
                 `;
             }).join('');
@@ -329,9 +468,85 @@
                 console.error('Remove from watchlist error:', err);
             }
             watchlist = watchlist.filter(t => t.asin !== asin);
+            // Also remove target price
+            delete priceTargets[asin];
+            localStorage.setItem('toytap_targets_' + currentUser.id, JSON.stringify(priceTargets));
             localStorage.setItem('toytap_watchlist_' + currentUser.id, JSON.stringify(watchlist));
             renderWatchlist();
         };
+
+        // Target Price Modal Functions
+        window.openTargetModal = function(asin) {
+            currentTargetAsin = asin;
+            const toy = watchlist.find(t => t.asin === asin);
+            if (!toy) return;
+
+            const price = parseFloat(toy.price) || 0;
+            const existingTarget = priceTargets[asin];
+
+            // Update modal content
+            document.getElementById('target-toy-info').innerHTML = `
+                <p class="text-white font-semibold text-sm line-clamp-2">${toy.toy_name || 'Unknown Toy'}</p>
+                <p class="text-white/50 text-xs mt-1">Current price: <span class="text-primary font-mono font-bold">$${price.toFixed(2)}</span></p>
+            `;
+
+            // Set input value
+            const input = document.getElementById('target-price-input');
+            if (existingTarget) {
+                input.value = existingTarget.toFixed(2);
+                document.getElementById('clear-target-btn').classList.remove('hidden');
+                document.getElementById('target-hint').textContent = 'Update your target price or remove the alert';
+            } else {
+                input.value = '';
+                input.placeholder = (price * 0.8).toFixed(2); // Suggest 20% off as default
+                document.getElementById('clear-target-btn').classList.add('hidden');
+                document.getElementById('target-hint').textContent = `Suggestion: 20% off would be $${(price * 0.8).toFixed(2)}`;
+            }
+
+            document.getElementById('target-modal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+            input.focus();
+        };
+
+        window.closeTargetModal = function() {
+            document.getElementById('target-modal').classList.add('hidden');
+            document.body.style.overflow = '';
+            currentTargetAsin = null;
+        };
+
+        window.saveTargetPrice = function() {
+            if (!currentTargetAsin) return;
+
+            const input = document.getElementById('target-price-input');
+            const targetPrice = parseFloat(input.value);
+
+            if (isNaN(targetPrice) || targetPrice <= 0) {
+                input.classList.add('border-red-500');
+                setTimeout(() => input.classList.remove('border-red-500'), 1000);
+                return;
+            }
+
+            priceTargets[currentTargetAsin] = targetPrice;
+            localStorage.setItem('toytap_targets_' + currentUser.id, JSON.stringify(priceTargets));
+
+            closeTargetModal();
+            renderWatchlist();
+        };
+
+        window.clearTargetPrice = function() {
+            if (!currentTargetAsin) return;
+
+            delete priceTargets[currentTargetAsin];
+            localStorage.setItem('toytap_targets_' + currentUser.id, JSON.stringify(priceTargets));
+
+            closeTargetModal();
+            renderWatchlist();
+        };
+
+        // Close modal on escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeTargetModal();
+        });
     </script>
 </body>
 </html>
