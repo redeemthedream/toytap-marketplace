@@ -297,37 +297,33 @@
             }
         });
 
-        // Handle magic link auth callback
+        // Track if we're currently signing in (to prevent double redirect)
+        let isSigningIn = false;
+
+        // Handle OAuth/magic link auth callback (not password sign in)
         supabaseClient.auth.onAuthStateChange(async (event, session) => {
-            // Don't auto-redirect during password recovery
-            if (isRecoveryFlow()) {
+            // Don't redirect during password recovery or if we're handling sign in manually
+            if (isRecoveryFlow() || isSigningIn) {
                 return;
             }
 
-            if (event === 'SIGNED_IN' && session) {
-                // Upsert user to public.users table
-                try {
-                    const { error } = await supabaseClient
-                        .from('users')
-                        .upsert({
-                            id: session.user.id,
-                            email: session.user.email,
-                            name: session.user.user_metadata?.full_name || null,
-                            display_name: session.user.user_metadata?.name || null,
-                            profile_pic: session.user.user_metadata?.avatar_url || null
-                        }, { onConflict: 'id' });
-
-                    if (error) console.error('Error saving user:', error);
-                } catch (err) {
-                    console.error('Error upserting user:', err);
-                }
-
-                // Save user to localStorage for easy access
+            // Only handle OAuth callbacks (when user arrives from Google etc)
+            if (event === 'SIGNED_IN' && session && window.location.hash.includes('access_token')) {
+                // Save user to localStorage
                 localStorage.setItem('toytap_user', JSON.stringify({
                     id: session.user.id,
                     email: session.user.email,
                     created_at: session.user.created_at
                 }));
+
+                // Save to database (non-blocking)
+                supabaseClient.from('users').upsert({
+                    id: session.user.id,
+                    email: session.user.email,
+                    name: session.user.user_metadata?.full_name || null,
+                    display_name: session.user.user_metadata?.name || null,
+                    profile_pic: session.user.user_metadata?.avatar_url || null
+                }, { onConflict: 'id' }).then(() => {}).catch(err => console.error('User save error:', err));
 
                 const redirect = getUrlParam('redirect') || 'watchlist.html';
                 window.location.href = redirect;
@@ -354,6 +350,7 @@
 
             btn.disabled = true;
             errorEl.classList.add('hidden');
+            isSigningIn = true;
 
             try {
                 if (currentTab === 'signup') {
@@ -402,6 +399,15 @@
 
                     if (error) throw error;
 
+                    // Save user to localStorage
+                    if (data.user) {
+                        localStorage.setItem('toytap_user', JSON.stringify({
+                            id: data.user.id,
+                            email: data.user.email,
+                            created_at: data.user.created_at
+                        }));
+                    }
+
                     // Success - redirect
                     const redirect = getUrlParam('redirect') || 'watchlist.html';
                     window.location.href = redirect;
@@ -409,14 +415,14 @@
 
             } catch (err) {
                 console.error('Auth error:', err);
-                if (err.message.includes('Invalid login credentials')) {
+                isSigningIn = false;
+                if (err.message && err.message.includes('Invalid login credentials')) {
                     showError('Invalid email or password. Please try again.');
-                } else if (err.message.includes('Email not confirmed')) {
+                } else if (err.message && err.message.includes('Email not confirmed')) {
                     showError('Please check your email and confirm your account first.');
                 } else {
                     showError(err.message || 'Something went wrong. Please try again.');
                 }
-            } finally {
                 btn.disabled = false;
                 btn.innerHTML = currentTab === 'signup' ? 'Sign Up' : 'Sign In';
             }
