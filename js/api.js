@@ -1,4 +1,4 @@
-/* ToyTap Marketplace - Shared JavaScript Utilities */
+/* Toy Tap Marketplace - Shared JavaScript Utilities */
 
 const API_BASE = 'https://hub.gettoytap.com';
 const PLACEHOLDER_IMG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Crect fill='%23f1f5f9' width='200' height='200'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='18' fill='%2394a3b8'%3ENo Image%3C/text%3E%3C/svg%3E";
@@ -353,7 +353,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // Export for use in pages
-window.ToyTap = {
+window.Toy Tap = {
     API_BASE,
     PLACEHOLDER_IMG,
     fetchToys,
