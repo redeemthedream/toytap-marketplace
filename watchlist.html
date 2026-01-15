@@ -203,6 +203,7 @@
             `;
 
             // Load watchlist from Supabase
+            const API_BASE = 'https://hub.gettoytap.com';
             try {
                 const { data, error } = await supabaseClient
                     .from('watchlist')
@@ -214,15 +215,18 @@
 
                 // Fetch toy details for each ASIN
                 if (data && data.length > 0) {
-                    const asins = data.map(w => w.asin);
-                    const toyResponse = await fetch(`https://api.gettoytap.com/toys?asins=${asins.join(',')}`);
-                    const toyData = await toyResponse.json();
-
-                    // Map watchlist items with toy data
-                    watchlist = data.map(w => {
-                        const toy = toyData.find(t => t.asin === w.asin) || {};
-                        return { ...toy, ...w };
+                    // Fetch each toy individually
+                    const toyPromises = data.map(async (w) => {
+                        try {
+                            const res = await fetch(`${API_BASE}/toys/search?q=${w.asin}&limit=5`);
+                            const result = await res.json();
+                            const toy = result.toys?.find(t => t.asin === w.asin) || {};
+                            return { ...toy, ...w };
+                        } catch {
+                            return { asin: w.asin, ...w };
+                        }
                     });
+                    watchlist = await Promise.all(toyPromises);
                 } else {
                     watchlist = [];
                 }
