@@ -202,7 +202,7 @@
                         <div class="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center font-bold font-mono text-white/50 shrink-0">
                             ${rank}
                         </div>
-                        <img src="${toy.image_url_proxied || toy.image_url}" alt="" class="w-16 h-16 object-contain bg-white rounded-lg shrink-0"/>
+                        <img src="${toy.image_url_proxied || toy.image_url}" alt="" class="w-20 h-20 md:w-24 md:h-24 object-contain bg-white rounded-xl shrink-0"/>
                         <div class="flex-1 min-w-0">
                             <p class="text-primary text-xs font-bold uppercase">${toy.brand || ''}</p>
                             <p class="text-white font-semibold truncate">${toy.toy_name}</p>
@@ -222,7 +222,7 @@
 
         function renderPodium(top3) {
             const medals = ['🥇', '🥈', '🥉'];
-            const sizes = ['w-44 md:w-52', 'w-36 md:w-44', 'w-36 md:w-44'];
+            const sizes = ['w-52 md:w-64', 'w-44 md:w-52', 'w-44 md:w-52'];
             const glows = ['gold-glow', 'silver-glow', 'bronze-glow'];
             const order = [1, 0, 2]; // 2nd, 1st, 3rd
 
@@ -231,7 +231,7 @@
                 return `
                     <a href="toy.html?asin=${toy.asin}" class="glass-card ${sizes[i]} rounded-2xl p-4 text-center hover:scale-105 transition-all ${glows[i]} ${i === 0 ? 'order-2' : i === 1 ? 'order-1' : 'order-3'} block">
                         <div class="text-4xl mb-2">${medals[i]}</div>
-                        <img src="${toy.image_url_proxied || toy.image_url}" alt="" class="w-20 h-20 md:w-28 md:h-28 object-contain mx-auto bg-white rounded-xl mb-3"/>
+                        <img src="${toy.image_url_proxied || toy.image_url}" alt="" class="w-28 h-28 md:w-36 md:h-36 object-contain mx-auto bg-white rounded-xl mb-3"/>
                         <p class="text-primary text-[10px] font-bold uppercase">${toy.brand || ''}</p>
                         <p class="text-white text-sm font-semibold line-clamp-2 mb-2 min-h-[2.5rem]">${toy.toy_name}</p>
                         <p class="text-white text-xl font-bold font-mono mb-2">$${parseFloat(toy.price).toFixed(2)}</p>
