@@ -209,6 +209,46 @@
                         Back to login
                     </button>
                 </div>
+
+                <!-- Reset Password View -->
+                <div id="reset-password-view" class="hidden">
+                    <h1 class="text-2xl font-bold text-center mb-2">Set New Password</h1>
+                    <p class="text-white/50 text-center mb-8">Enter your new password below</p>
+
+                    <div id="reset-error" class="hidden mb-4 p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-sm"></div>
+
+                    <form id="reset-form" onsubmit="handleResetPassword(event)" class="space-y-4">
+                        <div class="relative">
+                            <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-white/30">lock</span>
+                            <input
+                                type="password"
+                                id="reset-password"
+                                class="w-full bg-white/5 border border-white/10 rounded-xl py-4 pl-12 pr-4 text-white placeholder:text-white/30 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
+                                placeholder="New password"
+                                required
+                                minlength="6"
+                            />
+                        </div>
+                        <div class="relative">
+                            <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-white/30">lock</span>
+                            <input
+                                type="password"
+                                id="reset-confirm-password"
+                                class="w-full bg-white/5 border border-white/10 rounded-xl py-4 pl-12 pr-4 text-white placeholder:text-white/30 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
+                                placeholder="Confirm new password"
+                                required
+                                minlength="6"
+                            />
+                        </div>
+                        <button
+                            type="submit"
+                            id="reset-btn"
+                            class="w-full bg-primary text-navy-deep py-4 rounded-xl font-bold text-base hover:brightness-110 transition-all cyan-glow"
+                        >
+                            Update Password
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
     </main>
@@ -461,15 +501,70 @@
             document.getElementById('login-confirm-password').value = '';
         }
 
-        // Check for error in URL (from failed OAuth)
-        document.addEventListener('DOMContentLoaded', () => {
+        // Check for error or recovery (password reset) in URL
+        document.addEventListener('DOMContentLoaded', async () => {
             const hash = window.location.hash;
+
+            // Check for password reset flow
+            if (hash && hash.includes('type=recovery')) {
+                // User clicked password reset link - show reset form
+                document.getElementById('login-form-view').classList.add('hidden');
+                document.getElementById('reset-password-view').classList.remove('hidden');
+                return;
+            }
+
+            // Check for error from OAuth
             if (hash && hash.includes('error')) {
                 const params = new URLSearchParams(hash.substring(1));
                 const error = params.get('error_description') || params.get('error') || 'Authentication failed';
                 showError(decodeURIComponent(error.replace(/\+/g, ' ')));
             }
         });
+
+        async function handleResetPassword(event) {
+            event.preventDefault();
+
+            const password = document.getElementById('reset-password').value;
+            const confirmPassword = document.getElementById('reset-confirm-password').value;
+            const btn = document.getElementById('reset-btn');
+            const errorEl = document.getElementById('reset-error');
+
+            if (password.length < 6) {
+                errorEl.textContent = 'Password must be at least 6 characters';
+                errorEl.classList.remove('hidden');
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                errorEl.textContent = 'Passwords do not match';
+                errorEl.classList.remove('hidden');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = '<span class="material-symbols-outlined animate-spin">progress_activity</span> Updating...';
+            errorEl.classList.add('hidden');
+
+            try {
+                const { error } = await supabaseClient.auth.updateUser({
+                    password: password
+                });
+
+                if (error) throw error;
+
+                // Success - show message and redirect
+                alert('Password updated successfully! You can now sign in.');
+                window.location.href = 'login.html';
+
+            } catch (err) {
+                console.error('Reset error:', err);
+                errorEl.textContent = err.message || 'Could not update password. Please try again.';
+                errorEl.classList.remove('hidden');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = 'Update Password';
+            }
+        }
     </script>
 </body>
 </html>
