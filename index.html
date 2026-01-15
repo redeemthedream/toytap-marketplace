@@ -492,8 +492,8 @@
             if (!currentUser) return;
             try {
                 const { data, error } = await supabaseClient
-                    .from('user_watchlist')
-                    .select('toy_asin, price_alert')
+                    .from('watchlist')
+                    .select('asin, price_when_added')
                     .eq('user_id', currentUser.id);
                 if (error) throw error;
                 watchlist = data || [];
@@ -503,13 +503,13 @@
                 const saved = localStorage.getItem('toytap_watchlist_' + currentUser.id);
                 if (saved) {
                     const localList = JSON.parse(saved);
-                    watchlist = localList.map(t => ({ toy_asin: t.asin }));
+                    watchlist = localList.map(t => ({ asin: t.asin }));
                 }
             }
         }
 
         function isInWatchlist(asin) {
-            return watchlist.some(w => w.toy_asin === asin);
+            return watchlist.some(w => w.asin === asin);
         }
 
         async function toggleWatchlist(event, asin) {
@@ -529,26 +529,27 @@
                 if (inList) {
                     // Remove from watchlist
                     const { error } = await supabaseClient
-                        .from('user_watchlist')
+                        .from('watchlist')
                         .delete()
                         .eq('user_id', currentUser.id)
-                        .eq('toy_asin', asin);
+                        .eq('asin', asin);
                     if (error) throw error;
-                    watchlist = watchlist.filter(w => w.toy_asin !== asin);
+                    watchlist = watchlist.filter(w => w.asin !== asin);
                     icon.style.fontVariationSettings = "'FILL' 0";
                     icon.classList.remove('text-red-500');
                     icon.classList.add('text-white/70');
                 } else {
-                    // Add to watchlist
+                    // Add to watchlist with current price
+                    const price = parseFloat(toy.price) || null;
                     const { error } = await supabaseClient
-                        .from('user_watchlist')
+                        .from('watchlist')
                         .insert({
                             user_id: currentUser.id,
-                            toy_asin: asin,
-                            toy_data: toy
+                            asin: asin,
+                            price_when_added: price
                         });
                     if (error) throw error;
-                    watchlist.push({ toy_asin: asin });
+                    watchlist.push({ asin: asin, price_when_added: price });
                     icon.style.fontVariationSettings = "'FILL' 1";
                     icon.classList.add('text-red-500');
                     icon.classList.remove('text-white/70');
@@ -559,12 +560,12 @@
                 let localList = JSON.parse(localStorage.getItem('toytap_watchlist_' + currentUser.id) || '[]');
                 if (inList) {
                     localList = localList.filter(t => t.asin !== asin);
-                    watchlist = watchlist.filter(w => w.toy_asin !== asin);
+                    watchlist = watchlist.filter(w => w.asin !== asin);
                     icon.style.fontVariationSettings = "'FILL' 0";
                     icon.classList.remove('text-red-500');
                 } else {
                     localList.push(toy);
-                    watchlist.push({ toy_asin: asin });
+                    watchlist.push({ asin: asin });
                     icon.style.fontVariationSettings = "'FILL' 1";
                     icon.classList.add('text-red-500');
                 }

@@ -191,7 +191,7 @@
             }
         });
 
-        function showWatchlist() {
+        async function showWatchlist() {
             document.getElementById('auth-view').classList.add('hidden');
             document.getElementById('watchlist-view').classList.remove('hidden');
             document.getElementById('user-email').textContent = currentUser.email;
@@ -202,9 +202,37 @@
                 <button onclick="signOut()" class="text-sm font-bold text-white/70 hover:text-red-400 transition-colors px-3 py-2">Sign Out</button>
             `;
 
-            // Load watchlist from localStorage
-            const saved = localStorage.getItem('toytap_watchlist_' + currentUser.id);
-            watchlist = saved ? JSON.parse(saved) : [];
+            // Load watchlist from Supabase
+            try {
+                const { data, error } = await supabaseClient
+                    .from('watchlist')
+                    .select('asin, price_when_added, added_at')
+                    .eq('user_id', currentUser.id)
+                    .order('added_at', { ascending: false });
+
+                if (error) throw error;
+
+                // Fetch toy details for each ASIN
+                if (data && data.length > 0) {
+                    const asins = data.map(w => w.asin);
+                    const toyResponse = await fetch(`https://api.gettoytap.com/toys?asins=${asins.join(',')}`);
+                    const toyData = await toyResponse.json();
+
+                    // Map watchlist items with toy data
+                    watchlist = data.map(w => {
+                        const toy = toyData.find(t => t.asin === w.asin) || {};
+                        return { ...toy, ...w };
+                    });
+                } else {
+                    watchlist = [];
+                }
+            } catch (err) {
+                console.error('Error loading watchlist:', err);
+                // Fallback to localStorage
+                const saved = localStorage.getItem('toytap_watchlist_' + currentUser.id);
+                watchlist = saved ? JSON.parse(saved) : [];
+            }
+
             renderWatchlist();
         }
 
@@ -259,19 +287,43 @@
             window.location.href = 'index.html';
         }
 
-        window.addToWatchlist = function(toy) {
+        window.addToWatchlist = async function(toy) {
             if (!currentUser) {
                 window.location.href = 'login.html?redirect=watchlist.html';
                 return;
             }
             if (!watchlist.find(t => t.asin === toy.asin)) {
-                watchlist.push(toy);
-                localStorage.setItem('toytap_watchlist_' + currentUser.id, JSON.stringify(watchlist));
+                try {
+                    const { error } = await supabaseClient
+                        .from('watchlist')
+                        .insert({
+                            user_id: currentUser.id,
+                            asin: toy.asin,
+                            price_when_added: parseFloat(toy.price) || null
+                        });
+                    if (error) throw error;
+                    watchlist.push(toy);
+                } catch (err) {
+                    console.error('Add to watchlist error:', err);
+                    // Fallback to localStorage
+                    watchlist.push(toy);
+                    localStorage.setItem('toytap_watchlist_' + currentUser.id, JSON.stringify(watchlist));
+                }
                 renderWatchlist();
             }
         };
 
-        window.removeFromWatchlist = function(asin) {
+        window.removeFromWatchlist = async function(asin) {
+            try {
+                const { error } = await supabaseClient
+                    .from('watchlist')
+                    .delete()
+                    .eq('user_id', currentUser.id)
+                    .eq('asin', asin);
+                if (error) throw error;
+            } catch (err) {
+                console.error('Remove from watchlist error:', err);
+            }
             watchlist = watchlist.filter(t => t.asin !== asin);
             localStorage.setItem('toytap_watchlist_' + currentUser.id, JSON.stringify(watchlist));
             renderWatchlist();
