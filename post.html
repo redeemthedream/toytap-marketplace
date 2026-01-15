@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title id="page-title">Blog Post - Toy Tap</title>
+    <meta name="description" id="page-desc" content="Read this article on Toy Tap." />
+    <link rel="icon" type="image/png" href="https://i.imgur.com/HXSawxU.png" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#3fc3d5",
+                        "background-dark": "#0a0e27",
+                        "navy-deep": "#0a0e27",
+                        "navy-card": "#12183d",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .gradient-animate {
+            background: linear-gradient(90deg, #3fc3d5, #a855f7, #f59e0b, #3fc3d5);
+            background-size: 300% 100%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradient-shift 6s ease infinite;
+        }
+        @keyframes gradient-shift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .prose { max-width: 720px; margin: 0 auto; }
+        .prose h2 { font-size: 1.5rem; font-weight: 700; margin-top: 2rem; margin-bottom: 1rem; color: white; }
+        .prose h3 { font-size: 1.25rem; font-weight: 600; margin-top: 1.5rem; margin-bottom: 0.75rem; color: white; }
+        .prose p { margin-bottom: 1.25rem; line-height: 1.8; color: rgba(255,255,255,0.7); }
+        .prose ul, .prose ol { margin-bottom: 1.25rem; padding-left: 1.5rem; color: rgba(255,255,255,0.7); }
+        .prose li { margin-bottom: 0.5rem; line-height: 1.7; }
+        .prose a { color: #3fc3d5; text-decoration: underline; }
+        .prose strong { color: white; font-weight: 600; }
+        .prose img { border-radius: 12px; margin: 1.5rem 0; }
+    </style>
+</head>
+<body class="bg-background-dark font-display text-white min-h-screen">
+    <!-- Background Effects -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] bg-primary/10 rounded-full blur-[120px]"></div>
+        <div class="absolute bottom-[-10%] left-[-5%] w-[400px] h-[400px] bg-primary/5 rounded-full blur-[100px]"></div>
+    </div>
+
+    <!-- Navigation -->
+    <header class="relative z-50 border-b border-white/5 bg-navy-deep/80 backdrop-blur-md sticky top-0">
+        <div class="max-w-7xl mx-auto px-4 md:px-6 h-16 md:h-20 flex items-center justify-between">
+            <a href="index.html" class="flex items-center gap-2">
+                <img src="https://i.imgur.com/HXSawxU.png" alt="Toy Tap" class="h-8 w-8 md:h-10 md:w-10" />
+                <span class="text-xl md:text-2xl font-black tracking-tighter gradient-animate">Toy Tap</span>
+            </a>
+            <nav class="hidden md:flex items-center gap-8">
+                <a class="text-sm font-semibold text-white/70 hover:text-primary transition-colors" href="index.html">Home</a>
+                <a class="text-sm font-semibold text-white/70 hover:text-primary transition-colors" href="rankings.html">Rankings</a>
+                <a class="text-sm font-semibold text-white/70 hover:text-primary transition-colors" href="brands.html">Brands</a>
+                <a class="text-sm font-semibold text-primary" href="blog.html">Blog</a>
+                <a class="text-sm font-semibold text-white/70 hover:text-primary transition-colors" href="watchlist.html">Watchlist</a>
+                <a class="text-sm font-semibold text-yellow-400 hover:text-yellow-300 transition-colors" href="https://gettoytap.com" target="_blank">Partner ↗</a>
+            </nav>
+            <div id="nav-auth" class="flex items-center gap-2 md:gap-4">
+                <a href="login.html" class="text-sm font-bold text-white/70 hover:text-primary transition-colors px-3 py-2">Login</a>
+                <a href="login.html" class="bg-primary text-navy-deep px-4 md:px-6 py-2.5 rounded-lg font-bold text-sm hover:brightness-110 transition-all hidden md:block">Sign Up</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="relative z-10 max-w-4xl mx-auto px-4 py-8 md:py-12">
+        <!-- Back Link -->
+        <a href="blog.html" class="inline-flex items-center gap-2 text-primary font-semibold mb-6 hover:opacity-80 transition-opacity">
+            <span class="material-symbols-outlined">arrow_back</span> Back to Blog
+        </a>
+
+        <!-- Loading State -->
+        <div id="loading" class="text-center py-20">
+            <div class="w-12 h-12 border-4 border-primary/30 border-t-primary rounded-full animate-spin mx-auto mb-4"></div>
+            <p class="text-white/50">Loading post...</p>
+        </div>
+
+        <!-- Post Content -->
+        <article id="post-content" class="hidden">
+            <div class="mb-8">
+                <span id="post-category" class="text-primary text-sm font-bold uppercase tracking-wider"></span>
+                <h1 id="post-title" class="text-3xl md:text-4xl font-black text-white mt-2 mb-4"></h1>
+                <p id="post-date" class="text-white/40 text-sm"></p>
+            </div>
+            <img id="post-image" class="w-full h-64 md:h-96 object-cover rounded-2xl mb-8" src="" alt="" />
+            <div id="post-body" class="prose"></div>
+        </article>
+
+        <!-- Error State -->
+        <div id="error-state" class="hidden text-center py-20">
+            <p class="text-red-400 mb-4">Post not found</p>
+            <a href="blog.html" class="bg-primary text-navy-deep px-6 py-2 rounded-lg font-semibold">Back to Blog</a>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-white/5 bg-navy-deep/40 mt-12">
+        <div class="max-w-7xl mx-auto px-4 md:px-6 py-8">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-6">
+                <div class="flex items-center gap-2">
+                    <img src="https://i.imgur.com/HXSawxU.png" alt="Toy Tap" class="h-8 w-8" />
+                    <span class="text-lg font-bold">Toy Tap</span>
+                </div>
+                <p class="text-white/30 text-sm">© 2025 Toy Tap. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const SUPABASE_URL = 'https://ehuwltjozobbbzsdygbo.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVodXdsdGpvem9iYmJ6c2R5Z2JvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ5NjAzNDQsImV4cCI6MjA4MDUzNjM0NH0.xSRT_UkN4RLK40R51mHtksb1u90M8y2FjzS45aXLGSI';
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        document.addEventListener('DOMContentLoaded', loadPost);
+
+        async function loadPost() {
+            const slug = new URLSearchParams(window.location.search).get('slug');
+            if (!slug) {
+                showError();
+                return;
+            }
+
+            try {
+                // Try to fetch by slug first, then by id
+                let { data, error } = await supabaseClient
+                    .from('blog_posts')
+                    .select('*')
+                    .eq('slug', slug)
+                    .single();
+
+                // If no result by slug, try by id
+                if (error || !data) {
+                    const { data: dataById, error: errorById } = await supabaseClient
+                        .from('blog_posts')
+                        .select('*')
+                        .eq('id', slug)
+                        .single();
+                    data = dataById;
+                    error = errorById;
+                }
+
+                if (error || !data) {
+                    showError();
+                    return;
+                }
+
+                renderPost(data);
+            } catch (err) {
+                console.error('Error:', err);
+                showError();
+            }
+        }
+
+        function renderPost(post) {
+            const title = post.title || post.name || 'Untitled';
+            const category = post.category || post.type || 'Article';
+            const image = post.image_url || post.featured_image || post.image || getCategoryImage(category);
+            const body = post.content || post.body || post.text || '';
+            const date = post.created_at ? new Date(post.created_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : '';
+
+            document.getElementById('page-title').textContent = title + ' - Toy Tap';
+            document.getElementById('post-title').textContent = title;
+            document.getElementById('post-category').textContent = category;
+            document.getElementById('post-date').textContent = date;
+            document.getElementById('post-image').src = image;
+            document.getElementById('post-body').innerHTML = formatContent(body);
+
+            document.getElementById('loading').classList.add('hidden');
+            document.getElementById('post-content').classList.remove('hidden');
+        }
+
+        function formatContent(content) {
+            // If it's already HTML, return as is
+            if (content.includes('<p>') || content.includes('<h')) {
+                return content;
+            }
+            // Otherwise, convert newlines to paragraphs
+            return content.split('\n\n').map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`).join('');
+        }
+
+        function getCategoryImage(category) {
+            const images = {
+                'deals': 'https://images.unsplash.com/photo-1558060370-d644479cb6f7?w=800',
+                'guides': 'https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?w=800',
+                'reviews': 'https://images.unsplash.com/photo-1594787318286-3d835c1d207f?w=800',
+                'lego': 'https://images.unsplash.com/photo-1587654780291-39c9404d746b?w=800',
+                'default': 'https://images.unsplash.com/photo-1558060370-d644479cb6f7?w=800'
+            };
+            return images[category.toLowerCase()] || images.default;
+        }
+
+        function showError() {
+            document.getElementById('loading').classList.add('hidden');
+            document.getElementById('error-state').classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
