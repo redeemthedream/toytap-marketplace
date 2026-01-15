@@ -215,12 +215,12 @@
 
                 // Fetch toy details for each ASIN
                 if (data && data.length > 0) {
-                    // Fetch each toy individually
+                    // Fetch each toy using price-history endpoint (has all toy data)
                     const toyPromises = data.map(async (w) => {
                         try {
-                            const res = await fetch(`${API_BASE}/toys/search?q=${w.asin}&limit=5`);
+                            const res = await fetch(`${API_BASE}/toys/${w.asin}/price-history`);
                             const result = await res.json();
-                            const toy = result.toys?.find(t => t.asin === w.asin) || {};
+                            const toy = result.toy || {};
                             return { ...toy, ...w };
                         } catch {
                             return { asin: w.asin, ...w };
