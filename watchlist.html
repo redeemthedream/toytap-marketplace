@@ -284,7 +284,22 @@
                             const res = await fetch(`${API_BASE}/toys/${w.asin}/price-history`);
                             const result = await res.json();
                             const toy = result.toy || {};
-                            return { ...toy, ...w };
+                            const priceStats = result.price_stats || {};
+                            // Calculate discount percent if previous price exists
+                            const currentPrice = priceStats.current || 0;
+                            const previousPrice = priceStats.previous || priceStats.highest || 0;
+                            const discountPercent = previousPrice > currentPrice ? ((previousPrice - currentPrice) / previousPrice) * 100 : 0;
+                            // Merge toy data with price stats and watchlist data
+                            return {
+                                ...toy,
+                                price: currentPrice,
+                                highest_price: priceStats.highest,
+                                lowest_price: priceStats.lowest,
+                                discount_percent: discountPercent,
+                                is_lowest_price_ever: currentPrice === priceStats.lowest && priceStats.lowest < priceStats.highest,
+                                updated_at: new Date().toISOString(), // Use current time as approximation
+                                ...w
+                            };
                         } catch {
                             return { asin: w.asin, ...w };
                         }
@@ -377,48 +392,40 @@
 
                 return `
                     <div class="glass-card rounded-xl overflow-hidden relative group ${isBelowTarget ? 'ring-2 ring-purple-500/50' : ''}">
-                        <button onclick="removeFromWatchlist('${toy.asin}')" class="absolute top-2 right-2 z-10 w-8 h-8 rounded-full bg-red-500/20 text-red-400 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                            <span class="material-symbols-outlined text-lg">close</span>
+                        <!-- Remove button -->
+                        <button onclick="removeFromWatchlist('${toy.asin}')" class="absolute top-2 right-2 z-20 w-7 h-7 rounded-full bg-black/50 text-red-400 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <span class="material-symbols-outlined text-base">close</span>
                         </button>
                         <a href="toy.html?asin=${toy.asin}" class="block">
+                            <!-- Image -->
                             <div class="relative aspect-square bg-white/5">
-                                <img src="${toy.image_url_proxied || toy.image_url}" alt="" class="w-full h-full object-contain p-2"/>
-                                <!-- Tags -->
-                                ${tags.length > 0 ? `<div class="absolute top-2 left-2 flex flex-wrap gap-1">${tags.join('')}</div>` : ''}
+                                <img src="${toy.image_url_proxied || toy.image_url || ''}" alt="" class="w-full h-full object-contain p-2" onerror="this.style.display='none'"/>
+                                <!-- Tags - max 2 shown -->
+                                ${tags.length > 0 ? `<div class="absolute top-2 left-2 flex flex-col gap-1">${tags.slice(0,2).join('')}</div>` : ''}
                             </div>
+                            <!-- Content -->
                             <div class="p-3">
-                                <div class="flex items-center justify-between mb-1">
-                                    <p class="text-primary text-[10px] font-bold uppercase truncate">${toy.brand || ''}</p>
-                                    <span class="text-[10px] px-1.5 py-0.5 rounded ${freshness.class}">${freshness.label}</span>
+                                <!-- Brand & Freshness -->
+                                <div class="flex items-center justify-between gap-2 mb-1">
+                                    <p class="text-primary text-[10px] font-bold uppercase truncate flex-1">${toy.brand || ''}</p>
+                                    <span class="text-[10px] px-1.5 py-0.5 rounded shrink-0 ${freshness.class}">${freshness.label}</span>
                                 </div>
-                                <h3 class="text-white text-sm font-semibold line-clamp-2 mb-2">${toy.toy_name || 'Unknown Toy'}</h3>
-                                <div class="flex items-center justify-between">
-                                    <div>
+                                <!-- Title -->
+                                <h3 class="text-white text-sm font-semibold line-clamp-2 mb-2 min-h-[2.5rem]">${toy.toy_name || 'Unknown Toy'}</h3>
+                                <!-- Price Row -->
+                                <div class="flex items-end justify-between gap-2">
+                                    <div class="min-w-0">
                                         <p class="text-white text-lg font-bold font-mono">$${price.toFixed(2)}</p>
-                                        ${priceWhenAdded !== price ? `
-                                        <p class="text-white/40 text-xs">
-                                            Added at $${priceWhenAdded.toFixed(2)}
-                                        </p>
-                                        ` : ''}
+                                        ${Math.abs(priceDiff) > 0.01 ? `<p class="text-[10px] ${isPriceDrop ? 'text-emerald-400' : 'text-red-400'}">${isPriceDrop ? '↓' : '↑'}$${Math.abs(priceDiff).toFixed(2)} since added</p>` : ''}
                                     </div>
-                                    ${priceDiff !== 0 ? `
-                                    <div class="text-right">
-                                        <span class="text-sm font-bold ${isPriceDrop ? 'text-emerald-400' : 'text-red-400'}">
-                                            ${isPriceDrop ? '↓' : '↑'} $${Math.abs(priceDiff).toFixed(2)}
-                                        </span>
-                                        <p class="text-[10px] ${isPriceDrop ? 'text-emerald-400/70' : 'text-red-400/70'}">
-                                            ${isPriceDrop ? '' : '+'}${priceDiffPercent}%
-                                        </p>
-                                    </div>
-                                    ` : ''}
+                                    <!-- Alert Button -->
+                                    <button onclick="event.preventDefault(); event.stopPropagation(); openTargetModal('${toy.asin}')" class="shrink-0 px-2 py-1 rounded text-[10px] font-bold flex items-center gap-1 ${hasTarget ? (isBelowTarget ? 'bg-purple-500 text-white' : 'bg-white/10 text-white/60') : 'bg-white/5 text-white/40 hover:bg-primary/20 hover:text-primary'}">
+                                        <span class="material-symbols-outlined" style="font-size: 12px">${hasTarget ? 'notifications_active' : 'add_alert'}</span>
+                                        ${hasTarget ? `$${targetPrice.toFixed(2)}` : 'Alert'}
+                                    </button>
                                 </div>
                             </div>
                         </a>
-                        <!-- Target Price Button -->
-                        <button onclick="event.stopPropagation(); openTargetModal('${toy.asin}')" class="absolute bottom-3 right-3 z-10 px-2 py-1 rounded-lg text-[10px] font-bold flex items-center gap-1 transition-all ${hasTarget ? (isBelowTarget ? 'bg-purple-500 text-white' : 'bg-white/10 text-white/70') : 'bg-white/5 text-white/50 hover:bg-primary/20 hover:text-primary'}">
-                            <span class="material-symbols-outlined text-xs" style="font-size: 12px">${hasTarget ? 'notifications_active' : 'add_alert'}</span>
-                            ${hasTarget ? `$${targetPrice.toFixed(2)}` : 'Set Alert'}
-                        </button>
                     </div>
                 `;
             }).join('');
