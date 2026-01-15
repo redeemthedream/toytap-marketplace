@@ -150,10 +150,24 @@ function isFreshDeal(toy) {
 7. Fixed TT Grade not showing on toy detail page
 8. Increased image sizes on rankings page
 9. Set up Resend SMTP for auth emails with branded templates
-10. LEGO block themed brand selector on brands.html (sharper edges, 2x2 studs)
+10. Changed brand selector to simple glass cards with colored left border (LEGO blocks rejected)
 11. Enhanced price display showing current price, slashed previous price, and highest price
-12. Added "Partner" link in navigation header (links to gettoytap.com for B2B)
+12. Added "Partner" link in navigation header (yellow, links to gettoytap.com for B2B)
 13. Fixed sort dropdown visibility in dark mode (proper styling for options)
+14. Added "Blog" link to navigation on all pages
+15. Added live ticker on homepage showing recent deals with pulsing "LIVE" indicator
+16. Connected blog.html to Supabase `blog_posts` table
+17. Created post.html for individual blog post pages (fetches toys from api_endpoint)
+18. Added trending toys section to blog page
+19. Blog posts now show real toy images from API endpoints (not stock photos)
+
+## Session Notes (Jan 15, 2026)
+See you tomorrow! Current state:
+- Blog fully working with Supabase blog_posts table
+- Blog posts display real toy images fetched from their api_endpoint field
+- Trending toys section shows 8 popular items on blog page
+- Live ticker scrolling on homepage with recent deals
+- All changes pushed to Vercel and live at dashboard.gettoytap.com
 
 ## Email Templates (Supabase)
 Custom branded HTML templates for:
@@ -169,27 +183,20 @@ All pages include these nav links:
 - Home → index.html
 - Rankings → rankings.html
 - Brands → brands.html
+- Blog → blog.html
 - Watchlist → watchlist.html
-- Partner → https://gettoytap.com (external, B2B sales page)
+- Partner → https://gettoytap.com (external, B2B sales page, yellow color)
 
-## LEGO Block Brand Selector (brands.html)
-```javascript
-// Renders brand blocks with 2x2 stud grid
-function renderBrandsGrid() {
-    TRACKED_BRANDS.map(brand => `
-        <button class="group transition-all hover:scale-105 hover:-translate-y-1">
-            <div class="flex justify-center mb-[-6px] z-10">
-                <div class="grid grid-cols-2 gap-1.5">
-                    <!-- 4 studs with gradient and shadow -->
-                </div>
-            </div>
-            <div class="pt-4 pb-4 px-4 rounded-[3px]" style="box-shadow: ...">
-                ${brand.name}
-            </div>
-        </button>
-    `);
-}
-```
+## Blog System
+- **blog.html** - Lists posts from Supabase `blog_posts` table with category filter pills
+- **post.html** - Individual post page, fetches toys from post's `api_endpoint` field
+- Posts show real toy images (first toy from API endpoint)
+- Trending toys section shows 8 items from leaderboard
+
+### blog_posts table columns:
+- id, title, slug, category, intro_text, api_endpoint
+- filter_max_price, filter_min_rating, filter_lowest_ever, sort_by
+- additional_content, created_at, updated_at
 
 ## Toy Card Price Display
 Shows up to 3 prices on each card:
