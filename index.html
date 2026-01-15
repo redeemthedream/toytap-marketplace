@@ -250,20 +250,26 @@
 
         // Filter configurations (matches Softr logic exactly)
         const FILTER_CONFIG = {
-            // Hot Now: Fresh deals (updated <48hrs + on sale), sorted by biggest discount
+            // Hot Now: Fresh deals (updated <48hrs + on sale), sorted by recency then discount
             hot: {
                 filterFn: (toys) => toys.filter(t => isFreshDeal(t)),
-                sortFn: (toys) => toys.sort((a, b) => (parseFloat(b.discount_percent) || 0) - (parseFloat(a.discount_percent) || 0))
+                sortFn: (toys) => toys.sort((a, b) => {
+                    // Sort by update time (most recent first), then by discount
+                    const dateA = new Date(a.updated_at || 0);
+                    const dateB = new Date(b.updated_at || 0);
+                    if (dateB - dateA !== 0) return dateB - dateA;
+                    return (parseFloat(b.discount_percent) || 0) - (parseFloat(a.discount_percent) || 0);
+                })
             },
             // Biggest % Off: All deals sorted by discount percentage
             biggest: {
                 filterFn: (toys) => toys.filter(t => t.discount_percent && parseFloat(t.discount_percent) > 0),
                 sortFn: (toys) => toys.sort((a, b) => (parseFloat(b.discount_percent) || 0) - (parseFloat(a.discount_percent) || 0))
             },
-            // Lowest Ever: Toys at their lowest recorded price
+            // Lowest Ever: Toys at their lowest recorded price, sorted by price (cheapest first)
             lowest: {
                 filterFn: (toys) => toys.filter(t => t.is_lowest_price_ever),
-                sortFn: (toys) => toys.sort((a, b) => (parseFloat(b.discount_percent) || 0) - (parseFloat(a.discount_percent) || 0))
+                sortFn: (toys) => toys.sort((a, b) => (parseFloat(a.price) || 0) - (parseFloat(b.price) || 0))
             }
         };
 
