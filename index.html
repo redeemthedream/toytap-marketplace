@@ -487,11 +487,13 @@
             toyCache[toy.asin] = toy; // Cache for modal
             const imageUrl = toy.image_url_proxied || toy.image_url || 'https://via.placeholder.com/300x300?text=No+Image';
             const price = parseFloat(toy.price) || 0;
-            const prevPrice = parseFloat(toy.compare_price) || parseFloat(toy.price_previous_distinct) || 0;
-            const highPrice = parseFloat(toy.highest_price) || 0;
+            // Previous price: use price_previous_distinct (most recent different price) or compare_price as fallback
+            const prevPrice = parseFloat(toy.price_previous_distinct) || parseFloat(toy.compare_price) || 0;
             const discount = parseFloat(toy.discount_percent) || 0;
             const grade = toy.tt_grade || '';
             const hasDiscount = discount > 5 && prevPrice > price;
+            // Show previous price with strikethrough if it's different from current
+            const showPrevPrice = prevPrice > 0 && Math.abs(prevPrice - price) > 0.01;
 
             return `
                 <div onclick="openModal('${toy.asin}')" class="glass-card rounded-xl overflow-hidden toy-card transition-all duration-300 hover:border-primary/30 group cursor-pointer">
@@ -505,12 +507,9 @@
                     <div class="p-3 md:p-4">
                         <p class="text-primary text-[10px] md:text-xs font-bold uppercase tracking-wider mb-1 truncate">${toy.brand || 'Brand'}</p>
                         <h3 class="text-white text-sm font-semibold leading-tight mb-2 line-clamp-2 min-h-[2.5rem]">${toy.toy_name}</h3>
-                        <div class="space-y-1">
-                            <div class="flex items-baseline gap-2">
-                                <span class="text-white text-lg md:text-xl font-bold font-mono">$${price.toFixed(2)}</span>
-                                ${hasDiscount ? `<span class="text-white/40 text-sm line-through">$${prevPrice.toFixed(2)}</span>` : ''}
-                            </div>
-                            ${highPrice > price ? `<p class="text-white/30 text-[10px]">High: $${highPrice.toFixed(2)}</p>` : ''}
+                        <div class="flex items-baseline gap-2">
+                            <span class="text-white text-lg md:text-xl font-bold font-mono">$${price.toFixed(2)}</span>
+                            ${showPrevPrice ? `<span class="text-white/40 text-sm line-through">$${prevPrice.toFixed(2)}</span>` : ''}
                         </div>
                     </div>
                 </div>
@@ -522,8 +521,10 @@
             if (!toy) return;
 
             const price = parseFloat(toy.price) || 0;
+            const prevPrice = parseFloat(toy.price_previous_distinct) || parseFloat(toy.compare_price) || 0;
             const discount = parseFloat(toy.discount_percent) || 0;
             const hasDiscount = discount > 5;
+            const showPrevPrice = prevPrice > 0 && Math.abs(prevPrice - price) > 0.01;
             const affiliateUrl = toy.affiliate_url || `https://amazon.com/dp/${asin}?tag=redeemer0d0-20`;
 
             document.getElementById('modal-content').innerHTML = `
@@ -538,7 +539,7 @@
                 <div class="flex items-center gap-4 mb-6">
                     <div class="flex items-baseline gap-2">
                         <span class="text-white text-3xl font-black font-mono">$${price.toFixed(2)}</span>
-                        ${hasDiscount && toy.compare_price ? `<span class="text-white/40 line-through">$${parseFloat(toy.compare_price).toFixed(2)}</span>` : ''}
+                        ${showPrevPrice ? `<span class="text-white/40 line-through">$${prevPrice.toFixed(2)}</span>` : ''}
                     </div>
                     <div class="flex items-center gap-2 text-white/50 text-sm">
                         <span>⭐ ${toy.rating || 'N/A'}</span>

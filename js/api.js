@@ -149,6 +149,11 @@ function renderToyCard(toy, options = {}) {
     const isLowestEver = toy.is_lowest_price_ever || false;
     const freshness = getFreshnessInfo(toy.updated_at);
 
+    // Previous price: use price_previous_distinct (most recent different price) or compare_price as fallback
+    const currentPrice = parseFloat(toy.price) || 0;
+    const prevPrice = parseFloat(toy.price_previous_distinct) || parseFloat(toy.compare_price) || 0;
+    const showPrevPrice = prevPrice > 0 && Math.abs(prevPrice - currentPrice) > 0.01;
+
     // Cache for modal
     window.toyCache[toy.asin] = toy;
 
@@ -206,7 +211,7 @@ function renderToyCard(toy, options = {}) {
                 </div>
                 <div class="toy-card-price">
                     $${formatPrice(toy.price)}
-                    ${hasDiscount ? `<span class="toy-card-original-price">$${formatPrice(toy.compare_price)}</span>` : ''}
+                    ${showPrevPrice ? `<span class="toy-card-original-price">$${formatPrice(prevPrice)}</span>` : ''}
                     ${hasDiscount ? `<span class="toy-card-deal">${discountPct}% off</span>` : ''}
                 </div>
             </div>
@@ -261,7 +266,7 @@ function openToyModal(asin) {
 
             <div class="modal-price-section">
                 <span class="modal-price">$${formatPrice(toy.price)}</span>
-                ${hasDiscount ? `<span class="modal-original-price">$${formatPrice(toy.compare_price)}</span>` : ''}
+                ${(parseFloat(toy.price_previous_distinct) || parseFloat(toy.compare_price)) && Math.abs((parseFloat(toy.price_previous_distinct) || parseFloat(toy.compare_price)) - parseFloat(toy.price)) > 0.01 ? `<span class="modal-original-price">$${formatPrice(parseFloat(toy.price_previous_distinct) || parseFloat(toy.compare_price))}</span>` : ''}
                 ${hasDiscount ? `<div class="modal-savings">Save ${discountPct}%</div>` : ''}
             </div>
 
