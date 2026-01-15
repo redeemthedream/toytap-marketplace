@@ -70,49 +70,44 @@
     </div>
 </footer>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/api.js"></script>
 <script>
-// Sample blog posts - replace with API call in production
-const POSTS = [
-    {
-        slug: 'best-lego-sets-2025',
-        title: 'Best LEGO Sets of 2025',
-        category: 'guides',
-        excerpt: 'Our top picks for LEGO sets this year, from Star Wars to City to Technic.',
-        image: 'https://images.unsplash.com/photo-1587654780291-39c9404d746b?w=400',
-        date: 'Jan 10, 2025'
-    },
-    {
-        slug: 'amazon-toy-deals-january',
-        title: 'Amazon Toy Deals This Week',
-        category: 'deals',
-        excerpt: 'The best toy discounts on Amazon right now, including some record lows.',
-        image: 'https://images.unsplash.com/photo-1558060370-d644479cb6f7?w=400',
-        date: 'Jan 8, 2025'
-    },
-    {
-        slug: 'educational-toys-toddlers',
-        title: 'Top Educational Toys for Toddlers',
-        category: 'guides',
-        excerpt: 'Montessori-approved and STEM toys that make learning fun.',
-        image: 'https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?w=400',
-        date: 'Jan 5, 2025'
-    },
-    {
-        slug: 'hot-wheels-collectors-guide',
-        title: 'Hot Wheels Collector\'s Guide',
-        category: 'reviews',
-        excerpt: 'Everything you need to know about collecting Hot Wheels in 2025.',
-        image: 'https://images.unsplash.com/photo-1594787318286-3d835c1d207f?w=400',
-        date: 'Jan 3, 2025'
-    }
-];
+// Supabase config
+const SUPABASE_URL = 'https://ehuwltjozobbbzsdygbo.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVodXdsdGpvem9iYmJ6c2R5Z2JvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ5NjAzNDQsImV4cCI6MjA4MDUzNjM0NH0.xSRT_UkN4RLK40R51mHtksb1u90M8y2FjzS45aXLGSI';
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+let POSTS = [];
 let currentFilter = 'all';
 
-document.addEventListener('DOMContentLoaded', () => {
-    renderPosts();
+document.addEventListener('DOMContentLoaded', async () => {
+    await loadPosts();
 });
+
+async function loadPosts() {
+    document.getElementById('blog-grid').innerHTML = '<p style="text-align:center;color:#94a3b8;padding:40px;">Loading posts...</p>';
+
+    try {
+        let { data, error } = await supabaseClient
+            .from('blog_posts')
+            .select('*')
+            .order('created_at', { ascending: false });
+
+        if (error) {
+            console.error('Error loading posts:', error);
+            document.getElementById('blog-grid').innerHTML = '<p style="text-align:center;color:#f87171;padding:40px;">Failed to load posts. Table might be named differently.</p>';
+            return;
+        }
+
+        POSTS = data || [];
+        console.log('Loaded posts:', POSTS);
+        renderPosts();
+    } catch (err) {
+        console.error('Error:', err);
+        document.getElementById('blog-grid').innerHTML = '<p style="text-align:center;color:#f87171;padding:40px;">Error loading posts</p>';
+    }
+}
 
 function filterPosts(filter) {
     currentFilter = filter;
@@ -123,18 +118,34 @@ function filterPosts(filter) {
 }
 
 function renderPosts() {
-    const filtered = currentFilter === 'all' ? POSTS : POSTS.filter(p => p.category === currentFilter);
-    document.getElementById('blog-grid').innerHTML = filtered.map(post => `
-        <div class="blog-card" onclick="window.location='post.html?slug=${post.slug}'">
-            <img src="${post.image}" alt="${post.title}" class="blog-card-image" />
-            <div class="blog-card-content">
-                <div class="blog-card-category">${post.category}</div>
-                <h2 class="blog-card-title">${post.title}</h2>
-                <p class="blog-card-excerpt">${post.excerpt}</p>
-                <div class="blog-card-meta">${post.date}</div>
+    const filtered = currentFilter === 'all' ? POSTS : POSTS.filter(p => (p.category || '').toLowerCase() === currentFilter);
+
+    if (filtered.length === 0) {
+        document.getElementById('blog-grid').innerHTML = '<p style="text-align:center;color:#94a3b8;padding:40px;">No posts found</p>';
+        return;
+    }
+
+    document.getElementById('blog-grid').innerHTML = filtered.map(post => {
+        // Handle different possible column names
+        const title = post.title || post.name || 'Untitled';
+        const slug = post.slug || post.id;
+        const image = post.image_url || post.featured_image || post.image || 'https://images.unsplash.com/photo-1558060370-d644479cb6f7?w=400';
+        const category = post.category || post.type || 'Article';
+        const excerpt = post.excerpt || post.summary || post.description || '';
+        const date = post.created_at ? new Date(post.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '';
+
+        return `
+            <div class="blog-card" onclick="window.location='post.html?slug=${slug}'">
+                <img src="${image}" alt="${title}" class="blog-card-image" onerror="this.src='https://images.unsplash.com/photo-1558060370-d644479cb6f7?w=400'" />
+                <div class="blog-card-content">
+                    <div class="blog-card-category">${category}</div>
+                    <h2 class="blog-card-title">${title}</h2>
+                    <p class="blog-card-excerpt">${excerpt}</p>
+                    <div class="blog-card-meta">${date}</div>
+                </div>
             </div>
-        </div>
-    `).join('');
+        `;
+    }).join('');
 }
 </script>
 </body>
