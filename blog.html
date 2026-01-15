@@ -55,8 +55,16 @@
     </div>
 
     <div id="blog-grid" class="blog-grid">
-        <!-- Sample posts - in production these would come from an API -->
+        <!-- Posts loaded from Supabase -->
     </div>
+
+    <!-- Trending Toys Section -->
+    <section style="max-width: 1200px; margin: 40px auto; padding: 0 20px;">
+        <h2 style="font-size: 24px; font-weight: 700; color: #fff; margin-bottom: 20px;">Trending Toys Right Now</h2>
+        <div id="trending-toys" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 16px;">
+            <!-- Loaded by JS -->
+        </div>
+    </section>
 </main>
 
 <footer class="site-footer">
@@ -83,7 +91,38 @@ let currentFilter = 'all';
 
 document.addEventListener('DOMContentLoaded', async () => {
     await loadPosts();
+    await loadTrendingToys();
 });
+
+async function loadTrendingToys() {
+    try {
+        const response = await fetch('https://hub.gettoytap.com/toys/leaderboard?limit=8');
+        const data = await response.json();
+        const toys = data.toys || data || [];
+
+        document.getElementById('trending-toys').innerHTML = toys.map(toy => {
+            const price = parseFloat(toy.price) || 0;
+            const discount = parseFloat(toy.discount_percent) || 0;
+            const imageUrl = toy.image_url_proxied || toy.image_url || '';
+
+            return `
+                <a href="toy.html?asin=${toy.asin}" style="background: rgba(18,24,61,0.8); border-radius: 12px; overflow: hidden; border: 1px solid rgba(63,195,213,0.1); transition: all 0.2s; display: block;">
+                    <div style="position: relative; aspect-ratio: 1; background: rgba(255,255,255,0.05);">
+                        <img src="${imageUrl}" alt="${toy.toy_name}" style="width: 100%; height: 100%; object-fit: contain; padding: 8px;"/>
+                        ${discount > 5 ? `<div style="position: absolute; top: 8px; left: 8px; background: #10b981; color: white; font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 6px;">-${discount.toFixed(0)}%</div>` : ''}
+                    </div>
+                    <div style="padding: 10px;">
+                        <p style="color: #3fc3d5; font-size: 9px; font-weight: 700; text-transform: uppercase;">${toy.brand || ''}</p>
+                        <h3 style="color: white; font-size: 12px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${toy.toy_name}</h3>
+                        <p style="color: white; font-size: 14px; font-weight: 700; font-family: monospace;">$${price.toFixed(2)}</p>
+                    </div>
+                </a>
+            `;
+        }).join('');
+    } catch (err) {
+        console.error('Error loading trending toys:', err);
+    }
+}
 
 async function loadPosts() {
     document.getElementById('blog-grid').innerHTML = '<p style="text-align:center;color:#94a3b8;padding:40px;">Loading posts...</p>';
@@ -161,11 +200,11 @@ function renderPosts() {
     }
 
     document.getElementById('blog-grid').innerHTML = filtered.map((post, index) => {
-        const title = post.title || post.name || 'Untitled';
+        const title = post.title || 'Untitled';
         const slug = post.slug || post.id;
-        const category = post.category || post.type || 'Article';
+        const category = post.category || 'Article';
         const image = getCategoryImage(category, index);
-        const excerpt = post.excerpt || post.summary || post.description || '';
+        const excerpt = post.intro_text || post.excerpt || post.summary || '';
         const date = post.created_at ? new Date(post.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '';
 
         return `

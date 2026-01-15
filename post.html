@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html class="dark" lang="en">
 <head>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
@@ -42,15 +42,11 @@
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
         }
-        .prose { max-width: 720px; margin: 0 auto; }
-        .prose h2 { font-size: 1.5rem; font-weight: 700; margin-top: 2rem; margin-bottom: 1rem; color: white; }
-        .prose h3 { font-size: 1.25rem; font-weight: 600; margin-top: 1.5rem; margin-bottom: 0.75rem; color: white; }
-        .prose p { margin-bottom: 1.25rem; line-height: 1.8; color: rgba(255,255,255,0.7); }
-        .prose ul, .prose ol { margin-bottom: 1.25rem; padding-left: 1.5rem; color: rgba(255,255,255,0.7); }
-        .prose li { margin-bottom: 0.5rem; line-height: 1.7; }
-        .prose a { color: #3fc3d5; text-decoration: underline; }
-        .prose strong { color: white; font-weight: 600; }
-        .prose img { border-radius: 12px; margin: 1.5rem 0; }
+        .glass-card {
+            background: rgba(18, 24, 61, 0.8);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(63, 195, 213, 0.1);
+        }
     </style>
 </head>
 <body class="bg-background-dark font-display text-white min-h-screen">
@@ -82,7 +78,7 @@
         </div>
     </header>
 
-    <main class="relative z-10 max-w-4xl mx-auto px-4 py-8 md:py-12">
+    <main class="relative z-10 max-w-7xl mx-auto px-4 py-8 md:py-12">
         <!-- Back Link -->
         <a href="blog.html" class="inline-flex items-center gap-2 text-primary font-semibold mb-6 hover:opacity-80 transition-opacity">
             <span class="material-symbols-outlined">arrow_back</span> Back to Blog
@@ -91,19 +87,27 @@
         <!-- Loading State -->
         <div id="loading" class="text-center py-20">
             <div class="w-12 h-12 border-4 border-primary/30 border-t-primary rounded-full animate-spin mx-auto mb-4"></div>
-            <p class="text-white/50">Loading post...</p>
+            <p class="text-white/50">Loading...</p>
         </div>
 
         <!-- Post Content -->
-        <article id="post-content" class="hidden">
+        <div id="post-content" class="hidden">
+            <!-- Header -->
             <div class="mb-8">
                 <span id="post-category" class="text-primary text-sm font-bold uppercase tracking-wider"></span>
-                <h1 id="post-title" class="text-3xl md:text-4xl font-black text-white mt-2 mb-4"></h1>
-                <p id="post-date" class="text-white/40 text-sm"></p>
+                <h1 id="post-title" class="text-3xl md:text-5xl font-black text-white mt-2 mb-4"></h1>
+                <p id="post-intro" class="text-white/60 text-lg md:text-xl leading-relaxed max-w-3xl"></p>
             </div>
-            <img id="post-image" class="w-full h-64 md:h-96 object-cover rounded-2xl mb-8" src="" alt="" />
-            <div id="post-body" class="prose"></div>
-        </article>
+
+            <!-- Additional Content -->
+            <div id="additional-content" class="text-white/70 mb-8 max-w-3xl hidden"></div>
+
+            <!-- Toys Grid -->
+            <div id="toys-section">
+                <h2 class="text-2xl font-bold text-white mb-6">Featured Toys</h2>
+                <div id="toys-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"></div>
+            </div>
+        </div>
 
         <!-- Error State -->
         <div id="error-state" class="hidden text-center py-20">
@@ -125,6 +129,7 @@
         </div>
     </footer>
 
+    <script src="js/api.js"></script>
     <script>
         const SUPABASE_URL = 'https://ehuwltjozobbbzsdygbo.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVodXdsdGpvem9iYmJ6c2R5Z2JvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ5NjAzNDQsImV4cCI6MjA4MDUzNjM0NH0.xSRT_UkN4RLK40R51mHtksb1u90M8y2FjzS45aXLGSI';
@@ -140,25 +145,23 @@
             }
 
             try {
-                // Try to fetch by slug first, then by id
+                // Fetch by slug first, then by id
                 let { data, error } = await supabaseClient
                     .from('blog_posts')
                     .select('*')
                     .eq('slug', slug)
                     .single();
 
-                // If no result by slug, try by id
                 if (error || !data) {
-                    const { data: dataById, error: errorById } = await supabaseClient
+                    const { data: dataById } = await supabaseClient
                         .from('blog_posts')
                         .select('*')
                         .eq('id', slug)
                         .single();
                     data = dataById;
-                    error = errorById;
                 }
 
-                if (error || !data) {
+                if (!data) {
                     showError();
                     return;
                 }
@@ -170,42 +173,71 @@
             }
         }
 
-        function renderPost(post) {
-            const title = post.title || post.name || 'Untitled';
-            const category = post.category || post.type || 'Article';
-            const image = post.image_url || post.featured_image || post.image || getCategoryImage(category);
-            const body = post.content || post.body || post.text || '';
-            const date = post.created_at ? new Date(post.created_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : '';
+        async function renderPost(post) {
+            document.getElementById('page-title').textContent = post.title + ' - Toy Tap';
+            document.getElementById('post-title').textContent = post.title;
+            document.getElementById('post-category').textContent = post.category || 'Featured';
+            document.getElementById('post-intro').textContent = post.intro_text || '';
 
-            document.getElementById('page-title').textContent = title + ' - Toy Tap';
-            document.getElementById('post-title').textContent = title;
-            document.getElementById('post-category').textContent = category;
-            document.getElementById('post-date').textContent = date;
-            document.getElementById('post-image').src = image;
-            document.getElementById('post-body').innerHTML = formatContent(body);
+            // Show additional content if exists
+            if (post.additional_content) {
+                document.getElementById('additional-content').innerHTML = post.additional_content;
+                document.getElementById('additional-content').classList.remove('hidden');
+            }
 
             document.getElementById('loading').classList.add('hidden');
             document.getElementById('post-content').classList.remove('hidden');
-        }
 
-        function formatContent(content) {
-            // If it's already HTML, return as is
-            if (content.includes('<p>') || content.includes('<h')) {
-                return content;
+            // Fetch toys from API endpoint
+            if (post.api_endpoint) {
+                await loadToys(post.api_endpoint);
+            } else {
+                document.getElementById('toys-section').classList.add('hidden');
             }
-            // Otherwise, convert newlines to paragraphs
-            return content.split('\n\n').map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`).join('');
         }
 
-        function getCategoryImage(category) {
-            const images = {
-                'deals': 'https://images.unsplash.com/photo-1558060370-d644479cb6f7?w=800',
-                'guides': 'https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?w=800',
-                'reviews': 'https://images.unsplash.com/photo-1594787318286-3d835c1d207f?w=800',
-                'lego': 'https://images.unsplash.com/photo-1587654780291-39c9404d746b?w=800',
-                'default': 'https://images.unsplash.com/photo-1558060370-d644479cb6f7?w=800'
-            };
-            return images[category.toLowerCase()] || images.default;
+        async function loadToys(endpoint) {
+            try {
+                document.getElementById('toys-grid').innerHTML = `
+                    <div class="col-span-full text-center py-10">
+                        <div class="w-8 h-8 border-4 border-primary/30 border-t-primary rounded-full animate-spin mx-auto"></div>
+                    </div>
+                `;
+
+                const response = await fetch(API_BASE + endpoint);
+                const data = await response.json();
+                const toys = data.toys || data || [];
+
+                if (toys.length === 0) {
+                    document.getElementById('toys-section').classList.add('hidden');
+                    return;
+                }
+
+                document.getElementById('toys-grid').innerHTML = toys.slice(0, 12).map(toy => {
+                    const price = parseFloat(toy.price) || 0;
+                    const discount = parseFloat(toy.discount_percent) || 0;
+                    const hasDiscount = discount > 5;
+                    const imageUrl = toy.image_url_proxied || toy.image_url || '';
+
+                    return `
+                        <a href="toy.html?asin=${toy.asin}" class="glass-card rounded-xl overflow-hidden hover:border-primary/30 transition-all block">
+                            <div class="relative aspect-square bg-white/5">
+                                <img src="${imageUrl}" alt="${toy.toy_name}" class="w-full h-full object-contain p-2"/>
+                                ${hasDiscount ? `<div class="absolute top-2 left-2 bg-emerald-500 text-white text-xs font-bold px-2 py-1 rounded-lg">-${discount.toFixed(0)}%</div>` : ''}
+                                ${toy.tt_grade ? `<div class="absolute top-2 right-2 bg-primary text-navy-deep text-xs font-bold px-2 py-1 rounded-lg">${toy.tt_grade}</div>` : ''}
+                            </div>
+                            <div class="p-3">
+                                <p class="text-primary text-[10px] font-bold uppercase">${toy.brand || ''}</p>
+                                <h3 class="text-white text-sm font-semibold line-clamp-2 mb-2">${toy.toy_name}</h3>
+                                <p class="text-white text-lg font-bold font-mono">$${price.toFixed(2)}</p>
+                            </div>
+                        </a>
+                    `;
+                }).join('');
+            } catch (err) {
+                console.error('Error loading toys:', err);
+                document.getElementById('toys-section').classList.add('hidden');
+            }
         }
 
         function showError() {
