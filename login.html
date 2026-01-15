@@ -66,18 +66,33 @@
 
     <!-- Navigation -->
     <header class="relative z-50 border-b border-white/5 bg-navy-deep/80 backdrop-blur-md">
-        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+        <div class="max-w-7xl mx-auto px-4 md:px-6 h-16 md:h-20 flex items-center justify-between">
             <a href="index.html" class="flex items-center gap-2">
-                <img src="https://i.imgur.com/HXSawxU.png" alt="Toy Tap" class="h-10 w-10" />
-                <span class="text-2xl font-black tracking-tighter gradient-animate">Toy Tap</span>
+                <img src="https://i.imgur.com/HXSawxU.png" alt="Toy Tap" class="h-8 w-8 md:h-10 md:w-10" />
+                <span class="text-xl md:text-2xl font-black tracking-tighter gradient-animate">Toy Tap</span>
             </a>
-            <nav class="hidden md:flex items-center gap-10">
+            <nav class="hidden md:flex items-center gap-8">
                 <a class="text-sm font-semibold text-white/70 hover:text-primary transition-colors" href="index.html">Home</a>
                 <a class="text-sm font-semibold text-white/70 hover:text-primary transition-colors" href="rankings.html">Rankings</a>
                 <a class="text-sm font-semibold text-white/70 hover:text-primary transition-colors" href="brands.html">Brands</a>
                 <a class="text-sm font-semibold text-white/70 hover:text-primary transition-colors" href="blog.html">Blog</a>
                 <a class="text-sm font-semibold text-white/70 hover:text-primary transition-colors" href="watchlist.html">Watchlist</a>
                 <a class="text-sm font-semibold text-yellow-400 hover:text-yellow-300 transition-colors" href="https://gettoytap.com" target="_blank">Partner ↗</a>
+            </nav>
+            <!-- Mobile Menu Button -->
+            <button onclick="document.getElementById('mobile-menu').classList.toggle('hidden')" class="md:hidden p-2 text-white/70 hover:text-primary">
+                <span class="material-symbols-outlined text-2xl">menu</span>
+            </button>
+        </div>
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden border-t border-white/5 bg-navy-deep/95 backdrop-blur-md">
+            <nav class="flex flex-col p-4 gap-1">
+                <a class="text-sm font-semibold text-white/70 py-3 px-4 rounded-lg hover:bg-white/5" href="index.html">Home</a>
+                <a class="text-sm font-semibold text-white/70 py-3 px-4 rounded-lg hover:bg-white/5" href="rankings.html">Rankings</a>
+                <a class="text-sm font-semibold text-white/70 py-3 px-4 rounded-lg hover:bg-white/5" href="brands.html">Brands</a>
+                <a class="text-sm font-semibold text-white/70 py-3 px-4 rounded-lg hover:bg-white/5" href="blog.html">Blog</a>
+                <a class="text-sm font-semibold text-white/70 py-3 px-4 rounded-lg hover:bg-white/5" href="watchlist.html">Watchlist</a>
+                <a class="text-sm font-semibold text-yellow-400 py-3 px-4 rounded-lg hover:bg-white/5" href="https://gettoytap.com" target="_blank">Partner ↗</a>
             </nav>
         </div>
     </header>
@@ -261,8 +276,19 @@
         // Initialize Supabase client
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        // Check if already logged in
+        // Check if this is a password recovery flow
+        function isRecoveryFlow() {
+            const hash = window.location.hash;
+            return hash && hash.includes('type=recovery');
+        }
+
+        // Check if already logged in (but not during recovery flow)
         document.addEventListener('DOMContentLoaded', async () => {
+            // Skip redirect if this is a password recovery flow
+            if (isRecoveryFlow()) {
+                return;
+            }
+
             const { data: { session } } = await supabaseClient.auth.getSession();
             if (session) {
                 // Already logged in, redirect
@@ -273,6 +299,11 @@
 
         // Handle magic link auth callback
         supabaseClient.auth.onAuthStateChange(async (event, session) => {
+            // Don't auto-redirect during password recovery
+            if (isRecoveryFlow()) {
+                return;
+            }
+
             if (event === 'SIGNED_IN' && session) {
                 // Upsert user to public.users table
                 try {
