@@ -300,6 +300,7 @@
         }
 
         function setFilter(filter) {
+            console.log('setFilter called:', filter);
             currentFilter = filter;
             visibleCount = 20;
             document.querySelectorAll('.filter-tab').forEach(tab => {
@@ -309,13 +310,19 @@
         }
 
         function applyFilterAndRender() {
+            console.log('applyFilterAndRender, currentFilter:', currentFilter, 'allToys:', allToys.length);
             const config = FILTER_CONFIG[currentFilter];
+            if (!config) {
+                console.error('No config for filter:', currentFilter);
+                return;
+            }
             // First filter, then sort
             let toys = [...allToys];
             if (config.filterFn) {
                 toys = config.filterFn(toys);
             }
-            filteredToys = config.sortFn(toys);
+            console.log('After filter:', toys.length, 'toys');
+            filteredToys = config.sortFn([...toys]); // Clone to avoid mutation
             if (currentSort !== 'default') applySort();
             renderToys();
         }
