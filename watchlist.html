@@ -226,7 +226,6 @@
 
         let currentUser = null;
         let watchlist = [];
-        let priceTargets = {}; // { asin: targetPrice }
         let currentTargetAsin = null;
 
         document.addEventListener('DOMContentLoaded', async () => {
@@ -259,18 +258,12 @@
                 <button onclick="signOut()" class="text-sm font-bold text-white/70 hover:text-red-400 transition-colors px-3 py-2">Sign Out</button>
             `;
 
-            // Load price targets from localStorage
-            const savedTargets = localStorage.getItem('toytap_targets_' + currentUser.id);
-            if (savedTargets) {
-                priceTargets = JSON.parse(savedTargets);
-            }
-
-            // Load watchlist from Supabase
+            // Load watchlist from Supabase (including target_price)
             const API_BASE = 'https://hub.gettoytap.com';
             try {
                 const { data, error } = await supabaseClient
                     .from('watchlist')
-                    .select('asin, price_when_added, added_at')
+                    .select('asin, price_when_added, added_at, target_price')
                     .eq('user_id', currentUser.id)
                     .order('added_at', { ascending: false });
 
@@ -364,7 +357,7 @@
             let belowTargetCount = 0;
             watchlist.forEach(toy => {
                 const price = parseFloat(toy.price) || 0;
-                const target = priceTargets[toy.asin];
+                const target = parseFloat(toy.target_price) || null;
                 if (target && price <= target) belowTargetCount++;
             });
 
@@ -379,9 +372,9 @@
                 const isLowestEver = toy.is_lowest_price_ever || false;
                 const freshness = getFreshnessInfo(toy.updated_at);
                 const discount = parseFloat(toy.discount_percent) || 0;
-                const targetPrice = priceTargets[toy.asin];
+                const targetPrice = parseFloat(toy.target_price) || null;
                 const isBelowTarget = targetPrice && price <= targetPrice;
-                const hasTarget = targetPrice !== undefined && targetPrice !== null;
+                const hasTarget = targetPrice !== null;
 
                 // Build tags
                 let tags = [];
@@ -475,10 +468,6 @@
                 console.error('Remove from watchlist error:', err);
             }
             watchlist = watchlist.filter(t => t.asin !== asin);
-            // Also remove target price
-            delete priceTargets[asin];
-            localStorage.setItem('toytap_targets_' + currentUser.id, JSON.stringify(priceTargets));
-            localStorage.setItem('toytap_watchlist_' + currentUser.id, JSON.stringify(watchlist));
             renderWatchlist();
         };
 
@@ -489,7 +478,7 @@
             if (!toy) return;
 
             const price = parseFloat(toy.price) || 0;
-            const existingTarget = priceTargets[asin];
+            const existingTarget = parseFloat(toy.target_price) || null;
 
             // Update modal content
             document.getElementById('target-toy-info').innerHTML = `
@@ -521,7 +510,7 @@
             currentTargetAsin = null;
         };
 
-        window.saveTargetPrice = function() {
+        window.saveTargetPrice = async function() {
             if (!currentTargetAsin) return;
 
             const input = document.getElementById('target-price-input');
@@ -533,18 +522,44 @@
                 return;
             }
 
-            priceTargets[currentTargetAsin] = targetPrice;
-            localStorage.setItem('toytap_targets_' + currentUser.id, JSON.stringify(priceTargets));
+            // Save to Supabase
+            try {
+                const { error } = await supabaseClient
+                    .from('watchlist')
+                    .update({ target_price: targetPrice })
+                    .eq('user_id', currentUser.id)
+                    .eq('asin', currentTargetAsin);
+                if (error) throw error;
+
+                // Update local watchlist
+                const toy = watchlist.find(t => t.asin === currentTargetAsin);
+                if (toy) toy.target_price = targetPrice;
+            } catch (err) {
+                console.error('Save target price error:', err);
+            }
 
             closeTargetModal();
             renderWatchlist();
         };
 
-        window.clearTargetPrice = function() {
+        window.clearTargetPrice = async function() {
             if (!currentTargetAsin) return;
 
-            delete priceTargets[currentTargetAsin];
-            localStorage.setItem('toytap_targets_' + currentUser.id, JSON.stringify(priceTargets));
+            // Clear from Supabase
+            try {
+                const { error } = await supabaseClient
+                    .from('watchlist')
+                    .update({ target_price: null })
+                    .eq('user_id', currentUser.id)
+                    .eq('asin', currentTargetAsin);
+                if (error) throw error;
+
+                // Update local watchlist
+                const toy = watchlist.find(t => t.asin === currentTargetAsin);
+                if (toy) toy.target_price = null;
+            } catch (err) {
+                console.error('Clear target price error:', err);
+            }
 
             closeTargetModal();
             renderWatchlist();
