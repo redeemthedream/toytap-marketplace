@@ -89,7 +89,7 @@
         <section class="max-w-7xl mx-auto px-4 md:px-6 pb-12">
             <!-- Brand Grid View -->
             <div id="brands-view">
-                <div id="brands-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"></div>
+                <div id="brands-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4"></div>
             </div>
 
             <!-- Brand Detail View -->
@@ -217,11 +217,27 @@
 
         function renderBrandsGrid() {
             document.getElementById('brands-grid').innerHTML = TRACKED_BRANDS.map(brand => `
-                <button onclick="selectBrand('${brand.name}')" class="glass-card rounded-xl px-6 py-5 text-left hover:border-primary/50 hover:bg-primary/5 transition-all group flex items-center justify-between">
-                    <span class="text-lg font-bold text-white group-hover:text-primary transition-colors">${brand.name}</span>
-                    <span class="material-symbols-outlined text-white/30 group-hover:text-primary group-hover:translate-x-1 transition-all">arrow_forward</span>
+                <button onclick="selectBrand('${brand.name}')" class="group relative">
+                    <!-- Block studs -->
+                    <div class="absolute -top-2 left-1/2 -translate-x-1/2 flex gap-2">
+                        <div class="w-4 h-4 rounded-full" style="background: ${brand.color}; box-shadow: inset 0 -2px 4px rgba(0,0,0,0.3)"></div>
+                        <div class="w-4 h-4 rounded-full" style="background: ${brand.color}; box-shadow: inset 0 -2px 4px rgba(0,0,0,0.3)"></div>
+                    </div>
+                    <!-- Block body -->
+                    <div class="pt-4 pb-5 px-4 rounded-xl text-center transition-all group-hover:scale-105 group-hover:-translate-y-1" style="background: ${brand.color}; box-shadow: 0 4px 0 ${adjustColor(brand.color, -30)}, 0 6px 20px rgba(0,0,0,0.3)">
+                        <span class="font-bold text-sm leading-tight block" style="color: ${brand.textColor || '#fff'}; text-shadow: 0 1px 2px rgba(0,0,0,0.2)">${brand.name}</span>
+                    </div>
                 </button>
             `).join('');
+        }
+
+        // Darken color for shadow
+        function adjustColor(hex, amount) {
+            const num = parseInt(hex.replace('#', ''), 16);
+            const r = Math.max(0, Math.min(255, (num >> 16) + amount));
+            const g = Math.max(0, Math.min(255, ((num >> 8) & 0x00FF) + amount));
+            const b = Math.max(0, Math.min(255, (num & 0x0000FF) + amount));
+            return '#' + (0x1000000 + r * 0x10000 + g * 0x100 + b).toString(16).slice(1);
         }
 
         async function selectBrand(brandName) {
