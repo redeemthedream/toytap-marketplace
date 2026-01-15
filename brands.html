@@ -283,38 +283,44 @@
             applyFilterAndRender();
         }
 
+        // Each filter has its own default sort to make tabs feel different
+        const FILTER_SORTS = {
+            hot: 'recency',      // Most recently updated first
+            picks: 'grade',      // Best TT Grade first
+            bestsellers: 'reviews', // Most reviews first
+            deals: 'discount',   // Biggest discount first
+            toprated: 'rating'   // Highest rating first
+        };
+
         function applyFilterAndRender() {
             console.log('applyFilterAndRender, currentFilter:', currentFilter, 'brandToys:', brandToys.length);
 
             // Apply filter
             switch (currentFilter) {
                 case 'hot':
-                    // Hot Now: Fresh deals (updated <48hrs + on sale), sorted by biggest discount
+                    // Hot Now: Fresh deals (updated <48hrs + on sale)
                     filteredToys = brandToys.filter(t => isFreshDeal(t));
-                    if (filteredToys.length === 0) filteredToys = brandToys.filter(t => parseFloat(t.discount_percent) > 0); // Fallback to all deals
-                    filteredToys.sort((a, b) => (parseFloat(b.discount_percent) || 0) - (parseFloat(a.discount_percent) || 0));
+                    if (filteredToys.length === 0) filteredToys = brandToys.filter(t => parseFloat(t.discount_percent) > 0);
                     break;
                 case 'picks':
                     // Toy Tap Picks: High TT Grade (S, A+, A)
                     filteredToys = brandToys.filter(t => t.tt_grade && ['S', 'A+', 'A'].includes(t.tt_grade));
-                    if (filteredToys.length === 0) filteredToys = [...brandToys]; // Fallback if not enough
+                    if (filteredToys.length === 0) filteredToys = [...brandToys];
                     break;
                 case 'bestsellers':
-                    // Best Sellers: Sorted by reviews count (most popular)
-                    filteredToys = [...brandToys].sort((a, b) => (parseInt(b.reviews_count) || 0) - (parseInt(a.reviews_count) || 0));
+                    // Best Sellers: All toys (will be sorted by reviews)
+                    filteredToys = [...brandToys];
                     break;
                 case 'deals':
                     // Price Drops: Has discount > 5%
                     filteredToys = brandToys.filter(t => parseFloat(t.discount_percent) > 5);
-                    if (filteredToys.length === 0) filteredToys = brandToys.filter(t => parseFloat(t.discount_percent) > 0); // Fallback
-                    filteredToys.sort((a, b) => (parseFloat(b.discount_percent) || 0) - (parseFloat(a.discount_percent) || 0));
+                    if (filteredToys.length === 0) filteredToys = brandToys.filter(t => parseFloat(t.discount_percent) > 0);
                     break;
                 case 'toprated':
                     // Top Rated: High rating (4.5+) with decent reviews (50+)
                     filteredToys = brandToys.filter(t => parseFloat(t.rating) >= 4.5 && parseInt(t.reviews_count) >= 50);
                     if (filteredToys.length === 0) filteredToys = brandToys.filter(t => parseFloat(t.rating) >= 4.0);
-                    if (filteredToys.length === 0) filteredToys = [...brandToys]; // Ultimate fallback
-                    filteredToys.sort((a, b) => (parseFloat(b.rating) || 0) - (parseFloat(a.rating) || 0));
+                    if (filteredToys.length === 0) filteredToys = [...brandToys];
                     break;
                 default:
                     filteredToys = [...brandToys];
@@ -327,26 +333,37 @@
             const freshCountEl = document.getElementById('fresh-count');
             if (freshCountEl) freshCountEl.textContent = freshCount;
 
-            sortAndRender();
+            // Apply filter-specific default sort
+            applyFilterSort();
+            renderToys();
         }
 
-        function showAllBrands() {
-            currentBrand = null;
-            history.pushState({}, '', 'brands.html');
-            document.getElementById('brands-view').classList.remove('hidden');
-            document.getElementById('brand-detail').classList.add('hidden');
-        }
-
-        function sortAndRender() {
-            let sorted = [...filteredToys];
-            switch (currentSort) {
-                case 'price-low': sorted.sort((a, b) => (parseFloat(a.price) || 0) - (parseFloat(b.price) || 0)); break;
-                case 'price-high': sorted.sort((a, b) => (parseFloat(b.price) || 0) - (parseFloat(a.price) || 0)); break;
-                case 'rating': sorted.sort((a, b) => (parseFloat(b.rating) || 0) - (parseFloat(a.rating) || 0)); break;
-                default: sorted.sort((a, b) => (parseFloat(b.toy_tap_score) || 0) - (parseFloat(a.toy_tap_score) || 0));
+        function applyFilterSort() {
+            const sortType = FILTER_SORTS[currentFilter] || 'score';
+            switch (sortType) {
+                case 'recency':
+                    filteredToys.sort((a, b) => new Date(b.updated_at || 0) - new Date(a.updated_at || 0));
+                    break;
+                case 'grade':
+                    const gradeOrder = { 'S': 6, 'A+': 5, 'A': 4, 'B+': 3, 'B': 2, 'C+': 1, 'C': 0, 'D': -1 };
+                    filteredToys.sort((a, b) => (gradeOrder[b.tt_grade] || -2) - (gradeOrder[a.tt_grade] || -2));
+                    break;
+                case 'reviews':
+                    filteredToys.sort((a, b) => (parseInt(b.reviews_count) || 0) - (parseInt(a.reviews_count) || 0));
+                    break;
+                case 'discount':
+                    filteredToys.sort((a, b) => (parseFloat(b.discount_percent) || 0) - (parseFloat(a.discount_percent) || 0));
+                    break;
+                case 'rating':
+                    filteredToys.sort((a, b) => (parseFloat(b.rating) || 0) - (parseFloat(a.rating) || 0));
+                    break;
+                default:
+                    filteredToys.sort((a, b) => (parseFloat(b.toy_tap_score) || 0) - (parseFloat(a.toy_tap_score) || 0));
             }
+        }
 
-            const toShow = sorted.slice(0, visibleCount);
+        function renderToys() {
+            const toShow = filteredToys.slice(0, visibleCount);
             document.getElementById('showing-count').textContent = toShow.length;
 
             if (toShow.length === 0) {
@@ -378,17 +395,38 @@
                 `;
             }).join('');
 
-            document.getElementById('show-more-btn').classList.toggle('hidden', visibleCount >= sorted.length);
+            document.getElementById('show-more-btn').classList.toggle('hidden', visibleCount >= filteredToys.length);
+        }
+
+        function showAllBrands() {
+            currentBrand = null;
+            history.pushState({}, '', 'brands.html');
+            document.getElementById('brands-view').classList.remove('hidden');
+            document.getElementById('brand-detail').classList.add('hidden');
         }
 
         function handleSortChange() {
-            currentSort = document.getElementById('sort-select').value;
-            sortAndRender();
+            const sortVal = document.getElementById('sort-select').value;
+            switch (sortVal) {
+                case 'price-low':
+                    filteredToys.sort((a, b) => (parseFloat(a.price) || 0) - (parseFloat(b.price) || 0));
+                    break;
+                case 'price-high':
+                    filteredToys.sort((a, b) => (parseFloat(b.price) || 0) - (parseFloat(a.price) || 0));
+                    break;
+                case 'rating':
+                    filteredToys.sort((a, b) => (parseFloat(b.rating) || 0) - (parseFloat(a.rating) || 0));
+                    break;
+                default:
+                    // Reset to filter's default sort
+                    applyFilterSort();
+            }
+            renderToys();
         }
 
         function showMore() {
             visibleCount += 24;
-            sortAndRender();
+            renderToys();
         }
 
         function getUrlParam(param) {
