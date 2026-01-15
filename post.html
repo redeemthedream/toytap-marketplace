@@ -11,7 +11,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="preconnect" href="https://cdn.tailwindcss.com" />
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL@24,400,0..1&icon_names=menu,close,arrow_back&display=swap" rel="stylesheet"/>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
@@ -51,6 +51,12 @@
             backdrop-filter: blur(8px);
             border: 1px solid rgba(63, 195, 213, 0.1);
         }
+        /* Mobile performance */
+        @media (max-width: 768px) {
+            .glass-card, .backdrop-blur-md { backdrop-filter: none; -webkit-backdrop-filter: none; }
+            .glass-card { background: rgba(18, 24, 61, 0.95); }
+            .gradient-animate { animation: none; background: linear-gradient(90deg, #3fc3d5, #a855f7); background-size: 100% 100%; }
+        }
     </style>
 </head>
 <body class="bg-background-dark font-display text-white min-h-screen">
@@ -81,7 +87,7 @@
                     <a href="login.html" class="bg-primary text-navy-deep px-4 md:px-6 py-2.5 rounded-lg font-bold text-sm hover:brightness-110 transition-all">Sign Up</a>
                 </div>
                 <button onclick="document.getElementById('mobile-menu').classList.toggle('hidden')" class="md:hidden p-2 text-white/70 hover:text-primary">
-                    <span class="material-symbols-outlined text-2xl">menu</span>
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
                 </button>
             </div>
         </div>
