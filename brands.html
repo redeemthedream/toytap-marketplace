@@ -33,6 +33,9 @@
         .cyan-glow { box-shadow: 0 0 20px rgba(63, 195, 213, 0.3); }
         .glass-panel { background: rgba(18, 24, 61, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(63, 195, 213, 0.1); }
         .glass-card { background: rgba(18, 24, 61, 0.8); backdrop-filter: blur(8px); border: 1px solid rgba(63, 195, 213, 0.1); }
+        .filter-tab { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.5); border: 1px solid rgba(255,255,255,0.1); }
+        .filter-tab:hover { background: rgba(63,195,213,0.1); color: white; }
+        .filter-tab.active { background: linear-gradient(135deg, #3fc3d5, #0a0e27); color: white; border-color: #3fc3d5; }
     </style>
 </head>
 <body class="bg-background-dark font-display text-white min-h-screen">
@@ -78,12 +81,16 @@
 
             <!-- Brand Detail View -->
             <div id="brand-detail" class="hidden">
-                <div class="flex items-center justify-between flex-wrap gap-4 mb-8 pb-6 border-b border-white/10">
+                <!-- Brand Header with Logo -->
+                <div class="flex items-center justify-between flex-wrap gap-4 mb-6 pb-6 border-b border-white/10">
                     <div class="flex items-center gap-4">
                         <button onclick="showAllBrands()" class="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white/70 hover:bg-primary/20 hover:text-primary transition-all">
                             <span class="material-symbols-outlined text-lg">arrow_back</span> All Brands
                         </button>
-                        <h2 id="brand-title" class="text-2xl md:text-3xl font-bold"></h2>
+                        <div class="flex items-center gap-3">
+                            <img id="brand-logo" src="" alt="" class="w-12 h-12 rounded-lg bg-white object-contain p-1" onerror="this.style.display='none'"/>
+                            <h2 id="brand-title" class="text-2xl md:text-3xl font-bold"></h2>
+                        </div>
                     </div>
                     <div class="flex gap-6 font-mono">
                         <div class="text-center">
@@ -95,6 +102,22 @@
                             <p class="text-xs text-white/50">On Sale</p>
                         </div>
                     </div>
+                </div>
+
+                <!-- Filter Tabs -->
+                <div class="flex flex-wrap gap-2 mb-6">
+                    <button class="filter-tab active px-4 py-2 rounded-lg text-sm font-semibold" data-filter="picks" onclick="setFilter('picks')">
+                        <span class="material-symbols-outlined text-base align-middle mr-1">star</span> Toy Tap Picks
+                    </button>
+                    <button class="filter-tab px-4 py-2 rounded-lg text-sm font-semibold" data-filter="bestsellers" onclick="setFilter('bestsellers')">
+                        <span class="material-symbols-outlined text-base align-middle mr-1">trending_up</span> Best Sellers
+                    </button>
+                    <button class="filter-tab px-4 py-2 rounded-lg text-sm font-semibold" data-filter="deals" onclick="setFilter('deals')">
+                        <span class="material-symbols-outlined text-base align-middle mr-1">local_offer</span> Price Drops
+                    </button>
+                    <button class="filter-tab px-4 py-2 rounded-lg text-sm font-semibold" data-filter="toprated" onclick="setFilter('toprated')">
+                        <span class="material-symbols-outlined text-base align-middle mr-1">thumb_up</span> Top Rated
+                    </button>
                 </div>
 
                 <div class="flex items-center justify-between mb-6">
@@ -134,35 +157,37 @@
     <script src="js/api.js"></script>
     <script>
         const TRACKED_BRANDS = [
-            { name: 'LEGO', icon: '🧱' },
-            { name: 'Fisher-Price', icon: '👶' },
-            { name: 'Melissa & Doug', icon: '🎨' },
-            { name: 'VTech', icon: '🔊' },
-            { name: 'Play-Doh', icon: '🎭' },
-            { name: 'Hot Wheels', icon: '🏎️' },
-            { name: 'Barbie', icon: '👱‍♀️' },
-            { name: 'MAGNA-TILES', icon: '🔷' },
-            { name: 'PicassoTiles', icon: '🔶' },
-            { name: 'Green Toys', icon: '♻️' },
-            { name: 'Hape', icon: '🪵' },
-            { name: 'Little Tikes', icon: '🏠' },
-            { name: 'Step2', icon: '🎢' },
-            { name: 'KidKraft', icon: '🏡' },
-            { name: 'LeapFrog', icon: '🐸' },
-            { name: 'Learning Resources', icon: '📚' },
-            { name: 'Skillmatics', icon: '🧩' },
-            { name: 'Snap Circuits', icon: '⚡' },
-            { name: 'BRIO', icon: '🚂' },
-            { name: 'Infantino', icon: '🍼' },
-            { name: 'Playmags', icon: '🧲' },
-            { name: 'Spirograph', icon: '🌀' },
-            { name: 'CATAN', icon: '🏝️' }
+            { name: 'LEGO', icon: '🧱', logo: 'https://logo.clearbit.com/lego.com' },
+            { name: 'Fisher-Price', icon: '👶', logo: 'https://logo.clearbit.com/fisher-price.com' },
+            { name: 'Melissa & Doug', icon: '🎨', logo: 'https://logo.clearbit.com/melissaanddoug.com' },
+            { name: 'VTech', icon: '🔊', logo: 'https://logo.clearbit.com/vtechkids.com' },
+            { name: 'Play-Doh', icon: '🎭', logo: 'https://logo.clearbit.com/hasbro.com' },
+            { name: 'Hot Wheels', icon: '🏎️', logo: 'https://logo.clearbit.com/hotwheels.mattel.com' },
+            { name: 'Barbie', icon: '👱‍♀️', logo: 'https://logo.clearbit.com/barbie.mattel.com' },
+            { name: 'MAGNA-TILES', icon: '🔷', logo: 'https://logo.clearbit.com/magnatiles.com' },
+            { name: 'PicassoTiles', icon: '🔶', logo: 'https://logo.clearbit.com/picassotiles.com' },
+            { name: 'Green Toys', icon: '♻️', logo: 'https://logo.clearbit.com/greentoys.com' },
+            { name: 'Hape', icon: '🪵', logo: 'https://logo.clearbit.com/hapetoys.com' },
+            { name: 'Little Tikes', icon: '🏠', logo: 'https://logo.clearbit.com/littletikes.com' },
+            { name: 'Step2', icon: '🎢', logo: 'https://logo.clearbit.com/step2.com' },
+            { name: 'KidKraft', icon: '🏡', logo: 'https://logo.clearbit.com/kidkraft.com' },
+            { name: 'LeapFrog', icon: '🐸', logo: 'https://logo.clearbit.com/leapfrog.com' },
+            { name: 'Learning Resources', icon: '📚', logo: 'https://logo.clearbit.com/learningresources.com' },
+            { name: 'Skillmatics', icon: '🧩', logo: 'https://logo.clearbit.com/skillmatics.com' },
+            { name: 'Snap Circuits', icon: '⚡', logo: 'https://logo.clearbit.com/elenco.com' },
+            { name: 'BRIO', icon: '🚂', logo: 'https://logo.clearbit.com/brio.net' },
+            { name: 'Infantino', icon: '🍼', logo: 'https://logo.clearbit.com/infantino.com' },
+            { name: 'Playmags', icon: '🧲', logo: 'https://logo.clearbit.com/playmags.com' },
+            { name: 'Spirograph', icon: '🌀', logo: 'https://logo.clearbit.com/playmonster.com' },
+            { name: 'CATAN', icon: '🏝️', logo: 'https://logo.clearbit.com/catan.com' }
         ];
 
         let currentBrand = null;
         let brandToys = [];
+        let filteredToys = [];
         let visibleCount = 24;
         let currentSort = 'score';
+        let currentFilter = 'picks';
 
         document.addEventListener('DOMContentLoaded', () => {
             const urlBrand = getUrlParam('brand');
@@ -175,10 +200,12 @@
 
         function renderBrandsGrid() {
             document.getElementById('brands-grid').innerHTML = TRACKED_BRANDS.map(brand => `
-                <button onclick="selectBrand('${brand.name}')" class="glass-card rounded-xl p-6 text-center hover:border-primary/30 hover:scale-105 transition-all">
-                    <div class="text-4xl mb-3">${brand.icon}</div>
+                <button onclick="selectBrand('${brand.name}')" class="glass-card rounded-xl p-6 text-center hover:border-primary/30 hover:scale-105 transition-all group">
+                    <div class="w-16 h-16 mx-auto mb-3 rounded-xl bg-white flex items-center justify-center overflow-hidden">
+                        <img src="${brand.logo}" alt="${brand.name}" class="w-12 h-12 object-contain" onerror="this.parentElement.innerHTML='<span class=\\'text-3xl\\'>${brand.icon}</span>'"/>
+                    </div>
                     <p class="font-semibold text-white">${brand.name}</p>
-                    <p class="text-primary text-sm mt-1">View toys →</p>
+                    <p class="text-primary text-sm mt-1 group-hover:underline">View toys →</p>
                 </button>
             `).join('');
         }
@@ -187,12 +214,27 @@
             currentBrand = brandName;
             visibleCount = 24;
             currentSort = 'score';
+            currentFilter = 'picks';
+
+            // Reset filter tabs
+            document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+            document.querySelector('[data-filter="picks"]').classList.add('active');
 
             history.pushState({}, '', `brands.html?brand=${encodeURIComponent(brandName)}`);
 
             document.getElementById('brands-view').classList.add('hidden');
             document.getElementById('brand-detail').classList.remove('hidden');
             document.getElementById('brand-title').textContent = brandName;
+
+            // Set brand logo
+            const brandInfo = TRACKED_BRANDS.find(b => b.name === brandName);
+            const logoEl = document.getElementById('brand-logo');
+            if (brandInfo && brandInfo.logo) {
+                logoEl.src = brandInfo.logo;
+                logoEl.style.display = 'block';
+            } else {
+                logoEl.style.display = 'none';
+            }
 
             document.getElementById('toy-grid').innerHTML = `
                 <div class="col-span-full flex flex-col items-center justify-center py-20">
@@ -202,14 +244,14 @@
             `;
 
             try {
-                const res = await fetch(`${API_BASE}/toys/brand/${encodeURIComponent(brandName)}?limit=100&sort=toy_tap_rank`);
+                const res = await fetch(`${API_BASE}/toys/brand/${encodeURIComponent(brandName)}?limit=200&sort=toy_tap_rank`);
                 const data = await res.json();
                 brandToys = data.toys || [];
 
                 document.getElementById('brand-toy-count').textContent = brandToys.length;
                 document.getElementById('brand-deal-count').textContent = brandToys.filter(t => parseFloat(t.discount_percent) > 10).length;
 
-                sortAndRender();
+                applyFilterAndRender();
             } catch (err) {
                 console.error('Error loading brand:', err);
                 document.getElementById('toy-grid').innerHTML = `
@@ -221,6 +263,46 @@
             }
         }
 
+        function setFilter(filter) {
+            currentFilter = filter;
+            visibleCount = 24;
+
+            // Update active tab
+            document.querySelectorAll('.filter-tab').forEach(t => {
+                t.classList.toggle('active', t.dataset.filter === filter);
+            });
+
+            applyFilterAndRender();
+        }
+
+        function applyFilterAndRender() {
+            // Apply filter
+            switch (currentFilter) {
+                case 'picks':
+                    // Toy Tap Picks - high TT Grade score
+                    filteredToys = brandToys.filter(t => t.tt_grade && ['S', 'A+', 'A'].includes(t.tt_grade));
+                    if (filteredToys.length < 5) filteredToys = [...brandToys]; // Fallback to all if not enough
+                    break;
+                case 'bestsellers':
+                    // Best Sellers - sorted by Amazon rank (lower is better)
+                    filteredToys = [...brandToys].sort((a, b) => (parseInt(a.rank) || 999999) - (parseInt(b.rank) || 999999));
+                    break;
+                case 'deals':
+                    // Price Drops - has discount
+                    filteredToys = brandToys.filter(t => parseFloat(t.discount_percent) > 5);
+                    break;
+                case 'toprated':
+                    // Top Rated - high rating with decent reviews
+                    filteredToys = brandToys.filter(t => parseFloat(t.rating) >= 4.5 && parseInt(t.reviews_count) >= 50);
+                    if (filteredToys.length < 5) filteredToys = brandToys.filter(t => parseFloat(t.rating) >= 4.0);
+                    break;
+                default:
+                    filteredToys = [...brandToys];
+            }
+
+            sortAndRender();
+        }
+
         function showAllBrands() {
             currentBrand = null;
             history.pushState({}, '', 'brands.html');
@@ -229,7 +311,7 @@
         }
 
         function sortAndRender() {
-            let sorted = [...brandToys];
+            let sorted = [...filteredToys];
             switch (currentSort) {
                 case 'price-low': sorted.sort((a, b) => (parseFloat(a.price) || 0) - (parseFloat(b.price) || 0)); break;
                 case 'price-high': sorted.sort((a, b) => (parseFloat(b.price) || 0) - (parseFloat(a.price) || 0)); break;
@@ -241,7 +323,7 @@
             document.getElementById('showing-count').textContent = toShow.length;
 
             if (toShow.length === 0) {
-                document.getElementById('toy-grid').innerHTML = `<div class="col-span-full text-center py-20 text-white/50">No toys found for this brand</div>`;
+                document.getElementById('toy-grid').innerHTML = `<div class="col-span-full text-center py-20 text-white/50">No toys found for this filter</div>`;
                 document.getElementById('show-more-btn').classList.add('hidden');
                 return;
             }
