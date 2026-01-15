@@ -101,7 +101,7 @@
                             <span class="material-symbols-outlined text-lg">arrow_back</span> All Brands
                         </button>
                         <div class="flex items-center gap-3">
-                            <img id="brand-logo" src="" alt="" class="w-12 h-12 rounded-lg bg-white object-contain p-1" onerror="this.style.display='none'"/>
+                            <div id="brand-badge" class="w-12 h-12 rounded-xl flex items-center justify-center"></div>
                             <h2 id="brand-title" class="text-2xl md:text-3xl font-bold"></h2>
                         </div>
                     </div>
@@ -174,23 +174,23 @@
     <script>
         // Only brands we actually track (sorted by toy count)
         const TRACKED_BRANDS = [
-            { name: 'Melissa & Doug', logo: 'https://logo.clearbit.com/melissaanddoug.com', color: '#e31937' },
-            { name: 'Learning Resources', logo: 'https://logo.clearbit.com/learningresources.com', color: '#0066b3' },
-            { name: 'VTech', logo: 'https://logo.clearbit.com/vtech.com', color: '#e4002b' },
-            { name: 'LEGO', logo: 'https://logo.clearbit.com/lego.com', color: '#ffcd00' },
-            { name: 'Play-Doh', logo: 'https://logo.clearbit.com/hasbro.com', color: '#ffd100' },
-            { name: 'Green Toys', logo: 'https://logo.clearbit.com/greentoys.com', color: '#4caf50' },
-            { name: 'LeapFrog', logo: 'https://logo.clearbit.com/leapfrog.com', color: '#7cb342' },
-            { name: 'Fisher-Price', logo: 'https://logo.clearbit.com/fisher-price.com', color: '#e31937' },
-            { name: 'PicassoTiles', logo: 'https://logo.clearbit.com/picassotiles.com', color: '#ff6f00' },
-            { name: 'Hape', logo: 'https://logo.clearbit.com/hape.com', color: '#e4002b' },
-            { name: 'Skillmatics', logo: 'https://logo.clearbit.com/skillmatics.com', color: '#6a1b9a' },
-            { name: 'KidKraft', logo: 'https://logo.clearbit.com/kidkraft.com', color: '#f44336' },
-            { name: 'Little Tikes', logo: 'https://logo.clearbit.com/littletikes.com', color: '#e31937' },
-            { name: 'BRIO', logo: 'https://logo.clearbit.com/brio.net', color: '#c62828' },
-            { name: 'Step2', logo: 'https://logo.clearbit.com/step2.com', color: '#1976d2' },
-            { name: 'MAGNA-TILES', logo: 'https://logo.clearbit.com/magnatiles.com', color: '#ff5722' },
-            { name: 'Infantino', logo: 'https://logo.clearbit.com/infantino.com', color: '#00bcd4' }
+            { name: 'Melissa & Doug', initials: 'M&D', color: '#e31937' },
+            { name: 'Learning Resources', initials: 'LR', color: '#0066b3' },
+            { name: 'VTech', initials: 'VT', color: '#e4002b' },
+            { name: 'LEGO', initials: 'L', color: '#ffcd00', textColor: '#000' },
+            { name: 'Play-Doh', initials: 'PD', color: '#ffd100', textColor: '#000' },
+            { name: 'Green Toys', initials: 'GT', color: '#4caf50' },
+            { name: 'LeapFrog', initials: 'LF', color: '#7cb342' },
+            { name: 'Fisher-Price', initials: 'FP', color: '#e31937' },
+            { name: 'PicassoTiles', initials: 'PT', color: '#ff6f00' },
+            { name: 'Hape', initials: 'H', color: '#e4002b' },
+            { name: 'Skillmatics', initials: 'SK', color: '#6a1b9a' },
+            { name: 'KidKraft', initials: 'KK', color: '#f44336' },
+            { name: 'Little Tikes', initials: 'LT', color: '#e31937' },
+            { name: 'BRIO', initials: 'B', color: '#c62828' },
+            { name: 'Step2', initials: 'S2', color: '#1976d2' },
+            { name: 'MAGNA-TILES', initials: 'MT', color: '#ff5722' },
+            { name: 'Infantino', initials: 'IN', color: '#00bcd4' }
         ];
 
         let currentBrand = null;
@@ -221,8 +221,8 @@
         function renderBrandsGrid() {
             document.getElementById('brands-grid').innerHTML = TRACKED_BRANDS.map(brand => `
                 <button onclick="selectBrand('${brand.name}')" class="glass-card rounded-xl p-6 text-center hover:border-primary/30 hover:scale-105 transition-all group">
-                    <div class="w-16 h-16 mx-auto mb-3 rounded-xl bg-white flex items-center justify-center overflow-hidden p-2">
-                        <img src="${brand.logo}" alt="${brand.name}" class="w-full h-full object-contain" onerror="this.style.display='none'; this.parentElement.style.background='${brand.color || '#3fc3d5'}'; this.parentElement.innerHTML='<span class=\\'text-white font-bold text-2xl\\'>${brand.name.charAt(0)}</span>'"/>
+                    <div class="w-16 h-16 mx-auto mb-3 rounded-2xl flex items-center justify-center" style="background: ${brand.color}">
+                        <span class="font-black text-xl" style="color: ${brand.textColor || '#fff'}">${brand.initials}</span>
                     </div>
                     <p class="font-semibold text-white">${brand.name}</p>
                     <p class="text-primary text-sm mt-1 group-hover:underline">View toys →</p>
@@ -246,14 +246,12 @@
             document.getElementById('brand-detail').classList.remove('hidden');
             document.getElementById('brand-title').textContent = brandName;
 
-            // Set brand logo
+            // Set brand badge
             const brandInfo = TRACKED_BRANDS.find(b => b.name === brandName);
-            const logoEl = document.getElementById('brand-logo');
-            if (brandInfo && brandInfo.logo) {
-                logoEl.src = brandInfo.logo;
-                logoEl.style.display = 'block';
-            } else {
-                logoEl.style.display = 'none';
+            const badgeEl = document.getElementById('brand-badge');
+            if (brandInfo) {
+                badgeEl.style.background = brandInfo.color;
+                badgeEl.innerHTML = `<span class="font-black text-lg" style="color: ${brandInfo.textColor || '#fff'}">${brandInfo.initials}</span>`;
             }
 
             document.getElementById('toy-grid').innerHTML = `
