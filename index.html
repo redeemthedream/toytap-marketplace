@@ -52,6 +52,21 @@
         .toy-card:hover { transform: translateY(-4px); }
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* Animated gradient text */
+        .gradient-animate {
+            background: linear-gradient(90deg, #3fc3d5, #a855f7, #f59e0b, #3fc3d5);
+            background-size: 300% 100%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradient-shift 4s ease infinite;
+        }
+        @keyframes gradient-shift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
     </style>
 </head>
 <body class="bg-background-dark font-display text-white min-h-screen">
@@ -104,7 +119,7 @@
                     Premium Toy Analytics
                 </span>
                 <h1 class="text-4xl md:text-6xl lg:text-7xl font-black leading-tight tracking-tight mb-6">
-                    Find the Best Toys at the <span class="text-primary">Best Prices</span>
+                    Find the Best Toys at the <span class="gradient-animate">Best Prices</span>
                 </h1>
                 <p class="text-lg text-white/60 max-w-xl mx-auto mb-8">
                     Track real-time price drops, historical trends, and expert-verified quality grades on 20,000+ toys.
