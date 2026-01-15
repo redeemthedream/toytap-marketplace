@@ -227,6 +227,19 @@
         </section>
     </main>
 
+    <!-- Toy Modal -->
+    <div id="toy-modal" class="fixed inset-0 z-[100] hidden">
+        <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="closeModal()"></div>
+        <div class="absolute inset-4 md:inset-auto md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-full md:max-w-lg glass-panel rounded-2xl overflow-hidden max-h-[90vh] overflow-y-auto">
+            <button onclick="closeModal()" class="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white/70 hover:text-white transition-all z-10">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+            <div id="modal-content" class="p-6">
+                <!-- Content injected by JS -->
+            </div>
+        </div>
+    </div>
+
     <!-- Footer -->
     <footer class="border-t border-white/5 bg-navy-deep/40 mt-12">
         <div class="max-w-7xl mx-auto px-4 md:px-6 py-8">
@@ -245,8 +258,22 @@
         </div>
     </footer>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/api.js"></script>
     <script>
+        // Supabase auth
+        const SUPABASE_URL = 'https://ehuwltjozobbbzsdygbo.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVodXdsdGpvem9iYmJ6c2R5Z2JvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ5NjAzNDQsImV4cCI6MjA4MDUzNjM0NH0.xSRT_UkN4RLK40R51mHtksb1u90M8y2FjzS45aXLGSI';
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        let currentUser = null;
+
+        // Check auth on load
+        supabaseClient.auth.getSession().then(({ data }) => {
+            if (data?.session) {
+                currentUser = data.session.user;
+            }
+        });
+
         // State
         let allToys = [];
         let filteredToys = [];
@@ -377,7 +404,11 @@
             document.getElementById('show-more-btn').classList.toggle('hidden', visibleCount >= filteredToys.length);
         }
 
+        // Store toys for modal access
+        let toyCache = {};
+
         function renderToyCard(toy) {
+            toyCache[toy.asin] = toy; // Cache for modal
             const imageUrl = toy.image_url_proxied || toy.image_url || 'https://via.placeholder.com/300x300?text=No+Image';
             const price = parseFloat(toy.price) || 0;
             const discount = parseFloat(toy.discount_percent) || 0;
@@ -386,7 +417,7 @@
             const hasDiscount = discount > 5;
 
             return `
-                <a href="toy.html?asin=${toy.asin}" class="glass-card rounded-xl overflow-hidden toy-card transition-all duration-300 hover:border-primary/30 group block">
+                <div onclick="openModal('${toy.asin}')" class="glass-card rounded-xl overflow-hidden toy-card transition-all duration-300 hover:border-primary/30 group cursor-pointer">
                     <!-- Image -->
                     <div class="relative aspect-square bg-white/5 overflow-hidden">
                         <img src="${imageUrl}" alt="${toy.toy_name}" class="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-300" onerror="this.src='https://via.placeholder.com/300x300?text=No+Image'"/>
@@ -402,9 +433,85 @@
                             ${rating ? `<span class="text-white/50 text-xs flex items-center gap-1">⭐ ${rating.toFixed(1)}</span>` : ''}
                         </div>
                     </div>
-                </a>
+                </div>
             `;
         }
+
+        function openModal(asin) {
+            const toy = toyCache[asin];
+            if (!toy) return;
+
+            const price = parseFloat(toy.price) || 0;
+            const discount = parseFloat(toy.discount_percent) || 0;
+            const hasDiscount = discount > 5;
+            const affiliateUrl = toy.affiliate_url || `https://amazon.com/dp/${asin}?tag=redeemer0d0-20`;
+
+            document.getElementById('modal-content').innerHTML = `
+                <div class="text-center mb-6">
+                    <img src="${toy.image_url_proxied || toy.image_url}" alt="${toy.toy_name}" class="w-40 h-40 object-contain mx-auto bg-white rounded-xl mb-4"/>
+                    ${hasDiscount ? `<span class="inline-block bg-emerald-500 text-white text-sm font-bold px-3 py-1 rounded-lg mb-2">-${discount.toFixed(0)}% OFF</span>` : ''}
+                    ${toy.tt_grade ? `<span class="inline-block bg-primary text-navy-deep text-sm font-bold px-3 py-1 rounded-lg ml-2">${toy.tt_grade}</span>` : ''}
+                </div>
+                <p class="text-primary text-xs font-bold uppercase tracking-wider mb-1">${toy.brand || 'Brand'}</p>
+                <h3 class="text-white text-xl font-bold mb-4 leading-tight">${toy.toy_name}</h3>
+
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="flex items-baseline gap-2">
+                        <span class="text-white text-3xl font-black font-mono">$${price.toFixed(2)}</span>
+                        ${hasDiscount && toy.compare_price ? `<span class="text-white/40 line-through">$${parseFloat(toy.compare_price).toFixed(2)}</span>` : ''}
+                    </div>
+                    <div class="flex items-center gap-2 text-white/50 text-sm">
+                        <span>⭐ ${toy.rating || 'N/A'}</span>
+                        <span>·</span>
+                        <span>${(toy.reviews_count || 0).toLocaleString()} reviews</span>
+                    </div>
+                </div>
+
+                <div class="space-y-3">
+                    <a href="${affiliateUrl}" target="_blank" class="w-full flex items-center justify-center gap-2 bg-orange-500 hover:bg-orange-400 text-white py-4 rounded-xl font-bold transition-all">
+                        <span class="material-symbols-outlined">shopping_cart</span> Buy on Amazon
+                    </a>
+                    <button onclick="viewDetails('${asin}')" class="w-full flex items-center justify-center gap-2 bg-white/5 hover:bg-primary/20 border border-white/10 hover:border-primary/30 text-white py-4 rounded-xl font-bold transition-all">
+                        <span class="material-symbols-outlined">analytics</span> View Price History
+                    </button>
+                </div>
+                <p class="text-center text-white/30 text-xs mt-4">Track prices, view history & more</p>
+            `;
+
+            document.getElementById('toy-modal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            document.getElementById('toy-modal').classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+
+        function viewDetails(asin) {
+            if (!currentUser) {
+                // Show login prompt in modal
+                document.getElementById('modal-content').innerHTML = `
+                    <div class="text-center py-8">
+                        <div class="w-20 h-20 mx-auto mb-6 rounded-full bg-primary/20 flex items-center justify-center">
+                            <span class="material-symbols-outlined text-primary text-4xl">lock</span>
+                        </div>
+                        <h3 class="text-white text-2xl font-bold mb-3">Sign in to view details</h3>
+                        <p class="text-white/50 mb-6">Create a free account to access price history, analytics, and price drop alerts.</p>
+                        <a href="login.html?redirect=toy.html?asin=${asin}" class="inline-block bg-primary text-navy-deep px-8 py-4 rounded-xl font-bold hover:brightness-110 transition-all">
+                            Sign In / Sign Up
+                        </a>
+                        <p class="text-white/30 text-xs mt-4">Free forever. No credit card required.</p>
+                    </div>
+                `;
+                return;
+            }
+            window.location.href = `toy.html?asin=${asin}`;
+        }
+
+        // Close modal on escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModal();
+        });
 
         function showMore() {
             visibleCount += 20;
