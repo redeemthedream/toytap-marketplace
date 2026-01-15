@@ -42,6 +42,19 @@
             backdrop-filter: blur(12px);
             border: 1px solid rgba(63, 195, 213, 0.1);
         }
+        .gradient-animate {
+            background: linear-gradient(90deg, #3fc3d5, #a855f7, #f59e0b, #3fc3d5);
+            background-size: 300% 100%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradient-shift 4s ease infinite;
+        }
+        @keyframes gradient-shift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
     </style>
 </head>
 <body class="bg-background-dark font-display text-white min-h-screen">
@@ -56,7 +69,7 @@
         <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
             <a href="index.html" class="flex items-center gap-2">
                 <img src="https://i.imgur.com/HXSawxU.png" alt="Toy Tap" class="h-10 w-10" />
-                <span class="text-2xl font-black tracking-tighter">Toy Tap</span>
+                <span class="text-2xl font-black tracking-tighter gradient-animate">Toy Tap</span>
             </a>
             <nav class="hidden md:flex items-center gap-10">
                 <a class="text-sm font-semibold text-white/70 hover:text-primary transition-colors" href="index.html">Home</a>
