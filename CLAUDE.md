@@ -1,10 +1,10 @@
 # ToyTap Marketplace - Project Context
 
 ## Overview
-Consumer-facing toy marketplace website rebuilt from Softr to standalone HTML/CSS/JS. Deployed on Netlify.
+Consumer-facing toy marketplace website rebuilt from Softr to standalone HTML/CSS/JS. Deployed on Vercel.
 
 ## Live Site
-- **URL**: https://taupe-druid-4dec45.netlify.app/
+- **URL**: https://toytap-marketplace.vercel.app/
 - **GitHub**: https://github.com/redeemthedream/toytap-marketplace
 
 ## API Configuration
@@ -19,79 +19,99 @@ Consumer-facing toy marketplace website rebuilt from Softr to standalone HTML/CS
 | `/toys/category/{cat}/{sub}?sort={sort}&limit=100` | Toys by subcategory |
 | `/toys/age/{age}?sort={sort}&limit=100` | Toys by age group |
 | `/toys/brand/{brand}?sort={sort}&limit=50` | Toys by brand |
-| `/toys/{asin}/price-history` | Price history data |
+| `/toys/{asin}/price-history` | Price history data (includes tt_grade, tt_grade_score, toy_tap_rank_global) |
+| `/toys/search?q={query}` | Search toys |
 | `/feature/{slug}` | Blog post data |
 
 ## File Structure
 ```
 D:\toytap-marketplace\
-├── index.html        # Homepage (deals page with 6 filter tabs)
+├── index.html        # Homepage with 3 filter tabs + modal popup
 ├── rankings.html     # Best Toys / Best Value leaderboard
 ├── categories.html   # 11 categories + 5 age groups
-├── brands.html       # Brand browser with A-Z navigation
+├── brands.html       # Brand browser with 5 filter tabs
 ├── blog.html         # Blog index with filters
 ├── post.html         # Individual blog post template
 ├── watchlist.html    # User watchlist (Supabase auth)
-├── price.html        # Price history with Chart.js graphs
+├── login.html        # Authentication page (magic link + Google)
+├── toy.html          # Toy detail page with price history charts
 ├── css/
 │   └── styles.css    # Shared styles
 ├── js/
-│   ├── api.js        # Shared API utilities
-│   └── auth.js       # Supabase auth helpers
-└── netlify.toml      # Netlify deployment config
+│   └── api.js        # Shared API utilities
+└── CLAUDE.md         # This file
 ```
 
 ## Design System
 
-### CSS Variables
-```css
---navy: #194A7C
---cyan: #6DC3D5
---yellow: #FDB913
---navy-dark: #0F3557
---bg-dark: #0a0e1a
---bg-card: #111827
---amazon-orange: #ff9900
---walmart-blue: #0071ce
+### Tailwind Colors (configured in each HTML)
+```javascript
+primary: "#3fc3d5"      // Cyan accent
+background-dark: "#0a0e27"  // Navy background
+navy-deep: "#0a0e27"
+navy-card: "#12183d"    // Card background
 ```
 
-### TT Grade Colors
-| Grade | Color |
-|-------|-------|
-| S | Purple (#a855f7) |
-| A+ | Green (#22c55e) |
-| A | Green (#22c55e) |
-| B+ | Blue (#3b82f6) |
-| B | Blue (#3b82f6) |
-| C+ | Orange (#f97316) |
-| C | Orange (#f97316) |
-| D | Gray (#6b7280) |
+### Gradient Logo
+```html
+<span class="bg-gradient-to-r from-primary via-white to-yellow-400 bg-clip-text text-transparent">Toy Tap</span>
+```
 
-### TAP FRESH Badges
-| Age | Class | Label |
-|-----|-------|-------|
-| <6 hours | fresh | Fresh |
-| <24 hours | oneday | 1 Day |
-| <72 hours | aging | 2-3 Days |
-| Older | old | Older |
+### Animated Gradient (index.html)
+```css
+.gradient-animate {
+    background: linear-gradient(90deg, #3fc3d5, #a855f7, #f59e0b, #3fc3d5);
+    background-size: 300% 100%;
+    animation: gradient-shift 4s ease infinite;
+}
+```
 
-## Homepage Filter Tabs
-1. **Hot Now** - Recent toys with high scores
-2. **ToyTap Picks** - Top TT Grade toys
-3. **Best Sellers** - Highest review counts
-4. **Price Drops** - Active discounts sorted by % off
-5. **Top Rated** - Highest Amazon ratings
-6. **Walmart Deals** - Walmart items with discounts
+### Glass Panel Effect
+```css
+.glass-panel {
+    background: rgba(18, 24, 61, 0.6);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(63, 195, 213, 0.1);
+}
+```
 
-## Categories (11 total)
-Building, Vehicles, Outdoor, Baby & Toddler, Educational, Pretend Play, Arts & Crafts, Games & Puzzles, Dolls & Plush, Electronics & Tech, Action & Figures
+## Homepage Filter Tabs (index.html)
+| Tab | Filter Logic | Sort |
+|-----|--------------|------|
+| Hot Now | Fresh deals (updated <48hrs + discount > 0) | By recency |
+| Biggest % Off | All deals with discount > 0 | By discount % |
+| Lowest Ever | is_lowest_price_ever = true | By price (lowest first) |
 
-## Age Groups (5 total)
-- Baby (0-12 months)
-- Toddler (1-3 years)
-- Preschool (3-5 years)
-- Kids (5-7 years)
-- Tweens (8-12 years)
+## Brands Page Filter Tabs (brands.html)
+| Tab | Filter Logic | Sort |
+|-----|--------------|------|
+| Hot Now | Fresh deals (<48hrs + discount) | By recency |
+| Toy Tap Picks | TT Grade S, A+, or A | By grade |
+| Best Sellers | All toys | By review count |
+| Price Drops | Discount > 5% | By discount % |
+| Top Rated | Rating >= 4.5 + 50+ reviews | By rating |
+
+## Rankings Page Tabs (rankings.html)
+| Tab | Metric | Sort |
+|-----|--------|------|
+| Best Toys | TT Grade | By tt_grade_score |
+| Best Value | TT Score | By toy_tap_score |
+
+## Tracked Brands (17 total)
+Melissa & Doug, Learning Resources, VTech, LEGO, Play-Doh, Green Toys, LeapFrog, Fisher-Price, PicassoTiles, Hape, Skillmatics, KidKraft, Little Tikes, BRIO, Step2, MAGNA-TILES, Infantino
+
+## Authentication (Supabase)
+- Magic link email (via Resend SMTP)
+- Google OAuth
+- User data upserted to `public.users` table on sign-in
+- Watchlist stored in localStorage per user ID
+
+## Modal Popup System (index.html)
+- Click toy card → opens modal with preview
+- Modal shows: image, brand, name, price, discount, rating, reviews
+- "Buy on Amazon" button (affiliate link)
+- "View Price History" button (requires login)
+- Non-authenticated users see login prompt in modal
 
 ## Key Functions (js/api.js)
 - `fetchLeaderboard(limit)` - Get top toys
@@ -104,7 +124,38 @@ Building, Vehicles, Outdoor, Baby & Toddler, Educational, Pretend Play, Arts & C
 - `getGradeClass(grade)` - Get CSS class for grade
 - `getFreshnessInfo(updatedAt)` - Get freshness badge info
 
+## Fresh Deal Logic
+```javascript
+function isFreshDeal(toy) {
+    if (!toy.updated_at) return false;
+    const date = new Date(toy.updated_at);
+    const now = new Date();
+    const hoursAgo = (now - date) / (1000 * 60 * 60);
+    return hoursAgo < 48 && toy.discount_percent && parseFloat(toy.discount_percent) > 0;
+}
+```
+
 ## Deployment
-- Auto-deploys from GitHub `main` branch
-- Netlify handles HTTPS, CDN, and routing
-- No build step required (static HTML/CSS/JS)
+- Auto-deploys from GitHub `main` branch to Vercel
+- Backend API on Render (hub.gettoytap.com)
+- CORS configured for *.vercel.app, *.netlify.app, *.softr.io
+
+## Recent Updates (Jan 2026)
+1. Migrated from Netlify to Vercel
+2. Added CORS support for Vercel domains in backend
+3. Fixed tab filtering to show distinct results per tab
+4. Added animated gradient to "Best Prices" headline
+5. Added modal popup for toy preview with buy button
+6. Added account gate - require login for price history
+7. Fixed TT Grade not showing on toy detail page
+8. Increased image sizes on rankings page
+9. Set up Resend SMTP for auth emails with branded templates
+
+## Email Templates (Supabase)
+Custom branded HTML templates for:
+- Confirm Sign Up
+- Magic Link
+- Change Email
+- Reset Password
+
+All use Toy Tap branding with dark navy/cyan theme.
