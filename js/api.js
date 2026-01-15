@@ -353,7 +353,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // Export for use in pages
-window.Toy Tap = {
+window.ToyTapAPI = {
     API_BASE,
     PLACEHOLDER_IMG,
     fetchToys,
