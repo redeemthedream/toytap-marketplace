@@ -85,11 +85,13 @@
             .fixed .blur-\[120px\], .fixed .blur-\[100px\] {
                 filter: blur(60px);
             }
-            /* Disable gradient animation on mobile */
+            /* Fix gradient text on mobile - use solid cyan color */
             .gradient-animate {
-                animation: none;
-                background: linear-gradient(90deg, #3fc3d5, #a855f7);
-                background-size: 100% 100%;
+                background: #3fc3d5 !important;
+                -webkit-background-clip: text !important;
+                background-clip: text !important;
+                -webkit-text-fill-color: transparent !important;
+                animation: none !important;
             }
             /* Disable hover transforms on touch devices */
             .toy-card:hover {
@@ -337,6 +339,10 @@
                 document.getElementById('nav-auth').innerHTML = `
                     <span class="text-sm text-white/50 hidden md:inline">${currentUser.email}</span>
                     <button onclick="signOut()" class="text-sm font-bold text-white/70 hover:text-red-400 transition-colors px-3 py-2">Sign Out</button>
+                    <!-- Mobile Menu Button -->
+                    <button onclick="document.getElementById('mobile-menu').classList.toggle('hidden')" class="md:hidden p-2">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                    </button>
                 `;
             }
         }
