@@ -151,11 +151,14 @@
                             <input
                                 type="password"
                                 id="login-password"
-                                class="w-full bg-white/5 border border-white/10 rounded-xl py-4 pl-12 pr-4 text-white placeholder:text-white/30 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
+                                class="w-full bg-white/5 border border-white/10 rounded-xl py-4 pl-12 pr-12 text-white placeholder:text-white/30 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
                                 placeholder="Enter your password"
                                 required
                                 minlength="6"
                             />
+                            <button type="button" onclick="togglePassword('login-password', this)" class="absolute right-4 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60 transition-colors">
+                                <span class="material-symbols-outlined">visibility_off</span>
+                            </button>
                         </div>
                         <!-- Confirm Password (Sign Up only) -->
                         <div id="confirm-password-wrap" class="relative hidden">
@@ -163,9 +166,12 @@
                             <input
                                 type="password"
                                 id="login-confirm-password"
-                                class="w-full bg-white/5 border border-white/10 rounded-xl py-4 pl-12 pr-4 text-white placeholder:text-white/30 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
+                                class="w-full bg-white/5 border border-white/10 rounded-xl py-4 pl-12 pr-12 text-white placeholder:text-white/30 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
                                 placeholder="Confirm your password"
                             />
+                            <button type="button" onclick="togglePassword('login-confirm-password', this)" class="absolute right-4 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60 transition-colors">
+                                <span class="material-symbols-outlined">visibility_off</span>
+                            </button>
                         </div>
                         <button
                             type="submit"
@@ -238,22 +244,28 @@
                             <input
                                 type="password"
                                 id="reset-password"
-                                class="w-full bg-white/5 border border-white/10 rounded-xl py-4 pl-12 pr-4 text-white placeholder:text-white/30 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
+                                class="w-full bg-white/5 border border-white/10 rounded-xl py-4 pl-12 pr-12 text-white placeholder:text-white/30 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
                                 placeholder="New password"
                                 required
                                 minlength="6"
                             />
+                            <button type="button" onclick="togglePassword('reset-password', this)" class="absolute right-4 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60 transition-colors">
+                                <span class="material-symbols-outlined">visibility_off</span>
+                            </button>
                         </div>
                         <div class="relative">
                             <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-white/30">lock</span>
                             <input
                                 type="password"
                                 id="reset-confirm-password"
-                                class="w-full bg-white/5 border border-white/10 rounded-xl py-4 pl-12 pr-4 text-white placeholder:text-white/30 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
+                                class="w-full bg-white/5 border border-white/10 rounded-xl py-4 pl-12 pr-12 text-white placeholder:text-white/30 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
                                 placeholder="Confirm new password"
                                 required
                                 minlength="6"
                             />
+                            <button type="button" onclick="togglePassword('reset-confirm-password', this)" class="absolute right-4 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60 transition-colors">
+                                <span class="material-symbols-outlined">visibility_off</span>
+                            </button>
                         </div>
                         <button
                             type="submit"
@@ -484,6 +496,19 @@
         function getUrlParam(param) {
             const urlParams = new URLSearchParams(window.location.search);
             return urlParams.get(param);
+        }
+
+        // Toggle password visibility
+        function togglePassword(inputId, btn) {
+            const input = document.getElementById(inputId);
+            const icon = btn.querySelector('.material-symbols-outlined');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.textContent = 'visibility';
+            } else {
+                input.type = 'password';
+                icon.textContent = 'visibility_off';
+            }
         }
 
         // Tab switching
