@@ -12,7 +12,7 @@
     <link rel="preconnect" href="https://cdn.tailwindcss.com" />
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL@24,400,0..1&icon_names=menu,close,favorite,search,arrow_back&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL@24,400,0..1&icon_names=menu,close,favorite,search,arrow_back,shopping_cart,analytics,lock&display=swap" rel="stylesheet"/>
     <script>
         tailwind.config = {
             darkMode: "class",
@@ -250,6 +250,30 @@
         let currentSort = 'score';
         let currentFilter = 'hot';
 
+        // Non-toy keywords to filter out
+        const NON_TOY_KEYWORDS = [
+            'water bottle', 'waterbottle', 'lunch box', 'lunchbox', 'lunch bag',
+            'backpack', 'bag', 'thermos', 'flask', 'tumbler', 'cup', 'mug',
+            'blanket', 'towel', 'pillow', 'bedding', 'sheet', 'curtain',
+            'clothing', 'shirt', 't-shirt', 'tshirt', 'pants', 'shorts', 'dress', 'costume',
+            'shoes', 'socks', 'slippers', 'hat', 'cap', 'headband',
+            'sticker', 'decal', 'poster', 'wall art', 'wall decor',
+            'book', 'coloring book', 'activity book', 'storybook',
+            'dvd', 'blu-ray', 'video', 'movie',
+            'gift card', 'gift wrap', 'wrapping paper',
+            'furniture', 'chair', 'table', 'desk', 'shelf', 'storage',
+            'rug', 'mat', 'carpet', 'clock', 'lamp', 'light',
+            'plate', 'bowl', 'utensil', 'fork', 'spoon', 'knife',
+            'toothbrush', 'soap', 'shampoo', 'lotion'
+        ];
+
+        // Check if product is a non-toy item
+        function isNonToy(toy) {
+            if (!toy.toy_name) return false;
+            const name = toy.toy_name.toLowerCase();
+            return NON_TOY_KEYWORDS.some(keyword => name.includes(keyword));
+        }
+
         // Fresh deal = updated within 48 hours AND has discount (matches Softr logic)
         function isFreshDeal(toy) {
             if (!toy.updated_at) return false;
@@ -314,7 +338,8 @@
             try {
                 const res = await fetch(`${API_BASE}/toys/brand/${encodeURIComponent(brandName)}?limit=200&sort=toy_tap_rank`);
                 const data = await res.json();
-                brandToys = data.toys || [];
+                // Filter out non-toy items (water bottles, lunch boxes, etc.)
+                brandToys = (data.toys || []).filter(toy => !isNonToy(toy));
 
                 document.getElementById('brand-toy-count').textContent = brandToys.length;
                 document.getElementById('brand-deal-count').textContent = brandToys.filter(t => parseFloat(t.discount_percent) > 10).length;

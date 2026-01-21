@@ -12,7 +12,7 @@
     <link rel="preconnect" href="https://cdn.tailwindcss.com" />
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL@24,400,0..1&icon_names=menu,close,favorite,schedule,verified,new_releases,star,emoji_events,trending_up,arrow_back&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL@24,400,0..1&icon_names=menu,close,favorite,schedule,verified,new_releases,star,emoji_events,trending_up,arrow_back,shopping_cart,analytics,lock&display=swap" rel="stylesheet"/>
     <script>
         tailwind.config = {
             darkMode: "class",
@@ -168,6 +168,19 @@
         </section>
     </main>
 
+    <!-- Toy Modal -->
+    <div id="toy-modal" class="fixed inset-0 z-[100] hidden">
+        <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="closeModal()"></div>
+        <div class="absolute inset-4 md:inset-auto md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-full md:max-w-lg glass-panel rounded-2xl overflow-hidden max-h-[90vh] overflow-y-auto">
+            <button onclick="closeModal()" class="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white/70 hover:text-white transition-all z-10">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+            <div id="modal-content" class="p-6">
+                <!-- Content injected by JS -->
+            </div>
+        </div>
+    </div>
+
     <!-- Footer -->
     <footer class="border-t border-white/5 bg-navy-deep/40">
         <div class="max-w-7xl mx-auto px-4 md:px-6 py-8">
@@ -208,6 +221,7 @@
         let allToys = [];
         let currentTab = 'quality';
         let visibleCount = 25;
+        let toyCache = {};
 
         const TAB_CONFIG = {
             quality: {
@@ -261,10 +275,11 @@
             const listToys = sorted.slice(startIndex, startIndex + visibleCount);
 
             document.getElementById('ranking-list').innerHTML = listToys.map((toy, i) => {
+                toyCache[toy.asin] = toy; // Cache for modal
                 const rank = startIndex + i + 1;
                 const discount = parseFloat(toy.discount_percent) || 0;
                 return `
-                    <a href="toy.html?asin=${toy.asin}" class="glass-card rounded-xl p-4 flex items-center gap-4 hover:border-primary/30 transition-all block">
+                    <div onclick="openModal('${toy.asin}')" class="glass-card rounded-xl p-4 flex items-center gap-4 hover:border-primary/30 transition-all cursor-pointer">
                         <div class="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center font-bold font-mono text-white/50 shrink-0">
                             ${rank}
                         </div>
@@ -279,7 +294,7 @@
                             ${discount > 5 ? `<p class="text-emerald-400 text-sm font-semibold">-${discount.toFixed(0)}% off</p>` : ''}
                         </div>
                         ${toy.tt_grade ? `<div class="bg-primary text-navy-deep px-3 py-1 rounded-lg font-bold shrink-0">${toy.tt_grade}</div>` : ''}
-                    </a>
+                    </div>
                 `;
             }).join('');
 
@@ -292,17 +307,20 @@
             const glows = ['gold-glow', 'silver-glow', 'bronze-glow'];
             const order = [1, 0, 2]; // 2nd, 1st, 3rd
 
+            // Cache podium toys
+            top3.forEach(toy => { toyCache[toy.asin] = toy; });
+
             document.getElementById('podium').innerHTML = order.map(i => {
                 const toy = top3[i];
                 return `
-                    <a href="toy.html?asin=${toy.asin}" class="glass-card ${sizes[i]} rounded-2xl p-4 text-center hover:scale-105 transition-all ${glows[i]} ${i === 0 ? 'order-2' : i === 1 ? 'order-1' : 'order-3'} block">
+                    <div onclick="openModal('${toy.asin}')" class="glass-card ${sizes[i]} rounded-2xl p-4 text-center hover:scale-105 transition-all ${glows[i]} ${i === 0 ? 'order-2' : i === 1 ? 'order-1' : 'order-3'} cursor-pointer">
                         <div class="text-4xl mb-2">${medals[i]}</div>
                         <img src="${toy.image_url_proxied || toy.image_url}" alt="" loading="lazy" class="w-28 h-28 md:w-36 md:h-36 object-contain mx-auto bg-white rounded-xl mb-3"/>
                         <p class="text-primary text-[10px] font-bold uppercase">${toy.brand || ''}</p>
                         <p class="text-white text-sm font-semibold line-clamp-2 mb-2 min-h-[2.5rem]">${toy.toy_name}</p>
                         <p class="text-white text-xl font-bold font-mono mb-2">$${parseFloat(toy.price).toFixed(2)}</p>
                         ${toy.tt_grade ? `<div class="inline-block bg-primary text-navy-deep px-3 py-1 rounded-lg font-bold text-sm">${toy.tt_grade}</div>` : ''}
-                    </a>
+                    </div>
                 `;
             }).join('');
         }
@@ -311,6 +329,85 @@
             visibleCount += 25;
             renderRankings();
         }
+
+        // Modal functions
+        function openModal(asin) {
+            const toy = toyCache[asin];
+            if (!toy) return;
+
+            const price = parseFloat(toy.price) || 0;
+            const prevPrice = parseFloat(toy.price_previous_distinct) || parseFloat(toy.compare_price) || 0;
+            const discount = parseFloat(toy.discount_percent) || 0;
+            const hasDiscount = discount > 5;
+            const showPrevPrice = prevPrice > 0 && Math.abs(prevPrice - price) > 0.01;
+            const affiliateUrl = toy.affiliate_url || `https://amazon.com/dp/${asin}?tag=redeemer0d0-20`;
+
+            document.getElementById('modal-content').innerHTML = `
+                <div class="text-center mb-6">
+                    <img src="${toy.image_url_proxied || toy.image_url}" alt="${toy.toy_name}" class="w-40 h-40 object-contain mx-auto bg-white rounded-xl mb-4"/>
+                    ${hasDiscount ? `<span class="inline-block bg-emerald-500 text-white text-sm font-bold px-3 py-1 rounded-lg mb-2">-${discount.toFixed(0)}% OFF</span>` : ''}
+                    ${toy.tt_grade ? `<span class="inline-block bg-primary text-navy-deep text-sm font-bold px-3 py-1 rounded-lg ml-2">${toy.tt_grade}</span>` : ''}
+                </div>
+                <p class="text-primary text-xs font-bold uppercase tracking-wider mb-1">${toy.brand || 'Brand'}</p>
+                <h3 class="text-white text-xl font-bold mb-4 leading-tight">${toy.toy_name}</h3>
+
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="flex items-baseline gap-2">
+                        <span class="text-white text-3xl font-black font-mono">$${price.toFixed(2)}</span>
+                        ${showPrevPrice ? `<span class="text-white/40 line-through">$${prevPrice.toFixed(2)}</span>` : ''}
+                    </div>
+                    <div class="flex items-center gap-2 text-white/50 text-sm">
+                        <span>⭐ ${toy.rating || 'N/A'}</span>
+                        <span>·</span>
+                        <span>${(toy.reviews_count || 0).toLocaleString()} reviews</span>
+                    </div>
+                </div>
+
+                <div class="space-y-3">
+                    <a href="${affiliateUrl}" target="_blank" class="w-full flex items-center justify-center gap-2 bg-orange-500 hover:bg-orange-400 text-white py-4 rounded-xl font-bold transition-all">
+                        <span class="material-symbols-outlined">shopping_cart</span> Buy on Amazon
+                    </a>
+                    <button onclick="viewDetails('${asin}')" class="w-full flex items-center justify-center gap-2 bg-white/5 hover:bg-primary/20 border border-white/10 hover:border-primary/30 text-white py-4 rounded-xl font-bold transition-all">
+                        <span class="material-symbols-outlined">analytics</span> View Price History
+                    </button>
+                </div>
+                <p class="text-center text-white/30 text-xs mt-4">Track prices, view history & more</p>
+            `;
+
+            document.getElementById('toy-modal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            document.getElementById('toy-modal').classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+
+        function viewDetails(asin) {
+            if (!currentUser) {
+                // Show login prompt in modal
+                document.getElementById('modal-content').innerHTML = `
+                    <div class="text-center py-8">
+                        <div class="w-20 h-20 mx-auto mb-6 rounded-full bg-primary/20 flex items-center justify-center">
+                            <span class="material-symbols-outlined text-primary text-4xl">lock</span>
+                        </div>
+                        <h3 class="text-white text-2xl font-bold mb-3">Sign in to view details</h3>
+                        <p class="text-white/50 mb-6">Create a free account to access price history, analytics, and price drop alerts.</p>
+                        <a href="login.html?redirect=toy.html?asin=${asin}" class="inline-block bg-primary text-navy-deep px-8 py-4 rounded-xl font-bold hover:brightness-110 transition-all">
+                            Sign In / Sign Up
+                        </a>
+                        <p class="text-white/30 text-xs mt-4">Free forever. No credit card required.</p>
+                    </div>
+                `;
+                return;
+            }
+            window.location.href = `toy.html?asin=${asin}`;
+        }
+
+        // Close modal on escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModal();
+        });
     </script>
 </body>
 </html>

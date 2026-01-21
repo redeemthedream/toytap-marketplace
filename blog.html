@@ -1,80 +1,145 @@
 <!DOCTYPE html>
-<html lang="en">
+<html class="dark" lang="en">
 <head>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
     <title>Blog - Toy Tap</title>
     <meta name="description" content="Toy guides, deals roundups, and shopping tips from Toy Tap." />
     <link rel="icon" type="image/png" href="https://i.imgur.com/HXSawxU.png" />
-    <link rel="stylesheet" href="css/styles.css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet"/>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#3fc3d5",
+                        "background-dark": "#0a0e27",
+                        "navy-deep": "#0a0e27",
+                        "navy-card": "#12183d",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"],
+                        "mono": ["JetBrains Mono", "monospace"]
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        .blog-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px; max-width: 1200px; margin: 0 auto; padding: 40px 20px; }
-        .blog-card { background: var(--bg-card); border-radius: 16px; overflow: hidden; border: 1px solid rgba(109,195,213,0.15); transition: all 0.3s; cursor: pointer; }
-        .blog-card:hover { transform: translateY(-4px); border-color: var(--cyan); }
-        .blog-card-image { width: 100%; height: 180px; object-fit: cover; }
-        .blog-card-content { padding: 20px; }
-        .blog-card-category { font-size: 11px; color: var(--cyan); font-weight: 700; text-transform: uppercase; margin-bottom: 8px; }
-        .blog-card-title { font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 8px; line-height: 1.4; }
-        .blog-card-excerpt { font-size: 14px; color: #94a3b8; line-height: 1.6; margin-bottom: 12px; }
-        .blog-card-meta { font-size: 12px; color: #64748b; }
-        .filter-pills { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; padding: 20px; max-width: 800px; margin: 0 auto; }
-        .filter-pill { background: rgba(109,195,213,0.15); color: var(--cyan); padding: 10px 20px; border-radius: 50px; font-size: 14px; font-weight: 600; cursor: pointer; border: 1px solid transparent; transition: all 0.2s; }
-        .filter-pill:hover, .filter-pill.active { background: var(--cyan); color: var(--navy); }
+        .gradient-animate {
+            background: linear-gradient(90deg, #3fc3d5, #a855f7, #f59e0b, #3fc3d5);
+            background-size: 300% 100%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradient-shift 6s ease infinite;
+        }
+        @keyframes gradient-shift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .glass-panel { background: rgba(18, 24, 61, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(63, 195, 213, 0.1); }
+        .glass-card { background: rgba(18, 24, 61, 0.8); backdrop-filter: blur(8px); border: 1px solid rgba(63, 195, 213, 0.1); }
+        @media (max-width: 768px) {
+            .glass-panel, .glass-card { backdrop-filter: none; background: rgba(18, 24, 61, 0.95); }
+            .gradient-animate { animation: none; background: linear-gradient(90deg, #3fc3d5, #a855f7); background-size: 100% 100%; }
+        }
     </style>
 </head>
-<body>
-
-<header class="site-header">
-    <nav class="nav-container">
-        <a href="index.html"><img src="https://i.imgur.com/HXSawxU.png" alt="Toy Tap" class="nav-logo" /></a>
-        <button class="nav-toggle" onclick="document.querySelector('.nav-links').classList.toggle('open')">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
-        </button>
-        <div class="nav-links">
-            <a href="index.html" class="nav-link">Home</a>
-            <a href="rankings.html" class="nav-link">Rankings</a>
-            <a href="brands.html" class="nav-link">Brands</a>
-            <a href="blog.html" class="nav-link active">Blog</a>
-            <a href="watchlist.html" class="nav-link">Watchlist</a>
-            <a href="https://gettoytap.com" target="_blank" class="nav-link" style="color: #fbbf24;">Partner ↗</a>
-        </div>
-    </nav>
-</header>
-
-<main class="page-wrapper">
-    <section class="hero">
-        <h1 class="hero-title">Toy Tap Blog</h1>
-        <p class="hero-subtitle">Guides, deal roundups, and shopping tips</p>
-    </section>
-
-    <div class="filter-pills">
-        <div class="filter-pill active" onclick="filterPosts('all')">All</div>
-        <div class="filter-pill" onclick="filterPosts('deals')">Deals</div>
-        <div class="filter-pill" onclick="filterPosts('guides')">Guides</div>
-        <div class="filter-pill" onclick="filterPosts('reviews')">Reviews</div>
+<body class="bg-background-dark font-display text-white min-h-screen">
+    <!-- Background Effects -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] bg-primary/10 rounded-full blur-[120px]"></div>
+        <div class="absolute bottom-[-10%] left-[-5%] w-[400px] h-[400px] bg-primary/5 rounded-full blur-[100px]"></div>
     </div>
 
-    <div id="blog-grid" class="blog-grid">
+    <!-- Navigation -->
+    <header class="relative z-50 border-b border-white/5 bg-navy-deep/80 backdrop-blur-md sticky top-0">
+        <div class="max-w-7xl mx-auto px-4 md:px-6 h-16 md:h-20 flex items-center justify-between">
+            <a href="index.html" class="flex items-center gap-2">
+                <img src="https://i.imgur.com/HXSawxU.png" alt="Toy Tap" class="h-8 w-8 md:h-10 md:w-10" />
+                <span class="text-xl md:text-2xl font-black gradient-animate">Toy Tap</span>
+            </a>
+            <nav class="hidden md:flex items-center gap-8">
+                <a class="text-sm font-semibold text-white/70 hover:text-primary transition-colors" href="index.html">Home</a>
+                <a class="text-sm font-semibold text-white/70 hover:text-primary transition-colors" href="rankings.html">Rankings</a>
+                <a class="text-sm font-semibold text-white/70 hover:text-primary transition-colors" href="brands.html">Brands</a>
+                <a class="text-sm font-semibold text-primary" href="blog.html">Blog</a>
+                <a class="text-sm font-semibold text-white/70 hover:text-primary transition-colors" href="watchlist.html">Watchlist</a>
+                <a class="text-sm font-semibold text-yellow-400 hover:text-yellow-300 transition-colors" href="https://gettoytap.com" target="_blank">Partner ↗</a>
+            </nav>
+            <div class="flex items-center gap-2">
+                <div id="nav-auth" class="hidden md:flex items-center gap-2 md:gap-4">
+                    <a href="login.html" class="text-sm font-bold text-white/70 hover:text-primary transition-colors px-3 py-2">Login</a>
+                    <a href="login.html" class="bg-primary text-navy-deep px-4 md:px-6 py-2.5 rounded-lg font-bold text-sm hover:brightness-110 transition-all">Sign Up</a>
+                </div>
+                <button onclick="document.getElementById('mobile-menu').classList.toggle('hidden')" class="md:hidden p-2 text-white/70 hover:text-primary">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                </button>
+            </div>
+        </div>
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden border-t border-white/5 bg-navy-deep/95 backdrop-blur-md">
+            <nav class="flex flex-col p-4 gap-1">
+                <a class="text-sm font-semibold text-white/70 py-3 px-4 rounded-lg hover:bg-white/5" href="index.html">Home</a>
+                <a class="text-sm font-semibold text-white/70 py-3 px-4 rounded-lg hover:bg-white/5" href="rankings.html">Rankings</a>
+                <a class="text-sm font-semibold text-white/70 py-3 px-4 rounded-lg hover:bg-white/5" href="brands.html">Brands</a>
+                <a class="text-sm font-semibold text-primary py-3 px-4 rounded-lg bg-white/5" href="blog.html">Blog</a>
+                <a class="text-sm font-semibold text-white/70 py-3 px-4 rounded-lg hover:bg-white/5" href="watchlist.html">Watchlist</a>
+                <a class="text-sm font-semibold text-yellow-400 py-3 px-4 rounded-lg hover:bg-white/5" href="https://gettoytap.com" target="_blank">Partner ↗</a>
+                <div class="border-t border-white/10 mt-2 pt-2">
+                    <a class="text-sm font-semibold text-primary py-3 px-4 rounded-lg hover:bg-white/5 block" href="login.html">Sign In / Sign Up</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+<main class="relative z-10">
+    <!-- Hero -->
+    <section class="text-center py-12 md:py-16 px-4">
+        <h1 class="text-4xl md:text-6xl font-black text-white mb-4">Toy Tap Blog</h1>
+        <p class="text-white/60 text-lg">Guides, deal roundups, and shopping tips</p>
+    </section>
+
+    <!-- Filter Pills -->
+    <div class="flex flex-wrap gap-2 justify-center px-4 mb-8 max-w-2xl mx-auto">
+        <button class="filter-pill px-5 py-2.5 rounded-full text-sm font-semibold transition-all bg-primary text-navy-deep" data-filter="all" onclick="filterPosts('all')">All</button>
+        <button class="filter-pill px-5 py-2.5 rounded-full text-sm font-semibold transition-all bg-white/10 text-white/70 hover:bg-primary/20 hover:text-primary" data-filter="deals" onclick="filterPosts('deals')">Deals</button>
+        <button class="filter-pill px-5 py-2.5 rounded-full text-sm font-semibold transition-all bg-white/10 text-white/70 hover:bg-primary/20 hover:text-primary" data-filter="guides" onclick="filterPosts('guides')">Guides</button>
+        <button class="filter-pill px-5 py-2.5 rounded-full text-sm font-semibold transition-all bg-white/10 text-white/70 hover:bg-primary/20 hover:text-primary" data-filter="reviews" onclick="filterPosts('reviews')">Reviews</button>
+    </div>
+
+    <!-- Blog Grid -->
+    <div id="blog-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto px-4 pb-12">
         <!-- Posts loaded from Supabase -->
     </div>
 
     <!-- Trending Toys Section -->
-    <section style="max-width: 1200px; margin: 40px auto; padding: 0 20px;">
-        <h2 style="font-size: 24px; font-weight: 700; color: #fff; margin-bottom: 20px;">Trending Toys Right Now</h2>
-        <div id="trending-toys" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 16px;">
+    <section class="max-w-6xl mx-auto px-4 py-8">
+        <h2 class="text-2xl font-bold text-white mb-6">Trending Toys Right Now</h2>
+        <div id="trending-toys" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
             <!-- Loaded by JS -->
         </div>
     </section>
 </main>
 
-<footer class="site-footer">
-    <div class="footer-container">
-        <img src="https://i.imgur.com/HXSawxU.png" alt="Toy Tap" class="footer-logo" />
-        <div class="footer-links">
-            <a href="https://gettoytap.com" class="footer-link">For Businesses</a>
-            <a href="https://gettoytap.com/privacy" class="footer-link">Privacy</a>
+<!-- Footer -->
+<footer class="border-t border-white/5 bg-navy-deep/40 mt-12">
+    <div class="max-w-7xl mx-auto px-4 md:px-6 py-8">
+        <div class="flex flex-col md:flex-row justify-between items-center gap-6">
+            <div class="flex items-center gap-2">
+                <img src="https://i.imgur.com/HXSawxU.png" alt="Toy Tap" class="h-8 w-8" />
+                <span class="text-lg font-bold">Toy Tap</span>
+            </div>
+            <div class="flex items-center gap-6 text-sm text-white/40">
+                <a href="https://gettoytap.com" class="hover:text-primary transition-colors">For Businesses</a>
+                <a href="https://gettoytap.com/privacy" class="hover:text-primary transition-colors">Privacy</a>
+            </div>
+            <p class="text-white/30 text-sm">© 2025 Toy Tap. All rights reserved.</p>
         </div>
-        <p class="footer-copy">2025 Toy Tap. All rights reserved.</p>
     </div>
 </footer>
 
@@ -122,15 +187,15 @@ async function loadTrendingToys() {
             const imageUrl = toy.image_url_proxied || toy.image_url || '';
 
             return `
-                <a href="toy.html?asin=${toy.asin}" style="background: rgba(18,24,61,0.8); border-radius: 12px; overflow: hidden; border: 1px solid rgba(63,195,213,0.1); transition: all 0.2s; display: block;">
-                    <div style="position: relative; aspect-ratio: 1; background: rgba(255,255,255,0.05);">
-                        <img src="${imageUrl}" alt="${toy.toy_name}" style="width: 100%; height: 100%; object-fit: contain; padding: 8px;"/>
-                        ${discount > 5 ? `<div style="position: absolute; top: 8px; left: 8px; background: #10b981; color: white; font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 6px;">-${discount.toFixed(0)}%</div>` : ''}
+                <a href="toy.html?asin=${toy.asin}" class="glass-card rounded-xl overflow-hidden hover:border-primary/30 transition-all block">
+                    <div class="relative aspect-square bg-white/5">
+                        <img src="${imageUrl}" alt="${toy.toy_name}" class="w-full h-full object-contain p-2"/>
+                        ${discount > 5 ? `<div class="absolute top-2 left-2 bg-emerald-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded">-${discount.toFixed(0)}%</div>` : ''}
                     </div>
-                    <div style="padding: 10px;">
-                        <p style="color: #3fc3d5; font-size: 9px; font-weight: 700; text-transform: uppercase;">${toy.brand || ''}</p>
-                        <h3 style="color: white; font-size: 12px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${toy.toy_name}</h3>
-                        <p style="color: white; font-size: 14px; font-weight: 700; font-family: monospace;">$${price.toFixed(2)}</p>
+                    <div class="p-2.5">
+                        <p class="text-primary text-[9px] font-bold uppercase truncate">${toy.brand || ''}</p>
+                        <h3 class="text-white text-xs font-semibold truncate">${toy.toy_name}</h3>
+                        <p class="text-white text-sm font-bold font-mono">$${price.toFixed(2)}</p>
                     </div>
                 </a>
             `;
@@ -167,7 +232,12 @@ async function loadPosts() {
 function filterPosts(filter) {
     currentFilter = filter;
     document.querySelectorAll('.filter-pill').forEach(p => {
-        p.classList.toggle('active', p.textContent.toLowerCase() === filter || (filter === 'all' && p.textContent === 'All'));
+        const isActive = p.dataset.filter === filter;
+        if (isActive) {
+            p.className = 'filter-pill px-5 py-2.5 rounded-full text-sm font-semibold transition-all bg-primary text-navy-deep';
+        } else {
+            p.className = 'filter-pill px-5 py-2.5 rounded-full text-sm font-semibold transition-all bg-white/10 text-white/70 hover:bg-primary/20 hover:text-primary';
+        }
     });
     renderPosts();
 }
@@ -230,13 +300,15 @@ async function renderPosts() {
         const date = post.created_at ? new Date(post.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '';
 
         return `
-            <div class="blog-card" onclick="window.location='post.html?slug=${slug}'">
-                <img src="${image}" alt="${title}" class="blog-card-image" style="object-fit: contain; background: #fff; padding: 10px;" />
-                <div class="blog-card-content">
-                    <div class="blog-card-category">${category}</div>
-                    <h2 class="blog-card-title">${title}</h2>
-                    <p class="blog-card-excerpt">${excerpt}</p>
-                    <div class="blog-card-meta">${date}</div>
+            <div onclick="window.location='post.html?slug=${slug}'" class="glass-card rounded-xl overflow-hidden cursor-pointer hover:border-primary/30 transition-all hover:-translate-y-1">
+                <div class="bg-white h-44 flex items-center justify-center p-4">
+                    <img src="${image}" alt="${title}" class="max-h-full max-w-full object-contain" />
+                </div>
+                <div class="p-5">
+                    <div class="text-primary text-xs font-bold uppercase tracking-wider mb-2">${category}</div>
+                    <h2 class="text-white text-lg font-bold mb-2 line-clamp-2">${title}</h2>
+                    <p class="text-white/50 text-sm line-clamp-2 mb-3">${excerpt}</p>
+                    <div class="text-white/30 text-xs">${date}</div>
                 </div>
             </div>
         `;
