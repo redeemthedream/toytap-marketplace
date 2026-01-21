@@ -9,6 +9,7 @@
     <!-- Preconnect for faster resource loading -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://hub.gettoytap.com" />
     <link rel="preconnect" href="https://cdn.tailwindcss.com" />
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet"/>
@@ -239,14 +240,43 @@
         };
 
         document.addEventListener('DOMContentLoaded', async () => {
+            // Show loading skeleton immediately
+            showLoadingSkeleton();
+
             try {
-                allToys = await fetchLeaderboard(200);
+                // Fetch only 50 toys initially for faster load
+                allToys = await fetchLeaderboard(50);
                 renderRankings();
             } catch (err) {
                 console.error('Load error:', err);
                 document.getElementById('podium').innerHTML = `<div class="text-center py-10 w-full"><p class="text-red-400">Failed to load</p></div>`;
+                document.getElementById('ranking-list').innerHTML = '';
             }
         });
+
+        function showLoadingSkeleton() {
+            // Podium skeleton
+            document.getElementById('podium').innerHTML = `
+                <div class="flex justify-center items-end gap-4 animate-pulse">
+                    <div class="w-44 h-64 bg-white/5 rounded-2xl"></div>
+                    <div class="w-52 h-72 bg-white/5 rounded-2xl"></div>
+                    <div class="w-44 h-64 bg-white/5 rounded-2xl"></div>
+                </div>
+            `;
+            // List skeleton
+            document.getElementById('ranking-list').innerHTML = Array(5).fill(`
+                <div class="glass-card rounded-xl p-4 flex items-center gap-4 animate-pulse">
+                    <div class="w-12 h-12 rounded-full bg-white/10"></div>
+                    <div class="w-20 h-20 bg-white/10 rounded-xl"></div>
+                    <div class="flex-1 space-y-2">
+                        <div class="h-3 bg-white/10 rounded w-20"></div>
+                        <div class="h-4 bg-white/10 rounded w-48"></div>
+                        <div class="h-3 bg-white/10 rounded w-32"></div>
+                    </div>
+                    <div class="h-6 bg-white/10 rounded w-16"></div>
+                </div>
+            `).join('');
+        }
 
         function setRankingTab(tab) {
             currentTab = tab;
