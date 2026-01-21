@@ -355,6 +355,29 @@
         let currentSort = 'default';
         let visibleCount = 20;
 
+        // Non-toy keywords to filter out
+        const NON_TOY_KEYWORDS = [
+            'water bottle', 'waterbottle', 'lunch box', 'lunchbox', 'lunch bag',
+            'backpack', 'thermos', 'flask', 'tumbler', 'cup', 'mug',
+            'blanket', 'towel', 'pillow', 'bedding', 'sheet', 'curtain',
+            'clothing', 'shirt', 't-shirt', 'tshirt', 'pants', 'shorts', 'dress',
+            'shoes', 'socks', 'slippers', 'hat', 'cap',
+            'sticker', 'decal', 'poster', 'wall art',
+            'dvd', 'blu-ray', 'video', 'movie',
+            'gift card', 'gift wrap',
+            'furniture', 'chair', 'table', 'desk', 'shelf', 'storage',
+            'rug', 'mat', 'carpet', 'clock', 'lamp',
+            'plate', 'bowl', 'utensil', 'fork', 'spoon',
+            'toothbrush', 'soap', 'shampoo', 'lotion',
+            'water jug', 'water cooler', 'dispenser'
+        ];
+
+        function isNonToy(toy) {
+            if (!toy.toy_name) return false;
+            const name = toy.toy_name.toLowerCase();
+            return NON_TOY_KEYWORDS.some(keyword => name.includes(keyword));
+        }
+
         // Fresh deal = updated within 48 hours AND has discount (matches Softr logic)
         function isFreshDeal(toy) {
             if (!toy.updated_at) return false;
@@ -392,7 +415,8 @@
         // Initialize
         document.addEventListener('DOMContentLoaded', async () => {
             try {
-                allToys = await fetchLeaderboard(200);
+                const rawToys = await fetchLeaderboard(200);
+                allToys = rawToys.filter(toy => !isNonToy(toy));
                 updateStats();
                 applyFilterAndRender();
             } catch (err) {
