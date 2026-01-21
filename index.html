@@ -11,8 +11,12 @@
     <meta property="og:description" content="Track 20,000+ toys across Amazon. Never overpay for toys again." />
     <link rel="icon" type="image/png" href="https://i.imgur.com/HXSawxU.png" />
     <link rel="canonical" href="https://dashboard.gettoytap.com/" />
+    <!-- Preconnect for faster loading -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://hub.gettoytap.com" />
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
     <script>
         tailwind.config = {
@@ -66,6 +70,35 @@
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
+        }
+
+        /* Mobile performance optimizations */
+        @media (max-width: 768px) {
+            .glass-panel, .glass-card, .backdrop-blur-md, [class*="backdrop-blur"] {
+                backdrop-filter: none !important;
+                -webkit-backdrop-filter: none !important;
+            }
+            .glass-panel { background: rgba(18, 24, 61, 0.95); }
+            .glass-card { background: rgba(18, 24, 61, 0.95); }
+            .gradient-animate {
+                animation: none;
+                background: linear-gradient(90deg, #3fc3d5, #a855f7);
+                background-size: 100% 100%;
+                -webkit-background-clip: text;
+                background-clip: text;
+                -webkit-text-fill-color: transparent;
+            }
+            /* Remove expensive blur effects on mobile */
+            .blur-\[120px\], .blur-\[100px\] {
+                filter: none !important;
+                opacity: 0.5;
+            }
+        }
+
+        /* Better touch responsiveness */
+        button, a, [onclick] {
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
         }
     </style>
 </head>

@@ -46,9 +46,12 @@
         .glass-panel { background: rgba(18, 24, 61, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(63, 195, 213, 0.1); }
         .glass-card { background: rgba(18, 24, 61, 0.8); backdrop-filter: blur(8px); border: 1px solid rgba(63, 195, 213, 0.1); }
         @media (max-width: 768px) {
-            .glass-panel, .glass-card { backdrop-filter: none; background: rgba(18, 24, 61, 0.95); }
+            .glass-panel, .glass-card, .backdrop-blur-md, [class*="backdrop-blur"] { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+            .glass-panel, .glass-card { background: rgba(18, 24, 61, 0.95); }
             .gradient-animate { animation: none; background: linear-gradient(90deg, #3fc3d5, #a855f7); background-size: 100% 100%; -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
         }
+        /* Better touch responsiveness */
+        button, a, [onclick] { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
     </style>
 </head>
 <body class="bg-background-dark font-display text-white min-h-screen">
