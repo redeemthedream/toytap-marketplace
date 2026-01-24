@@ -7,13 +7,16 @@
     <meta name="description" content="Track your favorite toys and get notified when prices drop." />
     <link rel="icon" type="image/png" href="https://i.imgur.com/HXSawxU.png" />
     <!-- Preconnect for faster loading -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preconnect" href="https://hub.gettoytap.com">
-    <link rel="preconnect" href="https://ehuwltjozobbbzsdygbo.supabase.co">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://hub.gettoytap.com" />
+    <link rel="preconnect" href="https://ehuwltjozobbbzsdygbo.supabase.co" />
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+    <!-- Preload critical scripts -->
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" as="script" crossorigin />
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL@20..48,100..700,0..1&display=swap" rel="stylesheet"/>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         tailwind.config = {
@@ -70,6 +73,8 @@
                 background-clip: text;
                 -webkit-text-fill-color: transparent;
             }
+            /* Hide expensive blur backgrounds on mobile */
+            .blur-\[120px\], .blur-\[100px\] { display: none !important; }
         }
         .watchlist-card { contain: layout style paint; }
         /* Better touch responsiveness */
@@ -255,6 +260,24 @@
         let watchlist = [];
         let currentTargetAsin = null;
 
+        // Concurrent request limiter - max 3 simultaneous requests
+        async function limitConcurrency(tasks, limit = 3) {
+            const results = [];
+            const executing = [];
+            for (const task of tasks) {
+                const p = Promise.resolve().then(() => task());
+                results.push(p);
+                if (tasks.length >= limit) {
+                    const e = p.then(() => executing.splice(executing.indexOf(e), 1));
+                    executing.push(e);
+                    if (executing.length >= limit) {
+                        await Promise.race(executing);
+                    }
+                }
+            }
+            return Promise.all(results);
+        }
+
         document.addEventListener('DOMContentLoaded', async () => {
             const { data: { session } } = await supabaseClient.auth.getSession();
             if (session) {
@@ -296,10 +319,10 @@
 
                 if (error) throw error;
 
-                // Fetch toy details for each ASIN
+                // Fetch toy details for each ASIN (limited concurrency for mobile)
                 if (data && data.length > 0) {
-                    // Fetch each toy using price-history endpoint (has all toy data)
-                    const toyPromises = data.map(async (w) => {
+                    // Create task functions (not promises) for limited concurrency
+                    const tasks = data.map((w) => async () => {
                         try {
                             const res = await fetch(`${API_BASE}/toys/${w.asin}/price-history`);
                             const result = await res.json();
@@ -317,14 +340,15 @@
                                 lowest_price: priceStats.lowest,
                                 discount_percent: discountPercent,
                                 is_lowest_price_ever: currentPrice === priceStats.lowest && priceStats.lowest < priceStats.highest,
-                                updated_at: new Date().toISOString(), // Use current time as approximation
+                                updated_at: new Date().toISOString(),
                                 ...w
                             };
                         } catch {
                             return { asin: w.asin, ...w };
                         }
                     });
-                    watchlist = await Promise.all(toyPromises);
+                    // Limit to 3 concurrent requests (better for mobile)
+                    watchlist = await limitConcurrency(tasks, 3);
                 } else {
                     watchlist = [];
                 }

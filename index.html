@@ -15,9 +15,12 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="preconnect" href="https://hub.gettoytap.com" />
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+    <!-- Preload critical scripts -->
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" as="script" crossorigin />
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL@20..48,100..700,0..1&display=swap" rel="stylesheet"/>
     <script>
         tailwind.config = {
             darkMode: "class",
@@ -88,10 +91,14 @@
                 background-clip: text;
                 -webkit-text-fill-color: transparent;
             }
-            /* Remove expensive blur effects on mobile */
+            /* Remove expensive blur effects on mobile - hide completely */
             .blur-\[120px\], .blur-\[100px\] {
-                filter: none !important;
-                opacity: 0.5;
+                display: none !important;
+            }
+            /* Disable ticker animation on mobile for smoother scrolling */
+            .animate-scroll {
+                animation: none;
+                overflow-x: auto;
             }
         }
 
@@ -415,7 +422,7 @@
         // Initialize
         document.addEventListener('DOMContentLoaded', async () => {
             try {
-                const rawToys = await fetchLeaderboard(200);
+                const rawToys = await fetchLeaderboard(50);
                 allToys = rawToys.filter(toy => !isNonToy(toy));
                 updateStats();
                 applyFilterAndRender();
@@ -666,7 +673,7 @@
                 <div onclick="openModal('${toy.asin}')" class="glass-card rounded-xl overflow-hidden toy-card transition-all duration-300 hover:border-primary/30 group cursor-pointer relative">
                     <!-- Image -->
                     <div class="relative aspect-square bg-white/5 overflow-hidden">
-                        <img src="${imageUrl}" alt="${toy.toy_name}" class="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-300" onerror="this.src='https://via.placeholder.com/300x300?text=No+Image'"/>
+                        <img src="${imageUrl}" alt="${toy.toy_name}" class="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-300" loading="lazy" decoding="async" onerror="this.src='https://via.placeholder.com/300x300?text=No+Image'"/>
                         ${hasDiscount ? `<div class="absolute top-2 left-2 bg-emerald-500 text-white text-xs font-bold px-2 py-1 rounded-lg">-${discount.toFixed(0)}%</div>` : ''}
                         ${grade ? `<div class="absolute top-2 right-2 bg-primary text-navy-deep text-xs font-bold px-2 py-1 rounded-lg">${grade}</div>` : ''}
                         ${isLowestEver ? `<div class="absolute top-2 ${grade ? 'right-14' : 'right-2'} bg-yellow-500 text-navy-deep text-[10px] font-bold px-1.5 py-0.5 rounded">LOWEST</div>` : ''}
@@ -802,7 +809,7 @@
                     } else {
                         results.innerHTML = toys.map(toy => `
                             <a href="toy.html?asin=${toy.asin}" class="flex items-center gap-3 p-3 hover:bg-white/5 transition-colors border-b border-white/5 last:border-0">
-                                <img src="${toy.image_url_proxied || toy.image_url}" alt="" class="w-12 h-12 object-contain bg-white rounded-lg"/>
+                                <img src="${toy.image_url_proxied || toy.image_url}" alt="" class="w-12 h-12 object-contain bg-white rounded-lg" loading="lazy" decoding="async"/>
                                 <div class="flex-1 min-w-0">
                                     <p class="text-white text-sm font-semibold truncate">${toy.toy_name}</p>
                                     <p class="text-primary text-xs">${toy.brand || ''}</p>
