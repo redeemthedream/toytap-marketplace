@@ -338,6 +338,19 @@
             }
         });
 
+        // Listen for auth state changes (handles login redirects on mobile)
+        supabaseClient.auth.onAuthStateChange(async (event, session) => {
+            if (event === 'SIGNED_IN' && session) {
+                currentUser = session.user;
+                updateNavAuth();
+                await loadWatchlist();
+                if (filteredToys.length > 0) renderToys();
+            } else if (event === 'SIGNED_OUT') {
+                currentUser = null;
+                window.location.reload();
+            }
+        });
+
         function updateNavAuth() {
             if (currentUser) {
                 document.getElementById('nav-auth').innerHTML = `
@@ -438,7 +451,10 @@
         });
 
         function updateStats() {
-            const totalToys = allToys.length;
+            // Show static "20,000+" for total toys tracked (marketing number)
+            document.getElementById('stat-toys').textContent = '20,000+';
+
+            // Calculate from loaded sample for display
             const dealsCount = allToys.filter(t => parseFloat(t.discount_percent) > 0).length;
             const freshCount = allToys.filter(t => isFreshDeal(t)).length;
             const toysWithDeals = allToys.filter(t => parseFloat(t.discount_percent) > 0);
@@ -446,11 +462,15 @@
             if (toysWithDeals.length > 0) {
                 avgSavings = Math.round(toysWithDeals.reduce((sum, t) => sum + (parseFloat(t.discount_percent) || 0), 0) / toysWithDeals.length);
             }
-            document.getElementById('stat-toys').textContent = totalToys.toLocaleString();
 
             // Populate live ticker with recent deals
             populateTicker();
-            document.getElementById('stat-deals').textContent = dealsCount.toLocaleString();
+
+            // Show deals count from sample (or estimate based on ratio)
+            // If ~60% of sample is on sale, estimate total on sale
+            const saleRatio = dealsCount / allToys.length;
+            const estimatedDeals = Math.round(20000 * saleRatio);
+            document.getElementById('stat-deals').textContent = estimatedDeals.toLocaleString();
             document.getElementById('stat-savings').textContent = avgSavings + '%';
             document.getElementById('fresh-count').textContent = freshCount;
         }
