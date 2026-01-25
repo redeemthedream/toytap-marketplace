@@ -203,3 +203,108 @@ Shows up to 3 prices on each card:
 - Current price (large, white)
 - Previous/compare price (strikethrough, if different from current)
 - Highest recorded price (small, if higher than current)
+
+## Mobile Performance Optimizations (Jan 25, 2026)
+
+### Issues Fixed
+- Site was slow on mobile (initial load + interactions)
+- Login was slow and auth state not updating properly after Google OAuth
+
+### Optimizations Applied
+
+**Font Loading:**
+- Reduced Google Fonts Inter weights from 5 → 3 (400, 600, 700)
+- Added `display=swap` to prevent invisible text during load
+
+**Image Loading:**
+- Added `loading="lazy" decoding="async"` to toy card images
+- Images load on-demand as user scrolls
+
+**API Optimization:**
+- Reduced initial leaderboard fetch from 200 → 50 toys (index.html)
+- Watchlist uses concurrent request limiter (max 3 parallel API calls)
+
+**CSS Performance:**
+- Background blur elements (`blur-[120px]`) set to `display: none` on mobile
+- Gradient animations disabled on mobile
+- Ticker animation disabled on mobile for smoother scrolling
+
+**Preload Hints:**
+- Added `<link rel="preconnect">` for CDNs (fonts, jsdelivr, supabase)
+- Added `<link rel="preload">` for Supabase SDK
+
+### Concurrent Request Limiter (watchlist.html)
+```javascript
+async function limitConcurrency(tasks, limit = 3) {
+    const results = [];
+    const executing = [];
+    for (const task of tasks) {
+        const p = Promise.resolve().then(() => task());
+        results.push(p);
+        if (tasks.length >= limit) {
+            const e = p.then(() => executing.splice(executing.indexOf(e), 1));
+            executing.push(e);
+            if (executing.length >= limit) {
+                await Promise.race(executing);
+            }
+        }
+    }
+    return Promise.all(results);
+}
+```
+
+## Authentication Handling
+
+### Auth State Listener (all pages)
+All pages now have `onAuthStateChange` listener for proper auth state detection after Google OAuth redirect:
+```javascript
+supabaseClient.auth.onAuthStateChange((event, session) => {
+    if (session && !currentUser) {
+        currentUser = session.user;
+        updateNavAuth();
+    } else if (!session && currentUser) {
+        currentUser = null;
+        window.location.reload();
+    }
+});
+```
+
+### Global signOut Function
+signOut must be attached to window for onclick access in dynamic HTML:
+```javascript
+window.signOut = async function() {
+    await supabaseClient.auth.signOut();
+    window.location.reload();
+}
+```
+
+### Nav Auth Visibility
+`nav-auth` div must NOT have `hidden` class on mobile:
+```html
+<!-- CORRECT -->
+<div id="nav-auth" class="flex items-center gap-2 md:gap-4">
+
+<!-- WRONG - hides login on mobile -->
+<div id="nav-auth" class="hidden md:flex items-center gap-2 md:gap-4">
+```
+
+## Stats Bar (index.html)
+```
+| 20,000+ | X | X% |
+| Toys Tracked | Fresh Deals | Up To Off |
+```
+- **20,000+** - Static marketing number
+- **Fresh Deals** - Real count of hot deals (updated <48hrs + on sale)
+- **Up To X% Off** - Max discount found (more impressive than average)
+
+## Known Issues / Future Work
+
+### Google OAuth Branding
+Google consent screen shows "Continue to ehuw...supabase.co" because OAuth callback goes through Supabase.
+**Fix:** Supabase Pro ($25/mo) + Custom Domain (e.g., auth.gettoytap.com)
+- Go to Supabase Dashboard → Settings → Custom Domains
+- Update Google OAuth redirect URI to use custom domain
+
+### Supabase Project
+- Project ID: `ehuwltjozobbbzsdygbo`
+- Need Pro plan on THIS project for custom domain
