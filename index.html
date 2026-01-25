@@ -366,7 +366,7 @@
             }
         }
 
-        async function signOut() {
+        window.signOut = async function() {
             await supabaseClient.auth.signOut();
             window.location.reload();
         }
