@@ -189,18 +189,18 @@
                 <!-- Stats Bar -->
                 <div class="flex items-center justify-center gap-6 md:gap-12 font-mono">
                     <div class="flex flex-col items-center">
-                        <span class="text-2xl md:text-3xl font-bold text-white" id="stat-toys">--</span>
+                        <span class="text-2xl md:text-3xl font-bold text-white" id="stat-toys">20,000+</span>
                         <span class="text-white/40 text-[10px] md:text-xs uppercase tracking-wider">Toys Tracked</span>
                     </div>
                     <div class="w-px h-10 bg-white/10"></div>
                     <div class="flex flex-col items-center">
                         <span class="text-2xl md:text-3xl font-bold text-emerald-400" id="stat-deals">--</span>
-                        <span class="text-white/40 text-[10px] md:text-xs uppercase tracking-wider">On Sale</span>
+                        <span class="text-white/40 text-[10px] md:text-xs uppercase tracking-wider">Fresh Deals</span>
                     </div>
                     <div class="w-px h-10 bg-white/10"></div>
                     <div class="flex flex-col items-center">
                         <span class="text-2xl md:text-3xl font-bold text-yellow-400" id="stat-savings">--%</span>
-                        <span class="text-white/40 text-[10px] md:text-xs uppercase tracking-wider">Avg Savings</span>
+                        <span class="text-white/40 text-[10px] md:text-xs uppercase tracking-wider">Up To Off</span>
                     </div>
                 </div>
             </div>
@@ -454,27 +454,18 @@
         });
 
         function updateStats() {
-            // Show static "20,000+" for total toys tracked (marketing number)
-            document.getElementById('stat-toys').textContent = '20,000+';
-
-            // Calculate from loaded sample for display
-            const dealsCount = allToys.filter(t => parseFloat(t.discount_percent) > 0).length;
+            // Fresh deals = updated in last 48hrs with discount
             const freshCount = allToys.filter(t => isFreshDeal(t)).length;
-            const toysWithDeals = allToys.filter(t => parseFloat(t.discount_percent) > 0);
-            let avgSavings = 0;
-            if (toysWithDeals.length > 0) {
-                avgSavings = Math.round(toysWithDeals.reduce((sum, t) => sum + (parseFloat(t.discount_percent) || 0), 0) / toysWithDeals.length);
-            }
+
+            // Find max discount
+            const maxDiscount = Math.round(Math.max(...allToys.map(t => parseFloat(t.discount_percent) || 0)));
 
             // Populate live ticker with recent deals
             populateTicker();
 
-            // Show deals count from sample (or estimate based on ratio)
-            // If ~60% of sample is on sale, estimate total on sale
-            const saleRatio = dealsCount / allToys.length;
-            const estimatedDeals = Math.round(20000 * saleRatio);
-            document.getElementById('stat-deals').textContent = estimatedDeals.toLocaleString();
-            document.getElementById('stat-savings').textContent = avgSavings + '%';
+            // Update stats display
+            document.getElementById('stat-deals').textContent = freshCount;
+            document.getElementById('stat-savings').textContent = maxDiscount + '%';
             document.getElementById('fresh-count').textContent = freshCount;
         }
 
