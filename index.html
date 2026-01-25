@@ -338,14 +338,17 @@
             }
         });
 
-        // Listen for auth state changes (handles login redirects on mobile)
+        // Listen for auth state changes (handles login redirects including Google OAuth)
         supabaseClient.auth.onAuthStateChange(async (event, session) => {
-            if (event === 'SIGNED_IN' && session) {
+            console.log('Auth state change:', event, session?.user?.email);
+            if (session && !currentUser) {
+                // User just signed in (any method: Google, email, etc.)
                 currentUser = session.user;
                 updateNavAuth();
                 await loadWatchlist();
                 if (filteredToys.length > 0) renderToys();
-            } else if (event === 'SIGNED_OUT') {
+            } else if (!session && currentUser) {
+                // User signed out
                 currentUser = null;
                 window.location.reload();
             }
