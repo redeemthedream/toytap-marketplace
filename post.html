@@ -167,6 +167,40 @@
         const SUPABASE_URL = 'https://ehuwltjozobbbzsdygbo.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVodXdsdGpvem9iYmJ6c2R5Z2JvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ5NjAzNDQsImV4cCI6MjA4MDUzNjM0NH0.xSRT_UkN4RLK40R51mHtksb1u90M8y2FjzS45aXLGSI';
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        let currentUser = null;
+
+        function updateNavAuth() {
+            if (currentUser) {
+                document.getElementById('nav-auth').innerHTML = `
+                    <span class="text-sm text-white/50 hidden md:inline">${currentUser.email}</span>
+                    <button onclick="signOut()" class="text-sm font-bold text-white/70 hover:text-red-400 transition-colors px-3 py-2">Sign Out</button>
+                `;
+            }
+        }
+
+        async function signOut() {
+            await supabaseClient.auth.signOut();
+            window.location.reload();
+        }
+
+        // Check auth on load
+        supabaseClient.auth.getSession().then(({ data }) => {
+            if (data?.session) {
+                currentUser = data.session.user;
+                updateNavAuth();
+            }
+        });
+
+        // Listen for auth state changes (handles Google OAuth redirects)
+        supabaseClient.auth.onAuthStateChange((event, session) => {
+            if (session && !currentUser) {
+                currentUser = session.user;
+                updateNavAuth();
+            } else if (!session && currentUser) {
+                currentUser = null;
+                window.location.reload();
+            }
+        });
 
         document.addEventListener('DOMContentLoaded', loadPost);
 

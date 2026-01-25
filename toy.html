@@ -403,6 +403,18 @@
             }
         }
 
+        // Listen for auth state changes (handles Google OAuth redirects)
+        supabaseClient.auth.onAuthStateChange((event, session) => {
+            if (session && !currentUser) {
+                currentUser = session.user;
+                updateNavAuth();
+                loadWatchlist();
+            } else if (!session && currentUser) {
+                currentUser = null;
+                window.location.reload();
+            }
+        });
+
         function loadWatchlist() {
             if (currentUser) {
                 const saved = localStorage.getItem('toytap_watchlist_' + currentUser.id);

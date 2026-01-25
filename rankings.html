@@ -208,13 +208,30 @@
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         let currentUser = null;
 
-        supabaseClient.auth.getSession().then(({ data }) => {
-            if (data?.session) {
-                currentUser = data.session.user;
+        function updateNavAuth() {
+            if (currentUser) {
                 document.getElementById('nav-auth').innerHTML = `
                     <span class="text-sm text-white/50 hidden md:inline">${currentUser.email}</span>
                     <button onclick="signOut()" class="text-sm font-bold text-white/70 hover:text-red-400 transition-colors px-3 py-2">Sign Out</button>
                 `;
+            }
+        }
+
+        supabaseClient.auth.getSession().then(({ data }) => {
+            if (data?.session) {
+                currentUser = data.session.user;
+                updateNavAuth();
+            }
+        });
+
+        // Listen for auth state changes (handles Google OAuth redirects)
+        supabaseClient.auth.onAuthStateChange((event, session) => {
+            if (session && !currentUser) {
+                currentUser = session.user;
+                updateNavAuth();
+            } else if (!session && currentUser) {
+                currentUser = null;
+                window.location.reload();
             }
         });
 
