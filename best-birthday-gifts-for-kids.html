@@ -90,22 +90,59 @@
     </div>
 
     <!-- Navigation -->
-    <nav class="fixed top-0 left-0 right-0 z-50 bg-navy-deep/95 backdrop-blur-md border-b border-primary/10">
-        <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-            <a href="/" class="flex items-center gap-2">
-                <img src="https://i.imgur.com/HXSawxU.png" alt="Toy Tap" class="h-8 w-8" />
-                <span class="text-lg font-bold text-white">Toy Tap</span>
+    <header class="relative z-50 border-b border-white/5 bg-navy-deep/80 backdrop-blur-md sticky top-0">
+        <div class="max-w-7xl mx-auto px-4 md:px-6 h-16 md:h-20 flex items-center justify-between">
+            <a href="/index.html" class="flex items-center gap-2">
+                <img src="https://i.imgur.com/HXSawxU.png" alt="Toy Tap" class="h-8 w-8 md:h-10 md:w-10" />
+                <span class="text-xl md:text-2xl font-black gradient-animate">Toy Tap</span>
             </a>
-            <div class="flex items-center gap-4">
-                <a href="/rankings" class="text-sm text-white/70 hover:text-primary transition-colors">Rankings</a>
-                <a href="/categories" class="text-sm text-white/70 hover:text-primary transition-colors">Categories</a>
-                <a href="/brands" class="text-sm text-white/70 hover:text-primary transition-colors">Brands</a>
-                <a href="/blog" class="text-sm text-white/70 hover:text-primary transition-colors">Blog</a>
-            </div>
+            <nav class="hidden md:flex items-center gap-8">
+                <a class="text-sm font-semibold text-white/70 hover:text-primary transition-colors" href="/index.html">Home</a>
+                <a class="text-sm font-semibold text-white/70 hover:text-primary transition-colors" href="/rankings.html">Rankings</a>
+                <a class="text-sm font-semibold text-white/70 hover:text-primary transition-colors" href="/brands.html">Brands</a>
+                <a class="text-sm font-semibold text-white/70 hover:text-primary transition-colors" href="/blog.html">Blog</a>
+                <a class="text-sm font-semibold text-white/70 hover:text-primary transition-colors relative group" href="#">
+                    Guides <span class="material-symbols-outlined text-xs align-middle">expand_more</span>
+                    <div class="absolute hidden group-hover:block top-full left-0 pt-2 z-50">
+                        <div class="bg-[#12183d] border border-white/10 rounded-lg py-2 w-56 shadow-xl">
+                            <a href="/best-toys-for-toddlers.html" class="block px-4 py-2 text-sm text-white/70 hover:text-primary hover:bg-white/5">Toddlers (Ages 1-3)</a>
+                            <a href="/best-toys-for-preschoolers.html" class="block px-4 py-2 text-sm text-white/70 hover:text-primary hover:bg-white/5">Preschoolers (Ages 3-5)</a>
+                            <a href="/best-toys-for-kids.html" class="block px-4 py-2 text-sm text-white/70 hover:text-primary hover:bg-white/5">Kids (Ages 5-8)</a>
+                            <a href="/best-outdoor-toys.html" class="block px-4 py-2 text-sm text-white/70 hover:text-primary hover:bg-white/5">Outdoor Toys</a>
+                            <a href="/best-educational-toys.html" class="block px-4 py-2 text-sm text-white/70 hover:text-primary hover:bg-white/5">Educational Toys</a>
+                            <a href="/best-building-toys.html" class="block px-4 py-2 text-sm text-white/70 hover:text-primary hover:bg-white/5">Building Toys</a>
+                            <a href="/best-birthday-gifts-for-kids.html" class="block px-4 py-2 text-sm text-white/70 hover:text-primary hover:bg-white/5">Birthday Gifts</a>
+                        </div>
+                    </div>
+                </a>
+                <a class="text-sm font-semibold text-white/70 hover:text-primary transition-colors" href="/watchlist.html">Watchlist</a>
+            </nav>
+            <button onclick="document.getElementById('mobile-menu').classList.toggle('hidden')" class="md:hidden p-2 text-white/70 hover:text-primary">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+            </button>
         </div>
-    </nav>
+        <div id="mobile-menu" class="hidden md:hidden border-t border-white/5 bg-navy-deep/95 backdrop-blur-md">
+            <nav class="flex flex-col p-4 gap-1">
+                <a class="text-sm font-semibold text-white/70 py-3 px-4 rounded-lg hover:bg-white/5" href="/index.html">Home</a>
+                <a class="text-sm font-semibold text-white/70 py-3 px-4 rounded-lg hover:bg-white/5" href="/rankings.html">Rankings</a>
+                <a class="text-sm font-semibold text-white/70 py-3 px-4 rounded-lg hover:bg-white/5" href="/brands.html">Brands</a>
+                <a class="text-sm font-semibold text-white/70 py-3 px-4 rounded-lg hover:bg-white/5" href="/blog.html">Blog</a>
+                <a class="text-sm font-semibold text-white/70 py-3 px-4 rounded-lg hover:bg-white/5" href="/watchlist.html">Watchlist</a>
+                <div class="border-t border-white/10 mt-1 pt-1">
+                    <p class="text-xs text-white/30 uppercase tracking-wider px-4 py-2">Gift Guides</p>
+                    <a class="text-sm text-white/70 py-2 px-6 rounded-lg hover:bg-white/5 block" href="/best-toys-for-toddlers.html">Toddlers (Ages 1-3)</a>
+                    <a class="text-sm text-white/70 py-2 px-6 rounded-lg hover:bg-white/5 block" href="/best-toys-for-preschoolers.html">Preschoolers (Ages 3-5)</a>
+                    <a class="text-sm text-white/70 py-2 px-6 rounded-lg hover:bg-white/5 block" href="/best-toys-for-kids.html">Kids (Ages 5-8)</a>
+                    <a class="text-sm text-white/70 py-2 px-6 rounded-lg hover:bg-white/5 block" href="/best-outdoor-toys.html">Outdoor Toys</a>
+                    <a class="text-sm text-white/70 py-2 px-6 rounded-lg hover:bg-white/5 block" href="/best-educational-toys.html">Educational Toys</a>
+                    <a class="text-sm text-white/70 py-2 px-6 rounded-lg hover:bg-white/5 block" href="/best-building-toys.html">Building Toys</a>
+                    <a class="text-sm text-white/70 py-2 px-6 rounded-lg hover:bg-white/5 block" href="/best-birthday-gifts-for-kids.html">Birthday Gifts</a>
+                </div>
+            </nav>
+        </div>
+    </header>
 
-    <main class="relative z-10 pt-16">
+    <main class="relative z-10">
         <!-- Hero -->
         <section class="py-12 md:py-20 px-4">
             <div class="max-w-4xl mx-auto text-center">
@@ -113,7 +150,7 @@
                 <nav class="flex items-center justify-center gap-2 text-sm text-white/40 mb-6">
                     <a href="/" class="hover:text-primary transition-colors">Home</a>
                     <span>/</span>
-                    <a href="/blog" class="hover:text-primary transition-colors">Guides</a>
+                    <a href="/blog.html" class="hover:text-primary transition-colors">Guides</a>
                     <span>/</span>
                     <span class="text-white/70">Birthday Gifts</span>
                 </nav>
@@ -226,7 +263,7 @@
                 <div class="text-white/70 space-y-4 leading-relaxed">
                     <p>Every toy on this page is ranked by our proprietary <strong class="text-primary">TT Grade</strong> system. TT Grade is a letter rating (S through D) that evaluates toys based on multiple factors including customer review sentiment, star ratings, review volume, price stability, and overall value. No toy brand pays for placement on this list.</p>
                     <p>For this birthday guide, we filter toys by age range and sort each group by TT Grade. This means within each age bracket, you are seeing the highest-quality options first. Prices and grades update daily based on live Amazon data, so if a toy goes on sale right before a birthday, you will see the updated price here.</p>
-                    <p>Want to understand the full scoring methodology? Visit our <a href="/how-tt-grade-works" class="text-primary hover:underline">How TT Grade Works</a> page for a complete breakdown.</p>
+                    <p>Want to understand the full scoring methodology? Visit our <a href="/how-tt-grade-works.html" class="text-primary hover:underline">How TT Grade Works</a> page for a complete breakdown.</p>
                 </div>
             </div>
         </section>
@@ -266,6 +303,25 @@
             </div>
         </section>
 
+        <!-- Related Articles -->
+        <section class="max-w-4xl mx-auto px-4 mb-12">
+            <h3 class="text-lg font-bold text-white/50 mb-4">From the Blog</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <a href="/blog/gift-buying-mistakes.html" class="glass-card rounded-xl p-4 hover:border-primary/30 transition-all block">
+                    <span class="text-primary text-xs font-bold uppercase tracking-wider">Guides</span>
+                    <p class="text-white font-semibold mt-1">7 Common Gift-Buying Mistakes</p>
+                </a>
+                <a href="/blog/amazon-toy-deals-guide.html" class="glass-card rounded-xl p-4 hover:border-primary/30 transition-all block">
+                    <span class="text-primary text-xs font-bold uppercase tracking-wider">Deals</span>
+                    <p class="text-white font-semibold mt-1">How to Find the Best Amazon Toy Deals in 2026</p>
+                </a>
+                <a href="/blog/toy-price-tracking-saves-money.html" class="glass-card rounded-xl p-4 hover:border-primary/30 transition-all block">
+                    <span class="text-primary text-xs font-bold uppercase tracking-wider">Deals</span>
+                    <p class="text-white font-semibold mt-1">How Toy Price Tracking Saves Parents Money</p>
+                </a>
+            </div>
+        </section>
+
         <!-- CTA -->
         <section class="max-w-4xl mx-auto px-4 mb-16">
             <div class="glass-panel rounded-2xl p-8 text-center">
@@ -273,36 +329,46 @@
                 <p class="text-white/60 mb-6">Browse all 20,000+ tracked toys, check price histories, and find the best deals.</p>
                 <div class="flex flex-wrap items-center justify-center gap-4">
                     <a href="/" class="bg-primary text-navy-deep px-8 py-3 rounded-xl font-bold hover:brightness-110 transition-all">Browse All Toys</a>
-                    <a href="/rankings" class="bg-white/5 hover:bg-white/10 border border-white/10 text-white px-8 py-3 rounded-xl font-bold transition-all">View Rankings</a>
+                    <a href="/rankings.html" class="bg-white/5 hover:bg-white/10 border border-white/10 text-white px-8 py-3 rounded-xl font-bold transition-all">View Rankings</a>
                 </div>
             </div>
         </section>
     </main>
 
     <!-- Footer -->
-    <footer class="bg-navy-deep border-t border-primary/10 py-8 px-4">
-        <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-            <div class="flex items-center gap-2">
-                <img src="https://i.imgur.com/HXSawxU.png" alt="Toy Tap" class="h-6 w-6" />
-                <span class="text-sm text-white/50">Toy Tap &copy; 2026</span>
+    <footer class="border-t border-white/5 bg-navy-deep/40">
+        <div class="max-w-7xl mx-auto px-4 md:px-6 py-8">
+            <!-- Gift Guides Row -->
+            <div class="mb-6 pb-6 border-b border-white/5">
+                <p class="text-xs text-white/30 uppercase tracking-wider font-semibold mb-3">Gift Guides</p>
+                <div class="flex flex-wrap gap-3 text-sm text-white/50">
+                    <a href="/best-toys-for-toddlers.html" class="hover:text-primary transition-colors">Toddlers</a>
+                    <a href="/best-toys-for-preschoolers.html" class="hover:text-primary transition-colors">Preschoolers</a>
+                    <a href="/best-toys-for-kids.html" class="hover:text-primary transition-colors">Kids</a>
+                    <a href="/best-outdoor-toys.html" class="hover:text-primary transition-colors">Outdoor</a>
+                    <a href="/best-educational-toys.html" class="hover:text-primary transition-colors">Educational</a>
+                    <a href="/best-building-toys.html" class="hover:text-primary transition-colors">Building</a>
+                    <a href="/best-birthday-gifts-for-kids.html" class="hover:text-primary transition-colors">Birthday</a>
+                </div>
             </div>
-            <div class="flex items-center gap-6 text-sm text-white/50">
-                <a href="/rankings" class="hover:text-primary transition-colors">Rankings</a>
-                <a href="/categories" class="hover:text-primary transition-colors">Categories</a>
-                <a href="/brands" class="hover:text-primary transition-colors">Brands</a>
-                <a href="/blog" class="hover:text-primary transition-colors">Blog</a>
-                <a href="/how-tt-grade-works" class="hover:text-primary transition-colors">How TT Grade Works</a>
-                <a href="/about" class="hover:text-primary transition-colors">About</a>
+            <!-- Main Footer Row -->
+            <div class="flex flex-col md:flex-row justify-between items-center gap-6">
+                <div class="flex items-center gap-2">
+                    <img src="https://i.imgur.com/HXSawxU.png" alt="Toy Tap" class="h-6 w-6" />
+                    <span class="text-sm text-white/50">Toy Tap &copy; 2026</span>
+                </div>
+                <div class="flex items-center gap-6 text-sm text-white/50">
+                    <a href="/rankings.html" class="hover:text-primary transition-colors">Rankings</a>
+                    <a href="/brands.html" class="hover:text-primary transition-colors">Brands</a>
+                    <a href="/blog.html" class="hover:text-primary transition-colors">Blog</a>
+                    <a href="https://gettoytap.com" class="hover:text-primary transition-colors">For Businesses</a>
+                    <a href="https://gettoytap.com/privacy" class="hover:text-primary transition-colors">Privacy</a>
+                    <a href="https://gettoytap.com/terms" class="hover:text-primary transition-colors">Terms</a>
+                </div>
             </div>
+            <p class="text-center text-white/30 text-xs mt-6">As an Amazon Associate, Toy Tap earns from qualifying purchases. Prices and availability are accurate as of the date/time indicated and are subject to change. TT Grade ratings are algorithmically generated and not influenced by affiliate relationships.</p>
         </div>
     </footer>
-
-    <!-- Affiliate Disclosure -->
-    <div class="bg-navy-deep/80 border-t border-white/5 py-4 px-4">
-        <p class="max-w-4xl mx-auto text-center text-white/30 text-xs">
-            As an Amazon Associate, Toy Tap earns from qualifying purchases. Prices and availability are accurate as of the date/time indicated and are subject to change. TT Grade ratings are algorithmically generated and not influenced by affiliate relationships.
-        </p>
-    </div>
 
     <script>
         var API_BASE = 'https://hub.gettoytap.com';
