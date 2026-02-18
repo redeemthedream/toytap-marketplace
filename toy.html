@@ -4,7 +4,14 @@
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
     <title id="page-title">Toy Details - Toy Tap</title>
-    <meta name="description" content="View price history, analytics, and deal analysis for this toy on Toy Tap." />
+    <meta name="description" id="page-desc" content="View price history, analytics, and deal analysis for this toy on Toy Tap." />
+    <link rel="canonical" id="page-canonical" href="https://dashboard.gettoytap.com/toy" />
+    <meta property="og:type" content="product" />
+    <meta property="og:url" id="og-url" content="https://dashboard.gettoytap.com/toy" />
+    <meta property="og:title" id="og-title" content="Toy Details - Toy Tap" />
+    <meta property="og:description" id="og-desc" content="View price history, analytics, and deal analysis for this toy on Toy Tap." />
+    <meta property="og:image" id="og-image" content="https://i.imgur.com/HXSawxU.png" />
+    <script type="application/ld+json" id="product-schema">{}</script>
     <link rel="icon" type="image/png" href="https://i.imgur.com/HXSawxU.png" />
     <!-- Preconnect for faster resource loading -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -522,6 +529,42 @@
 
             // Buy link
             document.getElementById('buy-amazon').href = toy.affiliate_url || `https://amazon.com/dp/${toy.asin}?tag=redeemer0d0-20`;
+
+            // Dynamic SEO meta tags
+            const canonicalUrl = `https://dashboard.gettoytap.com/toy?asin=${toy.asin}`;
+            document.getElementById('page-canonical').href = canonicalUrl;
+            document.getElementById('page-desc').content = `${toy.toy_name} by ${toy.brand || 'Unknown'} — $${price.toFixed(2)}. View price history, TT Grade ${toy.tt_grade || 'N/A'}, and deal analysis on Toy Tap.`;
+            document.getElementById('og-url').content = canonicalUrl;
+            document.getElementById('og-title').content = `${toy.toy_name} - Toy Tap`;
+            document.getElementById('og-desc').content = `${toy.toy_name} by ${toy.brand || 'Unknown'} — $${price.toFixed(2)}. Track price history and find the best deal.`;
+            document.getElementById('og-image').content = toy.image_url_proxied || toy.image_url || 'https://i.imgur.com/HXSawxU.png';
+
+            // Product JSON-LD schema
+            const productSchema = {
+                "@context": "https://schema.org",
+                "@type": "Product",
+                "name": toy.toy_name,
+                "image": toy.image_url_proxied || toy.image_url || '',
+                "description": `${toy.toy_name} by ${toy.brand || 'Unknown'}`,
+                "brand": { "@type": "Brand", "name": toy.brand || 'Unknown' },
+                "url": canonicalUrl,
+                "offers": {
+                    "@type": "Offer",
+                    "url": toy.affiliate_url || `https://amazon.com/dp/${toy.asin}?tag=redeemer0d0-20`,
+                    "priceCurrency": "USD",
+                    "price": price.toFixed(2),
+                    "availability": "https://schema.org/InStock",
+                    "seller": { "@type": "Organization", "name": "Amazon" }
+                }
+            };
+            if (toy.rating) {
+                productSchema.aggregateRating = {
+                    "@type": "AggregateRating",
+                    "ratingValue": toy.rating,
+                    "reviewCount": toy.reviews_count || 0
+                };
+            }
+            document.getElementById('product-schema').textContent = JSON.stringify(productSchema);
 
             // Price stats
             if (priceStats.lowest !== undefined) {

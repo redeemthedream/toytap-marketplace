@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /watchlist
+Disallow: /login
+Disallow: /price
+
+Sitemap: https://dashboard.gettoytap.com/sitemap.xml

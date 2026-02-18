@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>How TT Grade Works — Our Toy Scoring System | Toy Tap</title>
+    <meta name="description" content="Learn how Toy Tap's TT Grade and TT Score systems work. Our algorithmic scoring rates toys from S to D based on quality, value, reviews, and price history." />
+    <link rel="icon" type="image/png" href="https://i.imgur.com/HXSawxU.png" />
+    <link rel="canonical" href="https://dashboard.gettoytap.com/how-tt-grade-works" />
+    <meta property="og:type" content="article" />
+    <meta property="og:url" content="https://dashboard.gettoytap.com/how-tt-grade-works" />
+    <meta property="og:title" content="How TT Grade Works — Our Toy Scoring System" />
+    <meta property="og:description" content="Learn how Toy Tap's TT Grade and TT Score systems rate toys for quality and value." />
+    <meta property="og:image" content="https://i.imgur.com/HXSawxU.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="How TT Grade Works — Our Toy Scoring System" />
+    <meta name="twitter:description" content="Our algorithmic scoring rates toys from S to D based on quality, value, reviews, and price history." />
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "How often do TT Grades update?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "TT Grades update daily. We pull fresh pricing data and review metrics from Amazon every day and recalculate all scores. This means grades reflect the most current information available."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can brands influence their TT Grade?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. TT Grades are calculated algorithmically based on publicly available data: customer reviews, star ratings, price history, and deal quality. There is no pay-for-placement or sponsorship that can alter a grade. The only way for a brand to improve its TT Grade is to make better products that earn better reviews and offer fair pricing."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is the difference between TT Grade and TT Score?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "TT Grade (letter rating S through D) measures overall toy quality based on reviews, ratings, and popularity. TT Score (0-100 number) measures deal quality, factoring in current price vs historical average, discount depth, and price stability. A toy can have a high TT Grade (great quality) but a low TT Score (not a good deal right now), or vice versa."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How should I use TT Grades for buying decisions?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Use TT Grade when you want the best quality toy regardless of current pricing. Use TT Score when you are looking for the best deal and want to maximize value. For birthday gifts and important purchases, prioritize TT Grade. For everyday shopping and deal-hunting, sort by TT Score."
+          }
+        }
+      ]
+    }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL@20..48,100..700,0..1&display=swap" rel="stylesheet"/>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#3fc3d5",
+                        "background-dark": "#0a0e27",
+                        "navy-deep": "#0a0e27",
+                        "navy-card": "#12183d",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"],
+                        "mono": ["JetBrains Mono", "monospace"]
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .cyan-glow { box-shadow: 0 0 20px rgba(63, 195, 213, 0.3); }
+        .glass-panel { background: rgba(18, 24, 61, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(63, 195, 213, 0.1); }
+        .glass-card { background: rgba(18, 24, 61, 0.8); backdrop-filter: blur(8px); border: 1px solid rgba(63, 195, 213, 0.1); }
+        .gradient-animate {
+            background: linear-gradient(90deg, #3fc3d5, #a855f7, #f59e0b, #3fc3d5);
+            background-size: 300% 100%;
+            -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+            animation: gradient-shift 6s ease infinite;
+        }
+        @keyframes gradient-shift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        details summary { cursor: pointer; list-style: none; }
+        details summary::-webkit-details-marker { display: none; }
+        details[open] summary .chevron { transform: rotate(180deg); }
+        @media (max-width: 768px) {
+            .glass-panel, .glass-card, .backdrop-blur-md, [class*="backdrop-blur"] { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+            .glass-panel, .glass-card { background: rgba(18, 24, 61, 0.95); }
+            .gradient-animate { animation: none; background: linear-gradient(90deg, #3fc3d5, #a855f7); background-size: 100% 100%; -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+            .blur-\[120px\], .blur-\[100px\] { display: none !important; }
+        }
+        button, a, [onclick] { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+    </style>
+</head>
+<body class="bg-background-dark font-display text-white min-h-screen">
+    <!-- Background Effects -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] bg-primary/10 rounded-full blur-[120px]"></div>
+        <div class="absolute bottom-[-10%] left-[-5%] w-[400px] h-[400px] bg-yellow-500/5 rounded-full blur-[100px]"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-navy-deep/95 backdrop-blur-md border-b border-primary/10">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+            <a href="/" class="flex items-center gap-2">
+                <img src="https://i.imgur.com/HXSawxU.png" alt="Toy Tap" class="h-8 w-8" />
+                <span class="text-lg font-bold text-white">Toy Tap</span>
+            </a>
+            <div class="flex items-center gap-4">
+                <a href="/rankings" class="text-sm text-white/70 hover:text-primary transition-colors">Rankings</a>
+                <a href="/categories" class="text-sm text-white/70 hover:text-primary transition-colors">Categories</a>
+                <a href="/brands" class="text-sm text-white/70 hover:text-primary transition-colors">Brands</a>
+                <a href="/blog" class="text-sm text-white/70 hover:text-primary transition-colors">Blog</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="relative z-10 pt-16">
+        <!-- Hero -->
+        <section class="py-12 md:py-20 px-4">
+            <div class="max-w-4xl mx-auto text-center">
+                <nav class="flex items-center justify-center gap-2 text-sm text-white/40 mb-6">
+                    <a href="/" class="hover:text-primary transition-colors">Home</a>
+                    <span>/</span>
+                    <span class="text-white/70">How TT Grade Works</span>
+                </nav>
+                <span class="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-bold tracking-widest uppercase border border-primary/20 mb-6">
+                    Methodology
+                </span>
+                <h1 class="text-4xl md:text-5xl lg:text-6xl font-black leading-tight tracking-tight mb-4">
+                    How TT Grade Works
+                </h1>
+                <p class="text-lg text-white/60 max-w-2xl mx-auto">
+                    Our proprietary scoring system that rates every toy for quality and value. No guesswork, no pay-for-placement, just data.
+                </p>
+            </div>
+        </section>
+
+        <!-- Section 1: What is TT Grade? -->
+        <section class="max-w-4xl mx-auto px-4 mb-10">
+            <div class="glass-panel rounded-2xl p-6 md:p-8">
+                <div class="flex items-center gap-3 mb-4">
+                    <span class="material-symbols-outlined text-primary text-3xl">grade</span>
+                    <h2 class="text-2xl font-bold">What is TT Grade?</h2>
+                </div>
+                <div class="text-white/70 space-y-4 leading-relaxed">
+                    <p>TT Grade is a letter rating system that scores every toy in our database from <strong class="text-yellow-400">S</strong> (the best) to <strong class="text-red-400">D</strong> (the worst). It represents overall toy quality and value based on real customer feedback, review data, pricing patterns, and market positioning.</p>
+                    <p>Think of it like a report card for toys. Instead of spending hours reading hundreds of Amazon reviews and comparing prices across weeks, you can glance at the TT Grade and immediately know whether a toy is worth your attention. An "S" or "A+" graded toy has been validated by a large number of satisfied customers and offers genuine value, while a "C" or "D" graded toy may have quality issues, poor reviews, or an inflated price.</p>
+                    <p>TT Grade is calculated algorithmically using publicly available data. No brand can pay to influence their grade. The only way to earn a higher TT Grade is to be a genuinely good product with satisfied customers and fair pricing.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: Grade Scale -->
+        <section class="max-w-4xl mx-auto px-4 mb-10">
+            <div class="glass-panel rounded-2xl p-6 md:p-8">
+                <div class="flex items-center gap-3 mb-6">
+                    <span class="material-symbols-outlined text-primary text-3xl">military_tech</span>
+                    <h2 class="text-2xl font-bold">Grade Scale</h2>
+                </div>
+                <div class="space-y-4">
+                    <!-- Grade S -->
+                    <div class="flex items-center gap-4 p-4 rounded-xl bg-yellow-500/5 border border-yellow-500/20">
+                        <div class="w-16 h-16 rounded-xl bg-yellow-500/20 flex items-center justify-center shrink-0">
+                            <span class="text-yellow-400 text-2xl font-black font-mono">S</span>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-yellow-400">Exceptional</h3>
+                            <p class="text-white/60 text-sm">Top-tier toy with outstanding value, reviews, and quality. Reserved for the very best toys in any category. These are products with near-perfect review scores, strong sales history, and excellent pricing.</p>
+                        </div>
+                    </div>
+                    <!-- Grade A+ -->
+                    <div class="flex items-center gap-4 p-4 rounded-xl bg-green-500/5 border border-green-500/20">
+                        <div class="w-16 h-16 rounded-xl bg-green-500/20 flex items-center justify-center shrink-0">
+                            <span class="text-green-400 text-2xl font-black font-mono">A+</span>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-green-400">Excellent</h3>
+                            <p class="text-white/60 text-sm">Premium toy with a great value proposition. High review scores, strong customer satisfaction, and typically a solid deal relative to its quality tier.</p>
+                        </div>
+                    </div>
+                    <!-- Grade A -->
+                    <div class="flex items-center gap-4 p-4 rounded-xl bg-emerald-500/5 border border-emerald-500/20">
+                        <div class="w-16 h-16 rounded-xl bg-emerald-500/20 flex items-center justify-center shrink-0">
+                            <span class="text-emerald-400 text-2xl font-black font-mono">A</span>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-emerald-400">Very Good</h3>
+                            <p class="text-white/60 text-sm">Strong quality and solid value. Well-reviewed by a healthy number of customers. A reliable choice that most buyers will be happy with.</p>
+                        </div>
+                    </div>
+                    <!-- Grade B+ -->
+                    <div class="flex items-center gap-4 p-4 rounded-xl bg-blue-500/5 border border-blue-500/20">
+                        <div class="w-16 h-16 rounded-xl bg-blue-500/20 flex items-center justify-center shrink-0">
+                            <span class="text-blue-400 text-2xl font-black font-mono">B+</span>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-blue-400">Good</h3>
+                            <p class="text-white/60 text-sm">Above average quality and fair value. Positive reviews outweigh negatives, and the price is reasonable for what you get. A solid pick.</p>
+                        </div>
+                    </div>
+                    <!-- Grade B -->
+                    <div class="flex items-center gap-4 p-4 rounded-xl bg-sky-500/5 border border-sky-500/20">
+                        <div class="w-16 h-16 rounded-xl bg-sky-500/20 flex items-center justify-center shrink-0">
+                            <span class="text-sky-400 text-2xl font-black font-mono">B</span>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-sky-400">Average</h3>
+                            <p class="text-white/60 text-sm">Decent toy at a reasonable price. Reviews are generally positive but may include some common complaints. Fine for casual purchases, but better options likely exist in the category.</p>
+                        </div>
+                    </div>
+                    <!-- Grade C -->
+                    <div class="flex items-center gap-4 p-4 rounded-xl bg-orange-500/5 border border-orange-500/20">
+                        <div class="w-16 h-16 rounded-xl bg-orange-500/20 flex items-center justify-center shrink-0">
+                            <span class="text-orange-400 text-2xl font-black font-mono">C</span>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-orange-400">Below Average</h3>
+                            <p class="text-white/60 text-sm">May have quality or value concerns. Mixed reviews with notable complaints about durability, accuracy of product description, or value for money. Proceed with caution.</p>
+                        </div>
+                    </div>
+                    <!-- Grade D -->
+                    <div class="flex items-center gap-4 p-4 rounded-xl bg-red-500/5 border border-red-500/20">
+                        <div class="w-16 h-16 rounded-xl bg-red-500/20 flex items-center justify-center shrink-0">
+                            <span class="text-red-400 text-2xl font-black font-mono">D</span>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-red-400">Poor</h3>
+                            <p class="text-white/60 text-sm">Significant quality or value issues. Predominantly negative reviews, overpriced relative to quality, or notable safety or durability concerns flagged by customers. We recommend looking elsewhere.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: What is TT Score? -->
+        <section class="max-w-4xl mx-auto px-4 mb-10">
+            <div class="glass-panel rounded-2xl p-6 md:p-8">
+                <div class="flex items-center gap-3 mb-4">
+                    <span class="material-symbols-outlined text-yellow-400 text-3xl">speed</span>
+                    <h2 class="text-2xl font-bold">What is TT Score?</h2>
+                </div>
+                <div class="text-white/70 space-y-4 leading-relaxed">
+                    <p>While TT Grade measures overall quality, <strong class="text-yellow-400">TT Score</strong> is a numeric value from 0 to 100 that measures <em>deal quality</em>. It answers the question: "Is this toy a good deal right now?"</p>
+                    <p>TT Score factors in several deal-specific signals:</p>
+                    <ul class="list-disc list-inside space-y-2 ml-2">
+                        <li><strong class="text-white">Current price vs. historical average</strong> -- Is the toy cheaper than usual right now?</li>
+                        <li><strong class="text-white">Discount depth</strong> -- How large is the current discount compared to the original or list price?</li>
+                        <li><strong class="text-white">Price stability</strong> -- Does this toy stay at a consistent price, or does it fluctuate frequently? Stable low prices score well.</li>
+                        <li><strong class="text-white">Review quality</strong> -- A cheap toy with terrible reviews is not actually a good deal.</li>
+                    </ul>
+                    <p>A toy can have a high TT Grade (great quality) but a low TT Score (not on sale, or overpriced right now). Conversely, a mid-tier toy with a big discount might have a high TT Score even if its TT Grade is only a B. Both metrics are useful depending on what you care about most.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 4: Price History Tracking -->
+        <section class="max-w-4xl mx-auto px-4 mb-10">
+            <div class="glass-panel rounded-2xl p-6 md:p-8">
+                <div class="flex items-center gap-3 mb-4">
+                    <span class="material-symbols-outlined text-primary text-3xl">timeline</span>
+                    <h2 class="text-2xl font-bold">Price History Tracking</h2>
+                </div>
+                <div class="text-white/70 space-y-4 leading-relaxed">
+                    <p>Toy Tap monitors Amazon prices on 20,000+ toys daily. This gives us a detailed picture of how prices move over time, which feeds into both TT Grade and TT Score calculations.</p>
+                    <p><strong class="text-white">What "Lowest Ever" means:</strong> When you see a "Lowest Ever" badge on a toy, it means the current price is the lowest we have recorded since we started tracking that product. This is not a marketing claim -- it is based on our actual price history data. These are often the best times to buy.</p>
+                    <p><strong class="text-white">How price alerts work:</strong> Registered users can add toys to their watchlist. When a watched toy drops in price or hits a new lowest-ever price, we flag it so you can act quickly. Price drops on popular toys often do not last long, especially around holidays.</p>
+                    <p><strong class="text-white">Why this matters:</strong> Many toys have a "list price" that rarely reflects what people actually pay. By tracking real transaction prices over time, we can tell you whether a "50% off" sale is genuinely a good deal or if the toy is always priced that way. This prevents you from falling for inflated list prices and fake discounts.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 5: How We Stay Objective -->
+        <section class="max-w-4xl mx-auto px-4 mb-10">
+            <div class="glass-panel rounded-2xl p-6 md:p-8">
+                <div class="flex items-center gap-3 mb-4">
+                    <span class="material-symbols-outlined text-primary text-3xl">verified</span>
+                    <h2 class="text-2xl font-bold">How We Stay Objective</h2>
+                </div>
+                <div class="text-white/70 space-y-4 leading-relaxed">
+                    <p>Objectivity is the foundation of the TT Grade system. Here is how we maintain it:</p>
+                    <ul class="list-disc list-inside space-y-2 ml-2">
+                        <li><strong class="text-white">Algorithmic scoring:</strong> Every grade is calculated by our algorithm using the same criteria for every product. No human manually assigns or adjusts grades.</li>
+                        <li><strong class="text-white">No pay-for-placement:</strong> Toy brands cannot pay to boost their TT Grade or appear higher in our rankings. Period.</li>
+                        <li><strong class="text-white">Updated daily:</strong> Grades reflect the latest available data, not a one-time snapshot. If a product improves or declines, its grade moves accordingly.</li>
+                        <li><strong class="text-white">Transparent methodology:</strong> You are reading this page. We explain what goes into our scores because we believe informed consumers make better decisions.</li>
+                    </ul>
+                    <p>We do earn affiliate commissions when you purchase a toy through our Amazon links (via the Amazon Associates program). This is how we fund the service. However, affiliate revenue has zero influence on TT Grade calculations. A toy we earn more commission on does not receive a higher grade.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQ -->
+        <section class="max-w-4xl mx-auto px-4 mb-12">
+            <h2 class="text-2xl font-bold mb-6">Frequently Asked Questions</h2>
+            <div class="space-y-3">
+                <details class="glass-panel rounded-xl overflow-hidden group">
+                    <summary class="flex items-center justify-between p-5 font-semibold cursor-pointer">
+                        <span>How often do TT Grades update?</span>
+                        <span class="material-symbols-outlined chevron transition-transform duration-200">expand_more</span>
+                    </summary>
+                    <div class="px-5 pb-5 text-white/70">TT Grades update daily. We pull fresh pricing data and review metrics from Amazon every day and recalculate all scores. This means grades reflect the most current information available. If a toy receives a surge of negative reviews overnight, its grade will adjust the next day.</div>
+                </details>
+                <details class="glass-panel rounded-xl overflow-hidden group">
+                    <summary class="flex items-center justify-between p-5 font-semibold cursor-pointer">
+                        <span>Can brands influence their TT Grade?</span>
+                        <span class="material-symbols-outlined chevron transition-transform duration-200">expand_more</span>
+                    </summary>
+                    <div class="px-5 pb-5 text-white/70">No. TT Grades are calculated algorithmically based on publicly available data: customer reviews, star ratings, price history, and deal quality. There is no pay-for-placement or sponsorship that can alter a grade. The only way for a brand to improve its TT Grade is to make better products that earn better reviews and offer fair pricing.</div>
+                </details>
+                <details class="glass-panel rounded-xl overflow-hidden group">
+                    <summary class="flex items-center justify-between p-5 font-semibold cursor-pointer">
+                        <span>What is the difference between TT Grade and TT Score?</span>
+                        <span class="material-symbols-outlined chevron transition-transform duration-200">expand_more</span>
+                    </summary>
+                    <div class="px-5 pb-5 text-white/70">TT Grade (letter rating S through D) measures overall toy quality based on reviews, ratings, and popularity. TT Score (0-100 number) measures deal quality, factoring in current price vs. historical average, discount depth, and price stability. A toy can have a high TT Grade (great quality) but a low TT Score (not a good deal right now), or vice versa. Use TT Grade for quality and TT Score for deals.</div>
+                </details>
+                <details class="glass-panel rounded-xl overflow-hidden group">
+                    <summary class="flex items-center justify-between p-5 font-semibold cursor-pointer">
+                        <span>How should I use TT Grades for buying decisions?</span>
+                        <span class="material-symbols-outlined chevron transition-transform duration-200">expand_more</span>
+                    </summary>
+                    <div class="px-5 pb-5 text-white/70">Use TT Grade when you want the best quality toy regardless of current pricing -- for example, when buying a birthday gift or a toy for your own child. Use TT Score when you are looking for the best deal and want to maximize value -- for example, when stocking up on party favors or buying multiple gifts during a sale event. For the best of both worlds, look for toys that have both a high TT Grade (A or above) and a high TT Score (70+).</div>
+                </details>
+            </div>
+        </section>
+
+        <!-- CTA -->
+        <section class="max-w-4xl mx-auto px-4 mb-16">
+            <div class="glass-panel rounded-2xl p-8 text-center">
+                <h2 class="text-2xl font-bold mb-3">See TT Grades in Action</h2>
+                <p class="text-white/60 mb-6">Browse our rankings to see the highest-graded toys across every category.</p>
+                <div class="flex flex-wrap items-center justify-center gap-4">
+                    <a href="/rankings" class="bg-primary text-navy-deep px-8 py-3 rounded-xl font-bold hover:brightness-110 transition-all">View Rankings</a>
+                    <a href="/categories" class="bg-white/5 hover:bg-white/10 border border-white/10 text-white px-8 py-3 rounded-xl font-bold transition-all">Browse Categories</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-navy-deep border-t border-primary/10 py-8 px-4">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-2">
+                <img src="https://i.imgur.com/HXSawxU.png" alt="Toy Tap" class="h-6 w-6" />
+                <span class="text-sm text-white/50">Toy Tap &copy; 2026</span>
+            </div>
+            <div class="flex items-center gap-6 text-sm text-white/50">
+                <a href="/rankings" class="hover:text-primary transition-colors">Rankings</a>
+                <a href="/categories" class="hover:text-primary transition-colors">Categories</a>
+                <a href="/brands" class="hover:text-primary transition-colors">Brands</a>
+                <a href="/blog" class="hover:text-primary transition-colors">Blog</a>
+                <a href="/how-tt-grade-works" class="hover:text-primary transition-colors">How TT Grade Works</a>
+                <a href="/about" class="hover:text-primary transition-colors">About</a>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>About Toy Tap — Track Toy Prices & Find the Best Deals</title>
+    <meta name="description" content="Toy Tap tracks prices on 20,000+ toys so you never overpay. Learn about our TT Grade scoring, price history tracking, and how we help parents find the best toy deals." />
+    <link rel="icon" type="image/png" href="https://i.imgur.com/HXSawxU.png" />
+    <link rel="canonical" href="https://dashboard.gettoytap.com/about" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://dashboard.gettoytap.com/about" />
+    <meta property="og:title" content="About Toy Tap — Track Toy Prices & Find the Best Deals" />
+    <meta property="og:description" content="Toy Tap tracks prices on 20,000+ toys so you never overpay. TT Grade scoring, price history, and deal alerts." />
+    <meta property="og:image" content="https://i.imgur.com/HXSawxU.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="About Toy Tap — Track Toy Prices & Find the Best Deals" />
+    <meta name="twitter:description" content="Toy Tap tracks prices on 20,000+ toys so you never overpay." />
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "Toy Tap",
+      "url": "https://dashboard.gettoytap.com",
+      "logo": "https://i.imgur.com/HXSawxU.png",
+      "description": "Toy Tap tracks prices on 20,000+ toys, calculates proprietary TT Grade ratings, and helps parents find the best toy deals on Amazon.",
+      "sameAs": [
+        "https://gettoytap.com",
+        "https://snaptapqr.com"
+      ]
+    }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL@20..48,100..700,0..1&display=swap" rel="stylesheet"/>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#3fc3d5",
+                        "background-dark": "#0a0e27",
+                        "navy-deep": "#0a0e27",
+                        "navy-card": "#12183d",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"],
+                        "mono": ["JetBrains Mono", "monospace"]
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .cyan-glow { box-shadow: 0 0 20px rgba(63, 195, 213, 0.3); }
+        .glass-panel { background: rgba(18, 24, 61, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(63, 195, 213, 0.1); }
+        .glass-card { background: rgba(18, 24, 61, 0.8); backdrop-filter: blur(8px); border: 1px solid rgba(63, 195, 213, 0.1); }
+        .gradient-animate {
+            background: linear-gradient(90deg, #3fc3d5, #a855f7, #f59e0b, #3fc3d5);
+            background-size: 300% 100%;
+            -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+            animation: gradient-shift 6s ease infinite;
+        }
+        @keyframes gradient-shift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        @media (max-width: 768px) {
+            .glass-panel, .glass-card, .backdrop-blur-md, [class*="backdrop-blur"] { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+            .glass-panel, .glass-card { background: rgba(18, 24, 61, 0.95); }
+            .gradient-animate { animation: none; background: linear-gradient(90deg, #3fc3d5, #a855f7); background-size: 100% 100%; -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+            .blur-\[120px\], .blur-\[100px\] { display: none !important; }
+        }
+        button, a, [onclick] { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+    </style>
+</head>
+<body class="bg-background-dark font-display text-white min-h-screen">
+    <!-- Background Effects -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] bg-primary/10 rounded-full blur-[120px]"></div>
+        <div class="absolute bottom-[-10%] left-[-5%] w-[400px] h-[400px] bg-primary/5 rounded-full blur-[100px]"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-navy-deep/95 backdrop-blur-md border-b border-primary/10">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+            <a href="/" class="flex items-center gap-2">
+                <img src="https://i.imgur.com/HXSawxU.png" alt="Toy Tap" class="h-8 w-8" />
+                <span class="text-lg font-bold text-white">Toy Tap</span>
+            </a>
+            <div class="flex items-center gap-4">
+                <a href="/rankings" class="text-sm text-white/70 hover:text-primary transition-colors">Rankings</a>
+                <a href="/categories" class="text-sm text-white/70 hover:text-primary transition-colors">Categories</a>
+                <a href="/brands" class="text-sm text-white/70 hover:text-primary transition-colors">Brands</a>
+                <a href="/blog" class="text-sm text-white/70 hover:text-primary transition-colors">Blog</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="relative z-10 pt-16">
+        <!-- Hero -->
+        <section class="py-16 md:py-24 px-4">
+            <div class="max-w-4xl mx-auto text-center">
+                <nav class="flex items-center justify-center gap-2 text-sm text-white/40 mb-6">
+                    <a href="/" class="hover:text-primary transition-colors">Home</a>
+                    <span>/</span>
+                    <span class="text-white/70">About</span>
+                </nav>
+                <div class="w-20 h-20 mx-auto mb-6 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center">
+                    <img src="https://i.imgur.com/HXSawxU.png" alt="Toy Tap" class="h-12 w-12" />
+                </div>
+                <h1 class="text-4xl md:text-5xl lg:text-6xl font-black leading-tight tracking-tight mb-4">
+                    About Toy Tap
+                </h1>
+                <p class="text-xl text-white/60 max-w-2xl mx-auto">
+                    We track prices on 20,000+ toys so you never overpay.
+                </p>
+            </div>
+        </section>
+
+        <!-- What is Toy Tap? -->
+        <section class="max-w-4xl mx-auto px-4 mb-10">
+            <div class="glass-panel rounded-2xl p-6 md:p-8">
+                <div class="flex items-center gap-3 mb-4">
+                    <span class="material-symbols-outlined text-primary text-3xl">info</span>
+                    <h2 class="text-2xl font-bold">What is Toy Tap?</h2>
+                </div>
+                <div class="text-white/70 space-y-4 leading-relaxed">
+                    <p>Toy Tap is a price tracking and comparison platform built specifically for toys. We monitor Amazon prices daily, calculate proprietary TT Grade quality ratings, and help parents, gift-givers, and toy enthusiasts find the best deals on the toys they care about.</p>
+                    <p>The toy market is enormous and prices change constantly. A toy that was $29.99 yesterday might be $19.99 today and $34.99 tomorrow. Without tracking, you have no way to know whether the price you see right now is a good deal or an inflated markup. Toy Tap solves this by building a complete price history for every product we track, then scoring each toy with our TT Grade system so you can make informed decisions at a glance.</p>
+                    <p>Whether you are shopping for a birthday gift, stocking up during a sale, or just curious about whether a toy is worth its price, Toy Tap gives you the data to shop smarter.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- What We Track -->
+        <section class="max-w-4xl mx-auto px-4 mb-10">
+            <div class="glass-panel rounded-2xl p-6 md:p-8">
+                <div class="flex items-center gap-3 mb-6">
+                    <span class="material-symbols-outlined text-primary text-3xl">monitoring</span>
+                    <h2 class="text-2xl font-bold">What We Track</h2>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="flex items-start gap-3 p-4 rounded-xl bg-white/5">
+                        <span class="material-symbols-outlined text-primary mt-0.5">inventory_2</span>
+                        <div>
+                            <h3 class="font-semibold text-white mb-1">20,000+ Toys</h3>
+                            <p class="text-white/60 text-sm">Covering all major categories: building, outdoor, educational, dolls, vehicles, games, electronics, and more.</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-3 p-4 rounded-xl bg-white/5">
+                        <span class="material-symbols-outlined text-primary mt-0.5">update</span>
+                        <div>
+                            <h3 class="font-semibold text-white mb-1">Daily Price Updates</h3>
+                            <p class="text-white/60 text-sm">We check Amazon prices every day to keep our data current and our TT Grade scores accurate.</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-3 p-4 rounded-xl bg-white/5">
+                        <span class="material-symbols-outlined text-primary mt-0.5">timeline</span>
+                        <div>
+                            <h3 class="font-semibold text-white mb-1">Price History</h3>
+                            <p class="text-white/60 text-sm">Months of historical pricing data so you can see trends, identify patterns, and know if a sale is real.</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-3 p-4 rounded-xl bg-white/5">
+                        <span class="material-symbols-outlined text-primary mt-0.5">local_offer</span>
+                        <div>
+                            <h3 class="font-semibold text-white mb-1">Discount Detection</h3>
+                            <p class="text-white/60 text-sm">We automatically detect price drops and flag "Lowest Ever" prices so you never miss a deal.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TT Grade -->
+        <section class="max-w-4xl mx-auto px-4 mb-10">
+            <div class="glass-panel rounded-2xl p-6 md:p-8">
+                <div class="flex items-center gap-3 mb-4">
+                    <span class="material-symbols-outlined text-yellow-400 text-3xl">military_tech</span>
+                    <h2 class="text-2xl font-bold">TT Grade</h2>
+                </div>
+                <div class="text-white/70 space-y-4 leading-relaxed">
+                    <p>Every toy in our database receives a TT Grade: a letter rating from S (exceptional) to D (poor) that summarizes its overall quality and value. TT Grades are calculated algorithmically using review data, star ratings, pricing patterns, and more. No brand can pay to influence their grade.</p>
+                    <p>We also calculate a TT Score (0-100) that measures current deal quality, helping you find the best value right now.</p>
+                </div>
+                <div class="mt-6">
+                    <a href="/how-tt-grade-works" class="inline-flex items-center gap-2 bg-primary/10 hover:bg-primary/20 text-primary px-6 py-3 rounded-xl font-semibold transition-all border border-primary/20">
+                        <span class="material-symbols-outlined text-xl">arrow_forward</span>
+                        Learn how TT Grade works
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- For Venue Owners -->
+        <section class="max-w-4xl mx-auto px-4 mb-10">
+            <div class="glass-panel rounded-2xl p-6 md:p-8 border-yellow-500/20">
+                <div class="flex items-center gap-3 mb-4">
+                    <span class="material-symbols-outlined text-yellow-400 text-3xl">storefront</span>
+                    <h2 class="text-2xl font-bold">For Venue Owners</h2>
+                </div>
+                <div class="text-white/70 space-y-4 leading-relaxed">
+                    <p>Own a play space, family entertainment center, or birthday party venue? ToyTap also helps play spaces earn affiliate revenue from toy discovery. When families visit your venue and discover toys through your branded hub page, you earn commissions on purchases they make.</p>
+                    <p>Learn more at <a href="https://gettoytap.com" target="_blank" rel="noopener noreferrer" class="text-primary hover:underline">gettoytap.com</a>.</p>
+                    <p>ToyTap is built on <a href="https://snaptapqr.com" target="_blank" rel="noopener noreferrer" class="text-primary hover:underline">SnapTapQR</a>, the complete QR engagement platform for local businesses. SnapTapQR provides customizable hub pages, review collection, missed call text-back, and more for businesses across industries including play spaces, restaurants, salons, contractors, and auto shops.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Affiliate Disclosure Section -->
+        <section class="max-w-4xl mx-auto px-4 mb-12">
+            <div class="glass-panel rounded-2xl p-6 md:p-8">
+                <div class="flex items-center gap-3 mb-4">
+                    <span class="material-symbols-outlined text-primary text-3xl">handshake</span>
+                    <h2 class="text-2xl font-bold">Affiliate Disclosure</h2>
+                </div>
+                <div class="text-white/70 space-y-4 leading-relaxed">
+                    <p>As an Amazon Associate, Toy Tap earns from qualifying purchases. When you click a product link on our site and make a purchase on Amazon, we may receive a small commission at no additional cost to you. This is how we fund the service and keep it free for everyone.</p>
+                    <p>Our TT Grade ratings are algorithmically generated and not influenced by affiliate relationships. A toy that generates higher affiliate commissions does not receive a higher grade. Our scoring is based entirely on publicly available data: customer reviews, star ratings, price history, and deal quality. We believe transparency about our business model builds trust, and we want you to feel confident that our recommendations are based on data, not revenue incentives.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA -->
+        <section class="max-w-4xl mx-auto px-4 mb-16">
+            <div class="glass-panel rounded-2xl p-8 text-center">
+                <h2 class="text-2xl font-bold mb-3">Start Finding Better Deals</h2>
+                <p class="text-white/60 mb-6">Browse 20,000+ toys with price tracking, TT Grade ratings, and real-time deal alerts.</p>
+                <div class="flex flex-wrap items-center justify-center gap-4">
+                    <a href="/" class="bg-primary text-navy-deep px-8 py-3 rounded-xl font-bold hover:brightness-110 transition-all">Browse All Toys</a>
+                    <a href="/rankings" class="bg-white/5 hover:bg-white/10 border border-white/10 text-white px-8 py-3 rounded-xl font-bold transition-all">View Rankings</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-navy-deep border-t border-primary/10 py-8 px-4">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-2">
+                <img src="https://i.imgur.com/HXSawxU.png" alt="Toy Tap" class="h-6 w-6" />
+                <span class="text-sm text-white/50">Toy Tap &copy; 2026</span>
+            </div>
+            <div class="flex items-center gap-6 text-sm text-white/50">
+                <a href="/rankings" class="hover:text-primary transition-colors">Rankings</a>
+                <a href="/categories" class="hover:text-primary transition-colors">Categories</a>
+                <a href="/brands" class="hover:text-primary transition-colors">Brands</a>
+                <a href="/blog" class="hover:text-primary transition-colors">Blog</a>
+                <a href="/how-tt-grade-works" class="hover:text-primary transition-colors">How TT Grade Works</a>
+                <a href="/about" class="hover:text-primary transition-colors">About</a>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

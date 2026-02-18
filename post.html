@@ -5,6 +5,26 @@
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
     <title id="page-title">Blog Post - Toy Tap</title>
     <meta name="description" id="page-desc" content="Read this article on Toy Tap." />
+    <link rel="canonical" id="page-canonical" href="https://dashboard.gettoytap.com/post" />
+    <meta property="og:type" content="article" />
+    <meta property="og:url" id="og-url" content="https://dashboard.gettoytap.com/post" />
+    <meta property="og:title" id="og-title" content="Blog Post - Toy Tap" />
+    <meta property="og:description" id="og-desc" content="Read this article on Toy Tap." />
+    <meta property="og:image" id="og-image" content="https://i.imgur.com/HXSawxU.png" />
+    <script type="application/ld+json" id="article-schema">
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "Blog Post",
+      "description": "Read this article on Toy Tap.",
+      "url": "https://dashboard.gettoytap.com/post",
+      "publisher": {
+        "@type": "Organization",
+        "name": "Toy Tap",
+        "url": "https://dashboard.gettoytap.com"
+      }
+    }
+    </script>
     <link rel="icon" type="image/png" href="https://i.imgur.com/HXSawxU.png" />
     <!-- Preconnect for faster resource loading -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -242,6 +262,32 @@
 
         async function renderPost(post) {
             document.getElementById('page-title').textContent = post.title + ' - Toy Tap';
+
+            // Dynamic SEO meta tags
+            const slug = new URLSearchParams(window.location.search).get('slug') || '';
+            const canonicalUrl = `https://dashboard.gettoytap.com/post?slug=${slug}`;
+            document.getElementById('page-canonical').href = canonicalUrl;
+            document.getElementById('page-desc').content = post.intro_text || post.title;
+            document.getElementById('og-url').content = canonicalUrl;
+            document.getElementById('og-title').content = post.title + ' - Toy Tap';
+            document.getElementById('og-desc').content = post.intro_text || post.title;
+
+            // Article JSON-LD schema
+            const articleSchema = {
+                "@context": "https://schema.org",
+                "@type": "Article",
+                "headline": post.title,
+                "description": post.intro_text || post.title,
+                "url": canonicalUrl,
+                "datePublished": post.created_at || new Date().toISOString(),
+                "publisher": {
+                    "@type": "Organization",
+                    "name": "Toy Tap",
+                    "url": "https://dashboard.gettoytap.com"
+                }
+            };
+            document.getElementById('article-schema').textContent = JSON.stringify(articleSchema);
+
             document.getElementById('post-title').textContent = post.title;
             document.getElementById('post-category').textContent = post.category || 'Featured';
             document.getElementById('post-intro').textContent = post.intro_text || '';
