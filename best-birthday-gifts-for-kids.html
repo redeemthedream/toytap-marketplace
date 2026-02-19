@@ -426,10 +426,10 @@
 
         document.addEventListener('DOMContentLoaded', async function() {
             var ageGroups = [
-                { gridId: 'grid-toddler', url: API_BASE + '/toys/age/1-3%20years?sort=score&limit=5' },
-                { gridId: 'grid-preschool', url: API_BASE + '/toys/age/3-5%20years?sort=score&limit=5' },
-                { gridId: 'grid-kids', url: API_BASE + '/toys/age/5-7%20years?sort=score&limit=5' },
-                { gridId: 'grid-tweens', url: API_BASE + '/toys/age/8-12%20years?sort=score&limit=5' }
+                { gridId: 'grid-toddler', url: API_BASE + '/toys/age/toddler?sort=toy_tap_rank&limit=5' },
+                { gridId: 'grid-preschool', url: API_BASE + '/toys/age/preschool?sort=toy_tap_rank&limit=5' },
+                { gridId: 'grid-kids', url: API_BASE + '/toys/age/kids?sort=toy_tap_rank&limit=5' },
+                { gridId: 'grid-tweens', url: API_BASE + '/toys/age/tweens?sort=toy_tap_rank&limit=5' }
             ];
 
             var fetches = ageGroups.map(function(group) {

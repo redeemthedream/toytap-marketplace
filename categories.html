@@ -432,7 +432,7 @@ const CATEGORIES = {
         icon: '&#128663;',
         subcategories: ['Cars & Trucks', 'Trains & Railways', 'Ride On Cars', 'Remote Control', 'Airplanes & Helicopters']
     },
-    'Outdoor & Sports': {
+    'Outdoor Play': {
         icon: '&#127966;',
         subcategories: ['Swing Sets', 'Playsets', 'Sand & Water', 'Sports', 'Bikes & Scooters', 'Trampolines']
     },
@@ -440,7 +440,7 @@ const CATEGORIES = {
         icon: '&#128118;',
         subcategories: ['Baby Toys', 'Toddler Toys', 'Bath Toys', 'Sensory Toys', 'Teethers & Rattles']
     },
-    'Educational': {
+    'Educational & Learning': {
         icon: '&#127891;',
         subcategories: ['STEM Toys', 'Montessori', 'Learning Games', 'Science Kits', 'Coding Toys']
     },
@@ -456,27 +456,23 @@ const CATEGORIES = {
         icon: '&#129513;',
         subcategories: ['Puzzles', 'Board Games', 'Card Games', 'Strategy Games', 'Family Games']
     },
-    'Dolls & Accessories': {
+    'Dolls & Plush': {
         icon: '&#129528;',
         subcategories: ['Dolls', 'Stuffed Animals', 'Doll Accessories', 'Barbie', 'Baby Dolls']
     },
-    'Electronics': {
+    'Electronics & Tech': {
         icon: '&#129302;',
         subcategories: ['Interactive Toys', 'Musical Toys', 'Tablets & Computers', 'Robots', 'Drones']
-    },
-    'Action Figures': {
-        icon: '&#129464;',
-        subcategories: ['Action Figures', 'Playsets', 'Collectibles', 'Superheroes', 'Dinosaurs']
     }
 };
 
 // Age group mappings
 const AGE_GROUPS = {
-    'Baby': { label: 'Baby (0-12 months)', icon: '&#128118;', apiValue: '0-12 months' },
-    'Toddler': { label: 'Toddler (1-3 years)', icon: '&#128103;', apiValue: '1-3 years' },
-    'Preschool': { label: 'Preschool (3-5 years)', icon: '&#128102;', apiValue: '3-5 years' },
-    'Kids': { label: 'Kids (5-7 years)', icon: '&#129490;', apiValue: '5-7 years' },
-    'Tweens': { label: 'Tweens (8-12 years)', icon: '&#128526;', apiValue: '8-12 years' }
+    'Baby': { label: 'Baby (0-12 months)', icon: '&#128118;', apiValue: 'baby' },
+    'Toddler': { label: 'Toddler (1-3 years)', icon: '&#128103;', apiValue: 'toddler' },
+    'Preschool': { label: 'Preschool (3-5 years)', icon: '&#128102;', apiValue: 'preschool' },
+    'Kids': { label: 'Kids (5-7 years)', icon: '&#129490;', apiValue: 'kids' },
+    'Tweens': { label: 'Tweens (8-12 years)', icon: '&#128526;', apiValue: 'tweens' }
 };
 
 // State
@@ -487,8 +483,8 @@ let toys = [];
 let ageToys = [];
 let visibleCount = 24;
 let ageVisibleCount = 24;
-let currentSort = 'score';
-let currentAgeSort = 'score';
+let currentSort = 'toy_tap_rank';
+let currentAgeSort = 'toy_tap_rank';
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
@@ -522,7 +518,7 @@ async function selectCategory(name) {
     currentSubcategory = null;
     currentAge = null;
     visibleCount = 24;
-    currentSort = 'score';
+    currentSort = 'toy_tap_rank';
 
     const cat = CATEGORIES[name];
 
@@ -622,7 +618,7 @@ async function selectAge(age) {
     currentCategory = null;
     currentSubcategory = null;
     ageVisibleCount = 24;
-    currentAgeSort = 'score';
+    currentAgeSort = 'toy_tap_rank';
 
     const ageData = AGE_GROUPS[age];
 

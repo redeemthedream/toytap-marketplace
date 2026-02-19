@@ -407,7 +407,7 @@
                 grid.innerHTML += '<div class="glass-card rounded-2xl p-4 animate-pulse"><div class="skeleton rounded-xl w-full h-48 mb-4"></div><div class="skeleton h-3 rounded w-16 mb-2"></div><div class="skeleton h-4 rounded w-full mb-2"></div><div class="skeleton h-4 rounded w-3/4 mb-3"></div><div class="skeleton h-6 rounded w-20"></div></div>';
             }
 
-            fetch(API_BASE + '/toys/category/Building%20%26%20Construction?sort=score&limit=20')
+            fetch(API_BASE + '/toys/category/Building%20%26%20Construction?sort=toy_tap_rank&limit=20')
                 .then(function(res) {
                     if (!res.ok) throw new Error('API Error ' + res.status);
                     return res.json();

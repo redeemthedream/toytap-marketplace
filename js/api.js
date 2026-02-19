@@ -24,7 +24,7 @@ async function fetchLeaderboard(limit = 100) {
     return data.toys || data || [];
 }
 
-async function fetchByCategory(category, subcategory = null, sort = 'score', limit = 100) {
+async function fetchByCategory(category, subcategory = null, sort = 'toy_tap_rank', limit = 100) {
     const cat = encodeURIComponent(category);
     let data;
     if (subcategory) {
@@ -36,11 +36,11 @@ async function fetchByCategory(category, subcategory = null, sort = 'score', lim
     return data.toys || data || [];
 }
 
-async function fetchByAge(age, sort = 'score', limit = 100) {
+async function fetchByAge(age, sort = 'toy_tap_rank', limit = 100) {
     return fetchToys(`/toys/age/${age}?sort=${sort}&limit=${limit}`);
 }
 
-async function fetchByBrand(brand, sort = 'score', limit = 50) {
+async function fetchByBrand(brand, sort = 'toy_tap_rank', limit = 50) {
     const data = await fetchToys(`/toys/brand/${encodeURIComponent(brand)}?sort=${sort}&limit=${limit}`);
     return data.toys || data || [];
 }

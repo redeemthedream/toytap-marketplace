@@ -358,7 +358,7 @@
 
         document.addEventListener('DOMContentLoaded', async function() {
             try {
-                var response = await fetch(API_BASE + '/toys/category/Outdoor%20%26%20Sports?sort=score&limit=20');
+                var response = await fetch(API_BASE + '/toys/category/Outdoor%20Play?sort=toy_tap_rank&limit=20');
                 var data = await response.json();
                 var toys = data.toys || data || [];
 

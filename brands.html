@@ -322,7 +322,7 @@
         let brandToys = [];
         let filteredToys = [];
         let visibleCount = 24;
-        let currentSort = 'score';
+        let currentSort = 'toy_tap_rank';
         let currentFilter = 'hot';
 
         // Non-toy keywords to filter out
@@ -388,7 +388,7 @@
         async function selectBrand(brandName) {
             currentBrand = brandName;
             visibleCount = 24;
-            currentSort = 'score';
+            currentSort = 'toy_tap_rank';
             currentFilter = 'hot';
 
             // Reset filter tabs
