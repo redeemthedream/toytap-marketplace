@@ -407,13 +407,13 @@
                 grid.innerHTML += '<div class="glass-card rounded-2xl p-4 animate-pulse"><div class="skeleton rounded-xl w-full h-48 mb-4"></div><div class="skeleton h-3 rounded w-16 mb-2"></div><div class="skeleton h-4 rounded w-full mb-2"></div><div class="skeleton h-4 rounded w-3/4 mb-3"></div><div class="skeleton h-6 rounded w-20"></div></div>';
             }
 
-            fetch(API_BASE + '/api/marketplace/toys?limit=20&sort=tt_grade&category=building')
+            fetch(API_BASE + '/toys/category/Building%20%26%20Construction?sort=score&limit=20')
                 .then(function(res) {
                     if (!res.ok) throw new Error('API Error ' + res.status);
                     return res.json();
                 })
                 .then(function(data) {
-                    var toys = data.toys || [];
+                    var toys = data.toys || data || [];
                     if (toys.length === 0) {
                         grid.innerHTML = '<div class="col-span-full text-center py-16"><p class="text-white/50 text-lg">No building toys found right now. Check back soon.</p></div>';
                         return;

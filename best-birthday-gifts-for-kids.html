@@ -426,17 +426,17 @@
 
         document.addEventListener('DOMContentLoaded', async function() {
             var ageGroups = [
-                { gridId: 'grid-toddler', url: API_BASE + '/api/marketplace/toys?limit=5&sort=tt_grade&age_min=1&age_max=3' },
-                { gridId: 'grid-preschool', url: API_BASE + '/api/marketplace/toys?limit=5&sort=tt_grade&age_min=3&age_max=5' },
-                { gridId: 'grid-kids', url: API_BASE + '/api/marketplace/toys?limit=5&sort=tt_grade&age_min=5&age_max=8' },
-                { gridId: 'grid-tweens', url: API_BASE + '/api/marketplace/toys?limit=5&sort=tt_grade&age_min=8&age_max=12' }
+                { gridId: 'grid-toddler', url: API_BASE + '/toys/age/1-3%20years?sort=score&limit=5' },
+                { gridId: 'grid-preschool', url: API_BASE + '/toys/age/3-5%20years?sort=score&limit=5' },
+                { gridId: 'grid-kids', url: API_BASE + '/toys/age/5-7%20years?sort=score&limit=5' },
+                { gridId: 'grid-tweens', url: API_BASE + '/toys/age/8-12%20years?sort=score&limit=5' }
             ];
 
             var fetches = ageGroups.map(function(group) {
                 return fetch(group.url)
                     .then(function(res) { return res.json(); })
                     .then(function(data) {
-                        renderAgeSection(group.gridId, data.toys || []);
+                        renderAgeSection(group.gridId, data.toys || data || []);
                     })
                     .catch(function(err) {
                         console.error('Load error for ' + group.gridId + ':', err);

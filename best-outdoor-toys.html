@@ -358,9 +358,9 @@
 
         document.addEventListener('DOMContentLoaded', async function() {
             try {
-                var response = await fetch(API_BASE + '/api/marketplace/toys?limit=20&sort=tt_grade&category=outdoor');
+                var response = await fetch(API_BASE + '/toys/category/Outdoor%20%26%20Sports?sort=score&limit=20');
                 var data = await response.json();
-                var toys = data.toys || [];
+                var toys = data.toys || data || [];
 
                 if (toys.length === 0) {
                     document.getElementById('toy-grid').innerHTML = '<div class="col-span-full text-center py-20 text-white/50">No outdoor toys found at this time. Check back soon.</div>';

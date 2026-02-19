@@ -407,13 +407,13 @@
                 grid.innerHTML += '<div class="glass-card rounded-2xl p-4 animate-pulse"><div class="skeleton rounded-xl w-full h-48 mb-4"></div><div class="skeleton h-3 rounded w-16 mb-2"></div><div class="skeleton h-4 rounded w-full mb-2"></div><div class="skeleton h-4 rounded w-3/4 mb-3"></div><div class="skeleton h-6 rounded w-20"></div></div>';
             }
 
-            fetch(API_BASE + '/api/marketplace/toys?limit=20&sort=tt_grade&age_min=5&age_max=8')
+            fetch(API_BASE + '/toys/age/5-7%20years?sort=score&limit=20')
                 .then(function(res) {
                     if (!res.ok) throw new Error('API Error ' + res.status);
                     return res.json();
                 })
                 .then(function(data) {
-                    var toys = data.toys || [];
+                    var toys = data.toys || data || [];
                     if (toys.length === 0) {
                         grid.innerHTML = '<div class="col-span-full text-center py-16"><p class="text-white/50 text-lg">No toys found for this age group right now. Check back soon.</p></div>';
                         return;
